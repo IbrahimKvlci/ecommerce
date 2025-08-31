@@ -1,5 +1,6 @@
 package com.ibrahimkvlci.ecommerce.catalog.dto;
 
+import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,8 +35,8 @@ public class ProductDTO {
     /**
      * Convert DTO to entity
      */
-    public com.ibrahimkvlci.ecommerce.catalog.models.Product toEntity() {
-        com.ibrahimkvlci.ecommerce.catalog.models.Product product = new com.ibrahimkvlci.ecommerce.catalog.models.Product();
+    public Product toEntity() {
+        Product product = new Product();
         product.setId(this.id);
         product.setTitle(this.title);
         product.setDescription(this.description);
@@ -46,7 +47,7 @@ public class ProductDTO {
     /**
      * Create DTO from entity
      */
-    public static ProductDTO fromEntity(com.ibrahimkvlci.ecommerce.catalog.models.Product product) {
+    public static ProductDTO fromEntity(Product product) {
         ProductDTO dto = new ProductDTO();
         dto.setId(product.getId());
         dto.setTitle(product.getTitle());
