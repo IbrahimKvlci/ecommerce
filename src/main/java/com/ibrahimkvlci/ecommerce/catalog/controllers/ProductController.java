@@ -66,13 +66,9 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, 
                                                  @Valid @RequestBody ProductDTO productDTO) {
-        try {
-            Product updatedProduct = productService.updateProduct(id, productDTO.toEntity());
-            ProductDTO updatedDTO = ProductDTO.fromEntity(updatedProduct);
-            return ResponseEntity.ok(updatedDTO);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        Product updatedProduct = productService.updateProduct(id, productDTO.toEntity());
+        ProductDTO updatedDTO = ProductDTO.fromEntity(updatedProduct);
+        return ResponseEntity.ok(updatedDTO);
     }
     
     /**
@@ -80,12 +76,8 @@ public class ProductController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        try {
-            productService.deleteProduct(id);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
     
     /**
@@ -93,15 +85,11 @@ public class ProductController {
      */
     @GetMapping("/search/title")
     public ResponseEntity<List<ProductDTO>> searchProductsByTitle(@RequestParam String title) {
-        try {
-            List<Product> products = productService.searchProductsByTitle(title);
-            List<ProductDTO> productDTOs = products.stream()
-                    .map(ProductDTO::fromEntity)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(productDTOs);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        List<Product> products = productService.searchProductsByTitle(title);
+        List<ProductDTO> productDTOs = products.stream()
+                .map(ProductDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(productDTOs);
     }
     
     /**
@@ -109,15 +97,11 @@ public class ProductController {
      */
     @GetMapping("/search/description")
     public ResponseEntity<List<ProductDTO>> searchProductsByDescription(@RequestParam String keyword) {
-        try {
-            List<Product> products = productService.searchProductsByDescription(keyword);
-            List<ProductDTO> productDTOs = products.stream()
-                    .map(ProductDTO::fromEntity)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(productDTOs);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        List<Product> products = productService.searchProductsByDescription(keyword);
+        List<ProductDTO> productDTOs = products.stream()
+                .map(ProductDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(productDTOs);
     }
     
     /**
@@ -127,15 +111,11 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> getProductsByPriceRange(
             @RequestParam double minPrice, 
             @RequestParam double maxPrice) {
-        try {
-            List<Product> products = productService.getProductsByPriceRange(minPrice, maxPrice);
-            List<ProductDTO> productDTOs = products.stream()
-                    .map(ProductDTO::fromEntity)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(productDTOs);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        List<Product> products = productService.getProductsByPriceRange(minPrice, maxPrice);
+        List<ProductDTO> productDTOs = products.stream()
+                .map(ProductDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(productDTOs);
     }
     
     /**
@@ -143,15 +123,11 @@ public class ProductController {
      */
     @GetMapping("/search/max-price")
     public ResponseEntity<List<ProductDTO>> getProductsByMaxPrice(@RequestParam double maxPrice) {
-        try {
-            List<Product> products = productService.getProductsByMaxPrice(maxPrice);
-            List<ProductDTO> productDTOs = products.stream()
-                    .map(ProductDTO::fromEntity)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(productDTOs);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        List<Product> products = productService.getProductsByMaxPrice(maxPrice);
+        List<ProductDTO> productDTOs = products.stream()
+                .map(ProductDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(productDTOs);
     }
     
     /**
@@ -159,14 +135,10 @@ public class ProductController {
      */
     @GetMapping("/search/min-price")
     public ResponseEntity<List<ProductDTO>> getProductsByMinPrice(@RequestParam double minPrice) {
-        try {
-            List<Product> products = productService.getProductsByMinPrice(minPrice);
-            List<ProductDTO> productDTOs = products.stream()
-                    .map(ProductDTO::fromEntity)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(productDTOs);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        List<Product> products = productService.getProductsByMinPrice(minPrice);
+        List<ProductDTO> productDTOs = products.stream()
+                .map(ProductDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(productDTOs);
     }
 }
