@@ -2,6 +2,8 @@ package com.ibrahimkvlci.ecommerce.catalog.controllers;
 
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.ProductNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.ProductValidationException;
+import com.ibrahimkvlci.ecommerce.catalog.exceptions.CategoryNotFoundException;
+import com.ibrahimkvlci.ecommerce.catalog.exceptions.CategoryValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -43,6 +45,38 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProductValidationException.class)
     public ResponseEntity<ErrorResponse> handleProductValidationException(
             ProductValidationException ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation Error",
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handle CategoryNotFoundException
+     */
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCategoryNotFoundException(
+            CategoryNotFoundException ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Category Not Found",
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Handle CategoryValidationException
+     */
+    @ExceptionHandler(CategoryValidationException.class)
+    public ResponseEntity<ErrorResponse> handleCategoryValidationException(
+            CategoryValidationException ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),

@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.services;
 
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
+import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,4 +62,14 @@ public interface ProductService {
      * Check if product exists by title
      */
     boolean productExistsByTitle(String title);
+    
+    /**
+     * Get products by category
+     */
+    List<Product> getProductsByCategory(Category category);
+    
+    /**
+     * Get products by category ID
+     */
+    List<Product> getProductsByCategoryId(Long categoryId);
 }

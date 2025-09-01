@@ -1,8 +1,11 @@
 package com.ibrahimkvlci.ecommerce.catalog.services;
 
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
+import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,14 +14,11 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
     
-    @Autowired
-    public ProductServiceImpl(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
     
     @Override
     public Product createProduct(Product product) {
@@ -40,11 +40,13 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
     
     @Override
+    @Transactional(readOnly = true)
     public Optional<Product> getProductById(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Product ID must be a positive number");
@@ -105,6 +107,7 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<Product> searchProductsByTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Search title cannot be null or empty");
@@ -113,6 +116,7 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<Product> getProductsByPriceRange(double minPrice, double maxPrice) {
         if (minPrice < 0 || maxPrice < 0) {
             throw new IllegalArgumentException("Prices cannot be negative");
@@ -126,6 +130,7 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<Product> getProductsByMaxPrice(double maxPrice) {
         if (maxPrice < 0) {
             throw new IllegalArgumentException("Maximum price cannot be negative");
@@ -134,6 +139,7 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<Product> getProductsByMinPrice(double minPrice) {
         if (minPrice < 0) {
             throw new IllegalArgumentException("Minimum price cannot be negative");
@@ -142,6 +148,7 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<Product> searchProductsByDescription(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             throw new IllegalArgumentException("Search keyword cannot be null or empty");
@@ -150,10 +157,29 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public boolean productExistsByTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             return false;
         }
         return productRepository.existsByTitle(title.trim());
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Product> getProductsByCategory(Category category) {
+        if (category == null) {
+            throw new IllegalArgumentException("Category cannot be null");
+        }
+        return productRepository.findByCategory(category);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Product> getProductsByCategoryId(Long categoryId) {
+        if (categoryId == null || categoryId <= 0) {
+            throw new IllegalArgumentException("Category ID must be a positive number");
+        }
+        return productRepository.findByCategoryId(categoryId);
     }
 }

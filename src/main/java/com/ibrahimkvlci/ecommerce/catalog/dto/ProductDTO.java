@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.dto;
 
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
+import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,6 +33,9 @@ public class ProductDTO {
     @Positive(message = "Product price must be positive")
     private Double price;
     
+    @NotNull(message = "Category is required")
+    private Long categoryId;
+    
     /**
      * Convert DTO to entity
      */
@@ -41,6 +45,11 @@ public class ProductDTO {
         product.setTitle(this.title);
         product.setDescription(this.description);
         product.setPrice(this.price);
+        if (this.categoryId != null) {
+            Category category = new Category();
+            category.setId(this.categoryId);
+            product.setCategory(category);
+        }
         return product;
     }
     
@@ -53,6 +62,9 @@ public class ProductDTO {
         dto.setTitle(product.getTitle());
         dto.setDescription(product.getDescription());
         dto.setPrice(product.getPrice());
+        if (product.getCategory() != null) {
+            dto.setCategoryId(product.getCategory().getId());
+        }
         return dto;
     }
 }

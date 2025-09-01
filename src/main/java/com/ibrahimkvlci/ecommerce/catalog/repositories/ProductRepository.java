@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.repositories;
 
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
+import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -38,5 +39,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      * Check if product exists by title
      */
     boolean existsByTitle(String title);
+    
+    /**
+     * Find products by category
+     */
+    List<Product> findByCategory(Category category);
+    
+    /**
+     * Find products by category ID
+     */
+    List<Product> findByCategoryId(Long categoryId);
 
 }
