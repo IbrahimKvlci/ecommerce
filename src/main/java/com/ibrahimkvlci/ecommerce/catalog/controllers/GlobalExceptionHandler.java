@@ -4,6 +4,9 @@ import com.ibrahimkvlci.ecommerce.catalog.exceptions.ProductNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.ProductValidationException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.CategoryNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.CategoryValidationException;
+import com.ibrahimkvlci.ecommerce.catalog.exceptions.BrandNotFoundException;
+import com.ibrahimkvlci.ecommerce.catalog.exceptions.BrandValidationException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -55,6 +58,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+
+
     /**
      * Handle CategoryNotFoundException
      */
@@ -77,6 +82,38 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CategoryValidationException.class)
     public ResponseEntity<ErrorResponse> handleCategoryValidationException(
             CategoryValidationException ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation Error",
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handle BrandNotFoundException
+     */
+    @ExceptionHandler(BrandNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleBrandNotFoundException(
+            BrandNotFoundException ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Brand Not Found",
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Handle BrandValidationException
+     */
+    @ExceptionHandler(BrandValidationException.class)
+    public ResponseEntity<ErrorResponse> handleBrandValidationException(
+            BrandValidationException ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),

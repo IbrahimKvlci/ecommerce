@@ -153,4 +153,17 @@ public class ProductController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
+
+    /**
+     * Get products by brand
+     */
+    @GetMapping("/brand/{brandId}")
+    public ResponseEntity<List<ProductDTO>> getProductsByBrandId(@PathVariable Long brandId) {
+        List<Product> products = productService.getProductsByBrandId(brandId);
+        List<ProductDTO> productDTOs = products.stream()
+                .map(ProductDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(productDTOs);
+    }
+    
 }

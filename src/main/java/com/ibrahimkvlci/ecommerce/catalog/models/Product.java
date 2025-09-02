@@ -37,4 +37,10 @@ public class Product {
     @JoinColumn(name = "category_id")
     @NotNull(message = "Category is required")
     private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    @NotNull(message = "Brand is required")
+    private Brand brand;
+
 }

@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.services;
 
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
+import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 
 import java.util.List;
@@ -72,4 +73,14 @@ public interface ProductService {
      * Get products by category ID
      */
     List<Product> getProductsByCategoryId(Long categoryId);
+
+    /**
+     * Get products by brand
+     */
+    List<Product> getProductsByBrand(Brand brand);
+    
+    /**
+     * Get products by brand ID
+     */
+    List<Product> getProductsByBrandId(Long brandId);
 }

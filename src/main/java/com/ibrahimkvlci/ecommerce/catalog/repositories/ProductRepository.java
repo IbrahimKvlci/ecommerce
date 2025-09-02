@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.repositories;
 
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
+import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -49,5 +50,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      * Find products by category ID
      */
     List<Product> findByCategoryId(Long categoryId);
+
+    /**
+     * Find products by brand
+     */
+    List<Product> findByBrand(Brand brand);
+    
+    /**
+     * Find products by brand ID
+     */
+    List<Product> findByBrandId(Long brandId);
 
 }

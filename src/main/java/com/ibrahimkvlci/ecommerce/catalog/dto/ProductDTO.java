@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.dto;
 
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
+import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,6 +36,9 @@ public class ProductDTO {
     
     @NotNull(message = "Category is required")
     private Long categoryId;
+
+    @NotNull(message = "Brand is required")
+    private Long brandId;
     
     /**
      * Convert DTO to entity
@@ -50,6 +54,11 @@ public class ProductDTO {
             category.setId(this.categoryId);
             product.setCategory(category);
         }
+        if (this.brandId != null) {
+            Brand brand = new Brand();
+            brand.setId(this.brandId);
+            product.setBrand(brand);
+        }
         return product;
     }
     
@@ -64,6 +73,9 @@ public class ProductDTO {
         dto.setPrice(product.getPrice());
         if (product.getCategory() != null) {
             dto.setCategoryId(product.getCategory().getId());
+        }
+        if (product.getBrand() != null) {
+            dto.setBrandId(product.getBrand().getId());
         }
         return dto;
     }

@@ -1,7 +1,10 @@
 package com.ibrahimkvlci.ecommerce.catalog.services;
 
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
+import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
+import com.ibrahimkvlci.ecommerce.catalog.repositories.BrandRepository;
+import com.ibrahimkvlci.ecommerce.catalog.repositories.CategoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,8 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
+    private final BrandRepository brandRepository;
+    private final CategoryRepository categoryRepository;
     
     
     @Override
@@ -35,8 +40,16 @@ public class ProductServiceImpl implements ProductService {
         if (productExistsByTitle(product.getTitle())) {
             throw new IllegalArgumentException("Product with title '" + product.getTitle() + "' already exists");
         }
-        
-        return productRepository.save(product);
+
+        if(brandRepository.findById(product.getBrand().getId()).isEmpty()) {
+            throw new IllegalArgumentException("Brand with ID " + product.getBrand().getId() + " not found");
+        }
+        if(categoryRepository.findById(product.getCategory().getId()).isEmpty()) {
+            throw new IllegalArgumentException("Category with ID " + product.getCategory().getId() + " not found");
+        }
+
+        return productRepository.save(product);            
+
     }
     
     @Override
@@ -181,5 +194,23 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Category ID must be a positive number");
         }
         return productRepository.findByCategoryId(categoryId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Product> getProductsByBrand(Brand brand) {
+        if (brand == null) {
+            throw new IllegalArgumentException("Brand cannot be null");
+        }
+        return productRepository.findByBrand(brand);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Product> getProductsByBrandId(Long brandId) {
+        if (brandId == null || brandId <= 0) {
+            throw new IllegalArgumentException("Brand ID must be a positive number");
+        }
+        return productRepository.findByBrandId(brandId);
     }
 }
