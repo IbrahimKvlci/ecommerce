@@ -23,7 +23,7 @@ public class BrandController {
     @PostMapping
     public ResponseEntity<BrandDTO> createBrand(@Valid @RequestBody BrandDTO brandDTO) {
         log.info("Creating new brand: {}", brandDTO.getName());
-        BrandDTO created = brandService.createBrand(brandDTO);
+        BrandDTO created = brandService.createBrand(brandDTO.toEntity());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -47,7 +47,7 @@ public class BrandController {
 
     @PutMapping("/{id}")
     public ResponseEntity<BrandDTO> updateBrand(@PathVariable Long id, @Valid @RequestBody BrandDTO brandDTO) {
-        BrandDTO updated = brandService.updateBrand(id, brandDTO);
+        BrandDTO updated = brandService.updateBrand(id, brandDTO.toEntity());
         return ResponseEntity.ok(updated);
     }
 

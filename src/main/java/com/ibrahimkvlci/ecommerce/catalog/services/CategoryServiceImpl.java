@@ -23,15 +23,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     
     @Override
-    public CategoryDTO createCategory(CategoryDTO categoryDTO) {
-        log.info("Creating new category: {}", categoryDTO.getName());
+    public CategoryDTO createCategory(Category category) {
+        log.info("Creating new category: {}", category.getName());
         
         // Check if category with same name already exists
-        if (categoryRepository.existsByNameIgnoreCase(categoryDTO.getName())) {
-            throw new CategoryValidationException("Category with name '" + categoryDTO.getName() + "' already exists");
+        if (categoryRepository.existsByNameIgnoreCase(category.getName())) {
+            throw new CategoryValidationException("Category with name '" + category.getName() + "' already exists");
         }
         
-        Category category = categoryDTO.toEntity();
         Category savedCategory = categoryRepository.save(category);
         
         log.info("Category created successfully with ID: {}", savedCategory.getId());
@@ -42,10 +41,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public List<CategoryDTO> getAllCategories() {
         log.info("Retrieving all categories");
-        return categoryRepository.findAll()
-                .stream()
-                .map(CategoryDTO::fromEntity)
-                .collect(Collectors.toList());
+        return categoryRepository.findAll().stream().map(CategoryDTO::fromEntity).collect(Collectors.toList());
     }
     
     @Override
@@ -67,19 +63,19 @@ public class CategoryServiceImpl implements CategoryService {
     }
     
     @Override
-    public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) {
+    public CategoryDTO updateCategory(Long id, Category category) {
         log.info("Updating category with ID: {}", id);
         
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with ID: " + id));
         
         // Check if another category with the same name exists (excluding current category)
-        if (!existingCategory.getName().equalsIgnoreCase(categoryDTO.getName()) 
-            && categoryRepository.existsByNameIgnoreCase(categoryDTO.getName())) {
-            throw new CategoryValidationException("Category with name '" + categoryDTO.getName() + "' already exists");
+        if (!existingCategory.getName().equalsIgnoreCase(category.getName()) 
+            && categoryRepository.existsByNameIgnoreCase(category.getName())) {
+            throw new CategoryValidationException("Category with name '" + category.getName() + "' already exists");
         }
         
-        existingCategory.setName(categoryDTO.getName());
+        existingCategory.setName(category.getName());
         
         Category updatedCategory = categoryRepository.save(existingCategory);
         
@@ -103,10 +99,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public List<CategoryDTO> searchCategoriesByName(String name) {
         log.info("Searching categories by name: {}", name);
-        return categoryRepository.findByNameContainingIgnoreCase(name)
-                .stream()
-                .map(CategoryDTO::fromEntity)
-                .collect(Collectors.toList());
+        return categoryRepository.findByNameContainingIgnoreCase(name).stream().map(CategoryDTO::fromEntity).collect(Collectors.toList());
     }
 
     @Override

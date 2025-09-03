@@ -22,14 +22,13 @@ public class BrandServiceImpl implements BrandService {
     private final BrandRepository brandRepository;
 
     @Override
-    public BrandDTO createBrand(BrandDTO brandDTO) {
-        log.info("Creating new brand: {}", brandDTO.getName());
+    public BrandDTO createBrand(Brand brand) {
+        log.info("Creating new brand: {}", brand.getName());
 
-        if (brandRepository.existsByNameIgnoreCase(brandDTO.getName())) {
-            throw new BrandValidationException("Brand with name '" + brandDTO.getName() + "' already exists");
+        if (brandRepository.existsByNameIgnoreCase(brand.getName())) {
+            throw new BrandValidationException("Brand with name '" + brand.getName() + "' already exists");
         }
 
-        Brand brand = brandDTO.toEntity();
         Brand saved = brandRepository.save(brand);
         return BrandDTO.fromEntity(saved);
     }
@@ -57,16 +56,16 @@ public class BrandServiceImpl implements BrandService {
     }
 
     @Override
-    public BrandDTO updateBrand(Long id, BrandDTO brandDTO) {
+    public BrandDTO updateBrand(Long id, Brand brand) {
         Brand existing = brandRepository.findById(id)
                 .orElseThrow(() -> new BrandNotFoundException("Brand not found with ID: " + id));
 
-        if (!existing.getName().equalsIgnoreCase(brandDTO.getName())
-                && brandRepository.existsByNameIgnoreCase(brandDTO.getName())) {
-            throw new BrandValidationException("Brand with name '" + brandDTO.getName() + "' already exists");
+        if (!existing.getName().equalsIgnoreCase(brand.getName())
+                && brandRepository.existsByNameIgnoreCase(brand.getName())) {
+            throw new BrandValidationException("Brand with name '" + brand.getName() + "' already exists");
         }
 
-        existing.setName(brandDTO.getName());
+        existing.setName(brand.getName());
         Brand updated = brandRepository.save(existing);
         return BrandDTO.fromEntity(updated);
     }
@@ -82,10 +81,7 @@ public class BrandServiceImpl implements BrandService {
     @Override
     @Transactional(readOnly = true)
     public List<BrandDTO> searchBrandsByName(String name) {
-        return brandRepository.findByNameContainingIgnoreCase(name)
-                .stream()
-                .map(BrandDTO::fromEntity)
-                .collect(Collectors.toList());
+        return brandRepository.findByNameContainingIgnoreCase(name).stream().map(BrandDTO::fromEntity).collect(Collectors.toList());
     }
 
     @Override

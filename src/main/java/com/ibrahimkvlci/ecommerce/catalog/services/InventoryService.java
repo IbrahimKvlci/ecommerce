@@ -1,12 +1,13 @@
 package com.ibrahimkvlci.ecommerce.catalog.services;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO;
+import com.ibrahimkvlci.ecommerce.catalog.models.Inventory;
 
 import java.util.List;
 
 public interface InventoryService {
 
-    InventoryDTO createInventory(InventoryDTO inventoryDTO);
+    InventoryDTO createInventory(Inventory inventory);
 
     List<InventoryDTO> getAllInventories();
 
@@ -14,7 +15,7 @@ public interface InventoryService {
 
     List<InventoryDTO> getInventoriesByProductId(Long productId);
 
-    InventoryDTO updateInventory(Long id, InventoryDTO inventoryDTO);
+    InventoryDTO updateInventory(Long id, Inventory inventory);
 
     void deleteInventory(Long id);
 }

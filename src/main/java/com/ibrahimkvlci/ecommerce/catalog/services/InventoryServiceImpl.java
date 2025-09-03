@@ -4,7 +4,6 @@ import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.InventoryNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.InventoryValidationException;
 import com.ibrahimkvlci.ecommerce.catalog.models.Inventory;
-import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.InventoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +24,11 @@ public class InventoryServiceImpl implements InventoryService {
     private final ProductRepository productRepository;
 
     @Override
-    public InventoryDTO createInventory(InventoryDTO inventoryDTO) {
-        Product product = productRepository.findById(inventoryDTO.getProductId())
-                .orElseThrow(() -> new InventoryValidationException("Product not found with ID: " + inventoryDTO.getProductId()));
+    public InventoryDTO createInventory(Inventory inventory) {
+        productRepository.findById(inventory.getProduct().getId())
+                .orElseThrow(() -> new InventoryValidationException("Product not found with ID: " + inventory.getProduct().getId()));
 
-        Inventory saved = inventoryRepository.save(inventoryDTO.toEntity(product));
+        Inventory saved = inventoryRepository.save(inventory);
         return InventoryDTO.fromEntity(saved);
     }
 
@@ -58,15 +57,15 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public InventoryDTO updateInventory(Long id, InventoryDTO inventoryDTO) {
+    public InventoryDTO updateInventory(Long id, Inventory inventory) {
         Inventory existing = inventoryRepository.findById(id)
                 .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + id));
 
-        if (!existing.getProduct().getId().equals(inventoryDTO.getProductId())) {
+        if (!existing.getProduct().getId().equals(inventory.getProduct().getId())) {
             throw new InventoryValidationException("Product ID cannot be changed for an existing inventory");
         }
 
-        existing.setQuantity(inventoryDTO.getQuantity());
+        existing.setQuantity(inventory.getQuantity());
         Inventory updated = inventoryRepository.save(existing);
         return InventoryDTO.fromEntity(updated);
     }

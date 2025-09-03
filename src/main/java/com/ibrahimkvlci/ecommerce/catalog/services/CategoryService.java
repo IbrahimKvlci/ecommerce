@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.services;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategoryDTO;
+import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface CategoryService {
     /**
      * Create a new category
      */
-    CategoryDTO createCategory(CategoryDTO categoryDTO);
+    CategoryDTO createCategory(Category category);
     
     /**
      * Get all categories
@@ -32,7 +33,7 @@ public interface CategoryService {
     /**
      * Update an existing category
      */
-    CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO);
+    CategoryDTO updateCategory(Long id, Category category);
     
     /**
      * Delete a category by ID
