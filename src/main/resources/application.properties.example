@@ -1,9 +1,9 @@
 spring.application.name=ecommerce
 
 # PostgreSQL Database Configuration
-spring.datasource.url=jdbc:postgresql://localhost:5432/ecommerce
-spring.datasource.username=postgres
-spring.datasource.password=258963
+spring.datasource.url={YOUR_DATABASE_URL}
+spring.datasource.username={YOUR_DATABASE_USERNAME}
+spring.datasource.password={YOUR_DATABASE_PASSWORD}
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 # JPA/Hibernate Configuration
@@ -16,3 +16,8 @@ spring.jpa.properties.hibernate.format_sql=true
 spring.datasource.hikari.maximum-pool-size=10
 spring.datasource.hikari.minimum-idle=5
 spring.datasource.hikari.connection-timeout=20000
+
+# JWT Configuration
+jwt.secret={YOUR_JWT_SECRET}
+jwt.expiration-time.access-token=1800000
+jwt.expiration-time.refresh-token=2592000000
