@@ -1,7 +1,6 @@
 package com.ibrahimkvlci.ecommerce.auth.dto;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -18,9 +17,9 @@ public class UserMyDetails implements UserDetails{
     public UserMyDetails(User user) {
         this.email = user.getEmail();
         this.password = user.getPasswordHash();
-        this.authorities = List.of(user.getRoles().split(","))
+        this.authorities = user.getRoles()
                 .stream()
-                .map(SimpleGrantedAuthority::new)
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .collect(Collectors.toList());
     }
 

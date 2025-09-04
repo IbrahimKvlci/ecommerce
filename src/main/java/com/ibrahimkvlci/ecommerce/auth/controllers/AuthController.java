@@ -3,6 +3,7 @@ package com.ibrahimkvlci.ecommerce.auth.controllers;
 import com.ibrahimkvlci.ecommerce.auth.dto.AuthRequest;
 import com.ibrahimkvlci.ecommerce.auth.dto.AuthResponse;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerRequest;
+import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerResponse;
 import com.ibrahimkvlci.ecommerce.auth.services.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +29,9 @@ public class AuthController {
     }
 
     @PostMapping("/register-customer")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterCustomerRequest request) {
+    public ResponseEntity<RegisterCustomerResponse> register(@Valid @RequestBody RegisterCustomerRequest request) {
         log.info("Register attempt for {}", request.getEmail());
-        AuthResponse response = authService.registerAsCustomer(request);
+        RegisterCustomerResponse response = authService.registerAsCustomer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
