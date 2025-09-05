@@ -7,16 +7,21 @@ import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerResponse;
 import com.ibrahimkvlci.ecommerce.auth.exceptions.AuthException;
 import com.ibrahimkvlci.ecommerce.auth.models.Customer;
 import com.ibrahimkvlci.ecommerce.auth.models.Role;
-import com.ibrahimkvlci.ecommerce.auth.models.User;
 import com.ibrahimkvlci.ecommerce.auth.models.Role.RoleEnum;
 import com.ibrahimkvlci.ecommerce.auth.repositories.CustomerRepository;
 import com.ibrahimkvlci.ecommerce.auth.repositories.RoleRepository;
-import com.ibrahimkvlci.ecommerce.auth.repositories.UserRepository;
+import com.ibrahimkvlci.ecommerce.auth.repositories.UserInfoRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
+import java.util.HashSet;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,22 +33,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository userRepository;
+    private final UserInfoRepository userRepository;
     private final CustomerRepository customerRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JWTService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     @Override
     public AuthResponse login(AuthRequest request) {
-        User user = userRepository.findByEmailIgnoreCaseWithRoles(request.getEmail())
-               .orElseThrow(() -> new AuthException("Invalid credentials"));
+        
+        Authentication authentication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword()));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new AuthException("Invalid credentials");
-        }
-
-        String token=jwtService.generateToken(request.getEmail());
+        String token=jwtService.generateToken((UserDetails)authentication.getPrincipal());
         return new AuthResponse(token, "Bearer");
     }
 
@@ -59,9 +61,11 @@ public class AuthServiceImpl implements AuthService {
         customer.setName(request.getName());
         customer.setSurname(request.getSurname());
         customer.setPhoneNumber(request.getPhoneNumber());
-        Role customerRole = roleRepository.findByName(RoleEnum.CUSTOMER)
+        Role customerRole = roleRepository.findByName("ROLE_CUSTOMER")
                 .orElseThrow(() -> new AuthException("Role CUSTOMER not configured"));
-        customer.setRoles(Set.of(customerRole));
+        Set<Role> roles = new HashSet<>();
+        roles.add(customerRole);
+        customer.setRoles(roles);
 
         Customer saved = customerRepository.save(customer);
 

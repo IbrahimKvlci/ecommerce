@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Customer extends User {
+public class Customer extends UserInfo {
 
     @Column(name = "name", nullable = false, length = 50)
     private String name;
