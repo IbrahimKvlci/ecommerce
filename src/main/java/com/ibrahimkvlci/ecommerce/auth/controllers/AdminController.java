@@ -2,7 +2,6 @@ package com.ibrahimkvlci.ecommerce.auth.controllers;
 
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterAdminRequest;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterAdminResponse;
-import com.ibrahimkvlci.ecommerce.auth.models.Admin;
 import com.ibrahimkvlci.ecommerce.auth.services.AdminService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

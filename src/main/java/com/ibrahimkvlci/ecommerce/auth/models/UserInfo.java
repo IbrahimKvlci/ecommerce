@@ -38,16 +38,16 @@ public class UserInfo implements UserDetails {
     private Set<Role> roles;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive=true;
+    private boolean isActive;
 
     @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted=false;
+    private boolean isDeleted;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt=LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt=LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -64,6 +64,19 @@ public class UserInfo implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    @PrePersist
+    private void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+        isActive = true;
+        isDeleted = false;
+    }
+
+    @PreUpdate
+    private void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 
 }
