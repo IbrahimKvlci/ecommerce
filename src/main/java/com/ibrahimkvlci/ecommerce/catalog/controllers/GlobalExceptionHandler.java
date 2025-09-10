@@ -11,7 +11,6 @@ import com.ibrahimkvlci.ecommerce.catalog.exceptions.InventoryValidationExceptio
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,13 +20,12 @@ import org.springframework.web.context.request.WebRequest;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import com.ibrahimkvlci.ecommerce.auth.exceptions.AuthException;
 
 /**
- * Global exception handler for all controllers.
- * Handles exceptions thrown by controllers and returns appropriate HTTP responses.
+ * Global exception handler for catalog controllers.
+ * Handles catalog-related exceptions and returns appropriate HTTP responses.
  */
-@ControllerAdvice
+@ControllerAdvice(basePackages = "com.ibrahimkvlci.ecommerce.catalog")
 public class GlobalExceptionHandler {
 
     /**
@@ -216,32 +214,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    /**
-     * Handle authentication-related exceptions
-     */
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<ErrorResponse> handleAuthException(AuthException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.UNAUTHORIZED.value(),
-                "Authentication Failed",
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
-    }
-    
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.UNAUTHORIZED.value(),
-                "Authentication Failed",
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
-    }
 
     /**
      * Handle generic Exception

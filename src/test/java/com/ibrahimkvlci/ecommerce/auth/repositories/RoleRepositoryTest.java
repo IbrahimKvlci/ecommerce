@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import com.ibrahimkvlci.ecommerce.auth.models.Role;
-import com.ibrahimkvlci.ecommerce.auth.models.Role.RoleEnum;
 
 
 @DataJpaTest
@@ -25,9 +24,9 @@ public class RoleRepositoryTest {
         //Role role = new Role();
         //role.setName("ADMIN");
         //roleRepository.save(role);
-        Optional<Role> foundRole = roleRepository.findByName(RoleEnum.CUSTOMER.name());
+        Optional<Role> foundRole = roleRepository.findByName("ROLE_CUSTOMER");
         System.out.println(foundRole.get().getName());
-        assertEquals("CUSTOMER", foundRole.get().getName());
+        assertEquals("ROLE_CUSTOMER", foundRole.get().getName());
     }
 
 }

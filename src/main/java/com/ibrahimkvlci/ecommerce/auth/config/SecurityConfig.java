@@ -17,6 +17,8 @@ import com.ibrahimkvlci.ecommerce.auth.filter.JwtAuthFilter;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authorization.AuthorizationDecision;
+
 
 @Configuration
 @EnableWebSecurity
@@ -34,9 +36,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .anyRequest().authenticated()
-            )
+                .requestMatchers("/api/auth/admin/**").access((authentication, context) -> {
+                    String remoteAddr = context.getRequest().getRemoteAddr();
+                    return "127.0.0.1".equals(remoteAddr) || "0:0:0:0:0:0:0:1".equals(remoteAddr) ?
+                            new AuthorizationDecision(true) :
+                            new AuthorizationDecision(false);
+                })
+                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/customer/**").permitAll()
+                )
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
