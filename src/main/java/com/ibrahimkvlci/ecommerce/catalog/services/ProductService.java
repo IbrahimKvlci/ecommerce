@@ -63,6 +63,11 @@ public interface ProductService {
      * Check if product exists by title
      */
     boolean productExistsByTitle(String title);
+
+    /**
+     * Check if product is available
+     */
+    boolean isProductAvailable(Long productId);
     
     /**
      * Get products by category

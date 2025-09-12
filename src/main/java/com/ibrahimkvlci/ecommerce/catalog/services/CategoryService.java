@@ -49,4 +49,9 @@ public interface CategoryService {
      * Check if category exists by name
      */
     boolean existsByName(String name);
+
+    /**
+     * Check if category exists by ID
+     */
+    boolean existsById(Long id);
 }

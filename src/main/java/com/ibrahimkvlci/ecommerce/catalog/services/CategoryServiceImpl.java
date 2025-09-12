@@ -107,4 +107,9 @@ public class CategoryServiceImpl implements CategoryService {
     public boolean existsByName(String name) {
         return categoryRepository.existsByNameIgnoreCase(name);
     }
+
+    @Override
+    public boolean existsById(Long id) {
+        return categoryRepository.existsById(id);
+    }
 }

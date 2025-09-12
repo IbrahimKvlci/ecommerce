@@ -1,17 +1,23 @@
 package com.ibrahimkvlci.ecommerce.order.services;
 
+import com.ibrahimkvlci.ecommerce.order.client.CategoryClient;
+import com.ibrahimkvlci.ecommerce.order.client.CustomerClient;
+import com.ibrahimkvlci.ecommerce.order.client.ProductClient;
 import com.ibrahimkvlci.ecommerce.order.dto.CreateOrderRequest;
 import com.ibrahimkvlci.ecommerce.order.dto.OrderDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.UpdateOrderRequest;
 import com.ibrahimkvlci.ecommerce.order.exceptions.OrderNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.OrderStatusException;
+import com.ibrahimkvlci.ecommerce.order.exceptions.OrderValidationException;
 import com.ibrahimkvlci.ecommerce.order.models.Order;
 import com.ibrahimkvlci.ecommerce.order.models.OrderItem;
 import com.ibrahimkvlci.ecommerce.order.models.OrderStatus;
 import com.ibrahimkvlci.ecommerce.order.repositories.OrderRepository;
+
+import lombok.RequiredArgsConstructor;
+
 import com.ibrahimkvlci.ecommerce.order.repositories.OrderItemRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,17 +28,13 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    
-    @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, 
-                          OrderItemRepository orderItemRepository) {
-        this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
-    }
+    private final ProductClient productClient;
+    private final CustomerClient customerClient;
     
     @Override
     public OrderDTO createOrder(CreateOrderRequest request) {
@@ -43,10 +45,14 @@ public class OrderServiceImpl implements OrderService {
         // Create order
         Order order = new Order();
         order.setTotalAmount(totalAmount);
-        order.setNotes(request.getNotes());
+        order.setNotes(request.getNotes()); 
+
+        if(!customerClient.existsById(request.getCustomerId())){
+            throw new OrderValidationException("Customer not available with ID: " + request.getCustomerId());
+        }
+
         order.setCustomerId(request.getCustomerId());
 
-        
         Order savedOrder = orderRepository.save(order);
         
         // Create order items
@@ -57,6 +63,11 @@ public class OrderServiceImpl implements OrderService {
                     orderItem.setQuantity(itemRequest.getQuantity());
                     orderItem.setUnitPrice(itemRequest.getUnitPrice());
                     orderItem.setTotalPrice(itemRequest.getQuantity() * itemRequest.getUnitPrice());
+
+                    if(!productClient.isProductAvailable(itemRequest.getProductId())){
+                        throw new OrderValidationException("Product not available with ID: " + itemRequest.getProductId());
+                    }
+
                     orderItem.setProductId(itemRequest.getProductId());
                     
                     return orderItem;

@@ -19,10 +19,7 @@ public class OrderItemDTO {
     
     private Long id;
     
-    @NotNull(message = "Product ID is required")
-    private Long productId;
-    
-    private String productName;
+    private ProductDTO product;
     
     @NotNull(message = "Quantity is required")
     @Positive(message = "Quantity must be positive")
@@ -43,7 +40,7 @@ public class OrderItemDTO {
         orderItem.setQuantity(this.quantity);
         orderItem.setUnitPrice(this.unitPrice);
         orderItem.setTotalPrice(this.totalPrice);
-        orderItem.setProductId(this.productId);
+        orderItem.setProductId(this.product.getId());
         
         return orderItem;
     }
@@ -51,13 +48,13 @@ public class OrderItemDTO {
     /**
      * Create DTO from entity
      */
-    public static OrderItemDTO fromEntity(OrderItem orderItem) {
+    public static OrderItemDTO fromEntity(OrderItem orderItem, ProductDTO product) {
         OrderItemDTO dto = new OrderItemDTO();
         dto.setId(orderItem.getId());
         dto.setQuantity(orderItem.getQuantity());
         dto.setUnitPrice(orderItem.getUnitPrice());
         dto.setTotalPrice(orderItem.getTotalPrice());
-        dto.setProductId(orderItem.getProductId());
+        dto.setProduct(product);
         
         return dto;
     }

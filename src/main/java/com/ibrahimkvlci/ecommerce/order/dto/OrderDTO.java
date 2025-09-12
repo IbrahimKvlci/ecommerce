@@ -87,7 +87,7 @@ public class OrderDTO {
         
         if (order.getOrderItems() != null) {
             dto.setOrderItems(order.getOrderItems().stream()
-                    .map(OrderItemDTO::fromEntity)
+                    .map(item -> OrderItemDTO.fromEntity(item, null))
                     .collect(Collectors.toList()));
         }
         

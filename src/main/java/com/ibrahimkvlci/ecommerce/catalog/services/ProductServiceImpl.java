@@ -213,4 +213,9 @@ public class ProductServiceImpl implements ProductService {
         }
         return productRepository.findByBrandId(brandId);
     }
+
+    @Override
+    public boolean isProductAvailable(Long productId) {
+        return productRepository.existsById(productId);
+    }
 }

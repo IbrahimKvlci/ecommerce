@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerRequest;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerResponse;
+import com.ibrahimkvlci.ecommerce.auth.dto.CustomerDTO;
 import com.ibrahimkvlci.ecommerce.auth.exceptions.RegistrationException;
 import com.ibrahimkvlci.ecommerce.auth.models.Customer;
 import com.ibrahimkvlci.ecommerce.auth.models.Role;
@@ -18,6 +19,8 @@ import com.ibrahimkvlci.ecommerce.auth.repositories.UserInfoRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +54,28 @@ public class CustomerServiceImpl implements CustomerService{
         Customer saved = customerRepository.save(customer);
 
         return new RegisterCustomerResponse(saved.getEmail(), saved.getName(), saved.getSurname(), saved.getPhoneNumber());
+    }
+
+    @Override
+    public Optional<CustomerDTO> getCustomerById(Long id) {
+        return customerRepository.findById(id)
+                .map(CustomerDTO::fromEntity);
+    }
+
+    @Override
+    public Optional<CustomerDTO> getCustomerByEmail(String email) {
+        return customerRepository.findByEmail(email)
+                .map(CustomerDTO::fromEntity);
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        return customerRepository.existsById(id);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return customerRepository.existsByEmail(email);
     }
 
 }
