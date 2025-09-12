@@ -20,7 +20,7 @@ import java.util.List;
  * Provides endpoints for CRUD operations and order management.
  */
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/orders/orders")
 @CrossOrigin(origins = "*")
 public class OrderController {
     

@@ -2,7 +2,6 @@ package com.ibrahimkvlci.ecommerce.order.dto;
 
 import com.ibrahimkvlci.ecommerce.order.models.Order;
 import com.ibrahimkvlci.ecommerce.order.models.OrderStatus;
-import com.ibrahimkvlci.ecommerce.auth.models.Customer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -61,11 +60,7 @@ public class OrderDTO {
         order.setNotes(this.notes);
         order.setCreatedAt(this.createdAt);
         order.setUpdatedAt(this.updatedAt);
-        
-        if (this.customerId != null) {
-            Customer customer = new Customer();
-            customer.setId(this.customerId);
-        }
+        order.setCustomerId(this.customerId);
         
         if (this.orderItems != null) {
             order.setOrderItems(this.orderItems.stream()
@@ -88,6 +83,7 @@ public class OrderDTO {
         dto.setNotes(order.getNotes());
         dto.setCreatedAt(order.getCreatedAt());
         dto.setUpdatedAt(order.getUpdatedAt());
+        dto.setCustomerId(order.getCustomerId());
         
         if (order.getOrderItems() != null) {
             dto.setOrderItems(order.getOrderItems().stream()

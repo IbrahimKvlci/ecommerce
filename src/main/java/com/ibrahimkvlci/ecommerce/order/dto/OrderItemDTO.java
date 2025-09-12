@@ -1,7 +1,6 @@
 package com.ibrahimkvlci.ecommerce.order.dto;
 
 import com.ibrahimkvlci.ecommerce.order.models.OrderItem;
-import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -44,11 +43,7 @@ public class OrderItemDTO {
         orderItem.setQuantity(this.quantity);
         orderItem.setUnitPrice(this.unitPrice);
         orderItem.setTotalPrice(this.totalPrice);
-        
-        if (this.productId != null) {
-            Product product = new Product();
-            product.setId(this.productId);
-        }
+        orderItem.setProductId(this.productId);
         
         return orderItem;
     }
@@ -62,6 +57,7 @@ public class OrderItemDTO {
         dto.setQuantity(orderItem.getQuantity());
         dto.setUnitPrice(orderItem.getUnitPrice());
         dto.setTotalPrice(orderItem.getTotalPrice());
+        dto.setProductId(orderItem.getProductId());
         
         return dto;
     }

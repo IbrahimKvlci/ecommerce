@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -51,6 +52,7 @@ public class Order {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        status = OrderStatus.PENDING;
         if (orderNumber == null) {
             orderNumber = generateOrderNumber();
         }
@@ -62,6 +64,6 @@ public class Order {
     }
     
     private String generateOrderNumber() {
-        return "ORD-" + System.currentTimeMillis() + "-" + (int)(Math.random() * 1000);
+        return  UUID.randomUUID().toString();
     }
 }

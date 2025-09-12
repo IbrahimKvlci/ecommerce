@@ -42,9 +42,10 @@ public class OrderServiceImpl implements OrderService {
         
         // Create order
         Order order = new Order();
-        order.setStatus(request.getStatus());
         order.setTotalAmount(totalAmount);
         order.setNotes(request.getNotes());
+        order.setCustomerId(request.getCustomerId());
+
         
         Order savedOrder = orderRepository.save(order);
         
@@ -56,6 +57,7 @@ public class OrderServiceImpl implements OrderService {
                     orderItem.setQuantity(itemRequest.getQuantity());
                     orderItem.setUnitPrice(itemRequest.getUnitPrice());
                     orderItem.setTotalPrice(itemRequest.getQuantity() * itemRequest.getUnitPrice());
+                    orderItem.setProductId(itemRequest.getProductId());
                     
                     return orderItem;
                 })

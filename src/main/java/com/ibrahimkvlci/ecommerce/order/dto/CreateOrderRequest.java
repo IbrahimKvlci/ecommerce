@@ -1,6 +1,5 @@
 package com.ibrahimkvlci.ecommerce.order.dto;
 
-import com.ibrahimkvlci.ecommerce.order.models.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,9 +21,6 @@ public class CreateOrderRequest {
     
     @NotNull(message = "Customer ID is required")
     private Long customerId;
-    
-    @NotNull(message = "Order status is required")
-    private OrderStatus status;
     
     @Size(max = 1000, message = "Notes cannot exceed 1000 characters")
     private String notes;
