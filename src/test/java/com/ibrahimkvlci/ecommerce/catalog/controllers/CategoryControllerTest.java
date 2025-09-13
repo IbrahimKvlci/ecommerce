@@ -31,7 +31,7 @@ public class CategoryControllerTest {
 	public void testCreateCategory() {
 		CategoryDTO dto = new CategoryDTO(null, "Electronics");
 		CategoryDTO saved = new CategoryDTO(1L, "Electronics");
-		when(categoryService.createCategory(dto.toEntity())).thenReturn(saved);
+		when(categoryService.createCategory(categoryService.mapToEntity(dto))).thenReturn(saved);
 
 		ResponseEntity<CategoryDTO> response = categoryController.createCategory(dto);
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -81,7 +81,7 @@ public class CategoryControllerTest {
 	public void testUpdateCategory() {
 		CategoryDTO update = new CategoryDTO(null, "New");
 		CategoryDTO updated = new CategoryDTO(2L, "New");
-		when(categoryService.updateCategory(2L, update.toEntity())).thenReturn(updated);
+		when(categoryService.updateCategory(2L, categoryService.mapToEntity(update))).thenReturn(updated);
 
 		ResponseEntity<CategoryDTO> response = categoryController.updateCategory(2L, update);
 		assertEquals(HttpStatus.OK, response.getStatusCode());

@@ -47,7 +47,7 @@ public class InventoryServiceTest {
 			return i;
 		});
 
-		InventoryDTO created = inventoryService.createInventory(dto.toEntity(product));
+		InventoryDTO created = inventoryService.createInventory(inventoryService.mapToEntity(dto));
 		assertEquals(5L, created.getId());
 		assertEquals(1L, created.getProductId());
 		assertEquals(10, created.getQuantity());
@@ -59,7 +59,7 @@ public class InventoryServiceTest {
 		Product product = new Product();
 		product.setId(99L);
 		when(productRepository.findById(99L)).thenReturn(Optional.empty());
-		assertThrows(InventoryValidationException.class, () -> inventoryService.createInventory(dto.toEntity(product)));
+		assertThrows(InventoryValidationException.class, () -> inventoryService.createInventory(inventoryService.mapToEntity(dto)));
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class InventoryServiceTest {
 		InventoryDTO update = new InventoryDTO(null, 2L, 20);
 		Product product = new Product();
 		product.setId(2L);
-		assertThrows(InventoryValidationException.class, () -> inventoryService.updateInventory(7L, update.toEntity(product)));
+		assertThrows(InventoryValidationException.class, () -> inventoryService.updateInventory(7L, inventoryService.mapToEntity(update)));
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class InventoryServiceTest {
 		when(inventoryRepository.findById(7L)).thenReturn(Optional.of(existing));
 		when(inventoryRepository.save(any(Inventory.class))).thenAnswer(inv -> inv.getArgument(0));
 		InventoryDTO update = new InventoryDTO(null, 1L, 25);
-		InventoryDTO updated = inventoryService.updateInventory(7L, update.toEntity(p));
+		InventoryDTO updated = inventoryService.updateInventory(7L, inventoryService.mapToEntity(update));
 		assertEquals(25, updated.getQuantity());
 	}
 

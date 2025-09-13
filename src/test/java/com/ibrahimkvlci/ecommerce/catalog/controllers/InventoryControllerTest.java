@@ -34,7 +34,7 @@ public class InventoryControllerTest {
 		InventoryDTO saved = new InventoryDTO(10L, 1L, 5);
 		Product product = new Product();
 		product.setId(1L);
-		when(inventoryService.createInventory(dto.toEntity(product))).thenReturn(saved);
+		when(inventoryService.createInventory(inventoryService.mapToEntity(dto))).thenReturn(saved);
 
 		ResponseEntity<InventoryDTO> response = inventoryController.createInventory(dto);
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -87,7 +87,7 @@ public class InventoryControllerTest {
 		InventoryDTO updated = new InventoryDTO(7L, 1L, 20);
 		Product product = new Product();
 		product.setId(1L);
-		when(inventoryService.updateInventory(7L, update.toEntity(product))).thenReturn(updated);
+		when(inventoryService.updateInventory(7L, inventoryService.mapToEntity(update))).thenReturn(updated);
 
 		ResponseEntity<InventoryDTO> response = inventoryController.updateInventory(7L, update);
 		assertEquals(HttpStatus.OK, response.getStatusCode());

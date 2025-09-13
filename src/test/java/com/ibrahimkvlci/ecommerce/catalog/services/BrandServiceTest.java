@@ -40,7 +40,7 @@ public class BrandServiceTest {
 			return b;
 		});
 
-		BrandDTO created = brandService.createBrand(dto.toEntity());
+		BrandDTO created = brandService.createBrand(brandService.mapToEntity(dto));
 		assertEquals(1L, created.getId());
 		assertEquals("Acme", created.getName());
 	}
@@ -49,7 +49,7 @@ public class BrandServiceTest {
 	public void testCreateBrandDuplicateName() {
 		BrandDTO dto = new BrandDTO(null, "Acme");
 		when(brandRepository.existsByNameIgnoreCase("Acme")).thenReturn(true);
-		assertThrows(BrandValidationException.class, () -> brandService.createBrand(dto.toEntity()));
+		assertThrows(BrandValidationException.class, () -> brandService.createBrand(brandService.mapToEntity(dto)));
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class BrandServiceTest {
 	public void testUpdateBrandConflictName() {
 		when(brandRepository.findById(1L)).thenReturn(Optional.of(new Brand(1L, "Old", null)));
 		when(brandRepository.existsByNameIgnoreCase("New")).thenReturn(true);
-		assertThrows(BrandValidationException.class, () -> brandService.updateBrand(1L, new BrandDTO(null, "New").toEntity()));
+		assertThrows(BrandValidationException.class, () -> brandService.updateBrand(1L, brandService.mapToEntity(new BrandDTO(null, "New"))));
 	}
 
 	@Test
@@ -91,7 +91,7 @@ public class BrandServiceTest {
 		when(brandRepository.findById(2L)).thenReturn(Optional.of(new Brand(2L, "Old", null)));
 		when(brandRepository.existsByNameIgnoreCase("New")).thenReturn(false);
 		when(brandRepository.save(any(Brand.class))).thenAnswer(inv -> inv.getArgument(0));
-		BrandDTO updated = brandService.updateBrand(2L, new BrandDTO(null, "New").toEntity());
+		BrandDTO updated = brandService.updateBrand(2L, brandService.mapToEntity(new BrandDTO(null, "New")));
 		assertEquals("New", updated.getName());
 	}
 

@@ -40,7 +40,7 @@ public class CategoryServiceTest {
 			return c;
 		});
 
-		CategoryDTO created = categoryService.createCategory(dto.toEntity());
+		CategoryDTO created = categoryService.createCategory(categoryService.mapToEntity(dto));
 		assertEquals(1L, created.getId());
 		assertEquals("Electronics", created.getName());
 	}
@@ -49,7 +49,7 @@ public class CategoryServiceTest {
 	public void testCreateCategoryDuplicateName() {
 		CategoryDTO dto = new CategoryDTO(null, "Electronics");
 		when(categoryRepository.existsByNameIgnoreCase("Electronics")).thenReturn(true);
-		assertThrows(CategoryValidationException.class, () -> categoryService.createCategory(dto.toEntity()));
+		assertThrows(CategoryValidationException.class, () -> categoryService.createCategory(categoryService.mapToEntity(dto)));
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class CategoryServiceTest {
 	public void testUpdateCategoryConflictName() {
 		when(categoryRepository.findById(1L)).thenReturn(Optional.of(new Category(1L, "Old", null)));
 		when(categoryRepository.existsByNameIgnoreCase("New")).thenReturn(true);
-		assertThrows(CategoryValidationException.class, () -> categoryService.updateCategory(1L, new CategoryDTO(null, "New").toEntity()));
+		assertThrows(CategoryValidationException.class, () -> categoryService.updateCategory(1L, categoryService.mapToEntity(new CategoryDTO(null, "New"))));
 	}
 
 	@Test
@@ -91,7 +91,7 @@ public class CategoryServiceTest {
 		when(categoryRepository.findById(2L)).thenReturn(Optional.of(new Category(2L, "Old", null)));
 		when(categoryRepository.existsByNameIgnoreCase("New")).thenReturn(false);
 		when(categoryRepository.save(any(Category.class))).thenAnswer(inv -> inv.getArgument(0));
-		CategoryDTO updated = categoryService.updateCategory(2L, new CategoryDTO(null, "New").toEntity());
+		CategoryDTO updated = categoryService.updateCategory(2L, categoryService.mapToEntity(new CategoryDTO(null, "New")));
 		assertEquals("New", updated.getName());
 	}
 

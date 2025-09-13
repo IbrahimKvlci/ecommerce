@@ -31,7 +31,7 @@ public class BrandControllerTest {
 	public void testCreateBrand() {
 		BrandDTO dto = new BrandDTO(null, "Acme");
 		BrandDTO saved = new BrandDTO(1L, "Acme");
-		when(brandService.createBrand(dto.toEntity())).thenReturn(saved);
+		when(brandService.createBrand(brandService.mapToEntity(dto))).thenReturn(saved);
 
 		ResponseEntity<BrandDTO> response = brandController.createBrand(dto);
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -81,7 +81,7 @@ public class BrandControllerTest {
 	public void testUpdateBrand() {
 		BrandDTO update = new BrandDTO(null, "New");
 		BrandDTO updated = new BrandDTO(2L, "New");
-		when(brandService.updateBrand(2L, update.toEntity())).thenReturn(updated);
+		when(brandService.updateBrand(2L, brandService.mapToEntity(update))).thenReturn(updated);
 
 		ResponseEntity<BrandDTO> response = brandController.updateBrand(2L, update);
 		assertEquals(HttpStatus.OK, response.getStatusCode());

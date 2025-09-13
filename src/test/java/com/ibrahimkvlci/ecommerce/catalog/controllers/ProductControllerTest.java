@@ -42,17 +42,17 @@ public class ProductControllerTest {
         productDTO.setCategoryId(1L);
         productDTO.setBrandId(1L);
 
-        when(productService.createProduct(productDTO.toEntity())).thenReturn(productDTO.toEntity());
+        when(productService.createProduct(productService.mapToEntity(productDTO))).thenReturn(productService.mapToEntity(productDTO));
 
         ResponseEntity<ProductDTO> response = productController.createProduct(productDTO);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         ProductDTO body = response.getBody();
         assertNotNull(body);
-        assertEquals(productDTO.toEntity().getTitle(), body.getTitle());
-        assertEquals(productDTO.toEntity().getDescription(), body.getDescription());
-        assertEquals(productDTO.toEntity().getPrice(), body.getPrice());
-        assertEquals(productDTO.toEntity().getCategory().getId(), body.getCategoryId());
-        assertEquals(productDTO.toEntity().getBrand().getId(), body.getBrandId());
+        assertEquals(productService.mapToEntity(productDTO).getTitle(), body.getTitle());
+        assertEquals(productService.mapToEntity(productDTO).getDescription(), body.getDescription());
+        assertEquals(productService.mapToEntity(productDTO).getPrice(), body.getPrice());
+        assertEquals(productService.mapToEntity(productDTO).getCategory().getId(), body.getCategoryId());
+        assertEquals(productService.mapToEntity(productDTO).getBrand().getId(), body.getBrandId());
         
     }
 
@@ -107,9 +107,9 @@ public class ProductControllerTest {
     @Test
     public void testUpdateProduct() {
         ProductDTO updateDTO = new ProductDTO(1L, "Updated", "Desc", 30.0, 3L, 4L);
-        Product updated = updateDTO.toEntity();
+        Product updated = productService.mapToEntity(updateDTO);
 
-        when(productService.updateProduct(1L, updateDTO.toEntity())).thenReturn(updated);
+        when(productService.updateProduct(1L, productService.mapToEntity(updateDTO))).thenReturn(updated);
 
         ResponseEntity<ProductDTO> response = productController.updateProduct(1L, updateDTO);
         assertEquals(HttpStatus.OK, response.getStatusCode());
