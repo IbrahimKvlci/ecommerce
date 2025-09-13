@@ -14,7 +14,7 @@ public class ProductApp {
     private final ProductService productService;
 
     public ProductDTO getProductById(Long productId){
-        return productService.getProductById(productId).map(ProductDTO::fromEntity).orElse(null);
+        return productService.getProductById(productId).map(productService::mapToDTO).orElse(null);
     }
 
     public boolean isProductAvailable(Long productId){
