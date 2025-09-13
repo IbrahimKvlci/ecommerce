@@ -3,6 +3,7 @@ package com.ibrahimkvlci.ecommerce.order.services;
 import com.ibrahimkvlci.ecommerce.order.dto.CreateOrderRequest;
 import com.ibrahimkvlci.ecommerce.order.dto.OrderDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.UpdateOrderRequest;
+import com.ibrahimkvlci.ecommerce.order.models.Order;
 import com.ibrahimkvlci.ecommerce.order.models.OrderStatus;
 
 import java.time.LocalDateTime;
@@ -90,5 +91,14 @@ public interface OrderService {
      * Check if order can be updated
      */
     boolean canUpdateOrder(Long id);
+
+    /**
+     * Map order to DTO
+     */
+    OrderDTO mapToDTO(Order order);
     
+    /**
+     * Map order DTO to entity
+     */
+    Order mapToEntity(OrderDTO orderDTO);
 }

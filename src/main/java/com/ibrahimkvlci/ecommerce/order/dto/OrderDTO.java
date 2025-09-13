@@ -1,6 +1,5 @@
 package com.ibrahimkvlci.ecommerce.order.dto;
 
-import com.ibrahimkvlci.ecommerce.order.models.Order;
 import com.ibrahimkvlci.ecommerce.order.models.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +11,7 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 /**
  * Data Transfer Object for Order operations.
@@ -47,50 +46,4 @@ public class OrderDTO {
     private LocalDateTime updatedAt;
     
     private List<OrderItemDTO> orderItems;
-    
-    /**
-     * Convert DTO to entity
-     */
-    public Order toEntity() {
-        Order order = new Order();
-        order.setId(this.id);
-        order.setOrderNumber(this.orderNumber);
-        order.setStatus(this.status);
-        order.setTotalAmount(this.totalAmount);
-        order.setNotes(this.notes);
-        order.setCreatedAt(this.createdAt);
-        order.setUpdatedAt(this.updatedAt);
-        order.setCustomerId(this.customerId);
-        
-        if (this.orderItems != null) {
-            order.setOrderItems(this.orderItems.stream()
-                    .map(OrderItemDTO::toEntity)
-                    .collect(Collectors.toList()));
-        }
-        
-        return order;
-    }
-    
-    /**
-     * Create DTO from entity
-     */
-    public static OrderDTO fromEntity(Order order) {
-        OrderDTO dto = new OrderDTO();
-        dto.setId(order.getId());
-        dto.setOrderNumber(order.getOrderNumber());
-        dto.setStatus(order.getStatus());
-        dto.setTotalAmount(order.getTotalAmount());
-        dto.setNotes(order.getNotes());
-        dto.setCreatedAt(order.getCreatedAt());
-        dto.setUpdatedAt(order.getUpdatedAt());
-        dto.setCustomerId(order.getCustomerId());
-        
-        if (order.getOrderItems() != null) {
-            dto.setOrderItems(order.getOrderItems().stream()
-                    .map(item -> OrderItemDTO.fromEntity(item, null))
-                    .collect(Collectors.toList()));
-        }
-        
-        return dto;
-    }
 }

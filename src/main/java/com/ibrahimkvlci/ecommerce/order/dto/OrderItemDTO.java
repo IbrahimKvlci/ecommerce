@@ -1,6 +1,5 @@
 package com.ibrahimkvlci.ecommerce.order.dto;
 
-import com.ibrahimkvlci.ecommerce.order.models.OrderItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,31 +30,4 @@ public class OrderItemDTO {
     
     private Double totalPrice;
     
-    /**
-     * Convert DTO to entity
-     */
-    public OrderItem toEntity() {
-        OrderItem orderItem = new OrderItem();
-        orderItem.setId(this.id);
-        orderItem.setQuantity(this.quantity);
-        orderItem.setUnitPrice(this.unitPrice);
-        orderItem.setTotalPrice(this.totalPrice);
-        orderItem.setProductId(this.product.getId());
-        
-        return orderItem;
-    }
-    
-    /**
-     * Create DTO from entity
-     */
-    public static OrderItemDTO fromEntity(OrderItem orderItem, ProductDTO product) {
-        OrderItemDTO dto = new OrderItemDTO();
-        dto.setId(orderItem.getId());
-        dto.setQuantity(orderItem.getQuantity());
-        dto.setUnitPrice(orderItem.getUnitPrice());
-        dto.setTotalPrice(orderItem.getTotalPrice());
-        dto.setProduct(product);
-        
-        return dto;
-    }
 }

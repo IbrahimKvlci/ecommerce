@@ -1,6 +1,5 @@
 package com.ibrahimkvlci.ecommerce.order.services;
 
-import com.ibrahimkvlci.ecommerce.order.client.CategoryClient;
 import com.ibrahimkvlci.ecommerce.order.client.CustomerClient;
 import com.ibrahimkvlci.ecommerce.order.client.ProductClient;
 import com.ibrahimkvlci.ecommerce.order.dto.CreateOrderRequest;
@@ -35,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final ProductClient productClient;
     private final CustomerClient customerClient;
+    private final OrderItemService orderItemService;
     
     @Override
     public OrderDTO createOrder(CreateOrderRequest request) {
@@ -77,14 +77,14 @@ public class OrderServiceImpl implements OrderService {
         orderItemRepository.saveAll(orderItems);
         savedOrder.setOrderItems(orderItems);
         
-        return OrderDTO.fromEntity(savedOrder);
+        return mapToDTO(savedOrder);
     }
     
     @Override
     @Transactional(readOnly = true)
     public List<OrderDTO> getAllOrders() {
         return orderRepository.findAll().stream()
-                .map(OrderDTO::fromEntity)
+                .map(order -> mapToDTO(order))
                 .collect(Collectors.toList());
     }
     
@@ -92,14 +92,14 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public Optional<OrderDTO> getOrderById(Long id) {
         return orderRepository.findById(id)
-                .map(OrderDTO::fromEntity);
+                .map(order -> mapToDTO(order));
     }
     
     @Override
     @Transactional(readOnly = true)
     public Optional<OrderDTO> getOrderByOrderNumber(String orderNumber) {
         return orderRepository.findByOrderNumber(orderNumber)
-                .map(OrderDTO::fromEntity);
+                .map(order -> mapToDTO(order));
     }
     
     @Override
@@ -119,7 +119,7 @@ public class OrderServiceImpl implements OrderService {
         }
         
         Order updatedOrder = orderRepository.save(order);
-        return OrderDTO.fromEntity(updatedOrder);
+        return mapToDTO(updatedOrder);
     }
     
     @Override
@@ -141,7 +141,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public List<OrderDTO> getOrdersByCustomerId(Long customerId) {
         return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId).stream()
-                .map(OrderDTO::fromEntity)
+                .map(order -> mapToDTO(order))
                 .collect(Collectors.toList());
     }
     
@@ -149,7 +149,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public List<OrderDTO> getOrdersByStatus(OrderStatus status) {
         return orderRepository.findByStatus(status).stream()
-                .map(OrderDTO::fromEntity)
+                .map(order -> mapToDTO(order))
                 .collect(Collectors.toList());
     }
     
@@ -167,7 +167,7 @@ public class OrderServiceImpl implements OrderService {
         
         order.setStatus(status);
         Order updatedOrder = orderRepository.save(order);
-        return OrderDTO.fromEntity(updatedOrder);
+        return mapToDTO(updatedOrder);
     }
     
     @Override
@@ -181,14 +181,14 @@ public class OrderServiceImpl implements OrderService {
         
         order.setStatus(OrderStatus.CANCELLED);
         Order updatedOrder = orderRepository.save(order);
-        return OrderDTO.fromEntity(updatedOrder);
+        return mapToDTO(updatedOrder);
     }
     
     @Override
     @Transactional(readOnly = true)
     public List<OrderDTO> getOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         return orderRepository.findByCreatedAtBetween(startDate, endDate).stream()
-                .map(OrderDTO::fromEntity)
+                .map(order -> mapToDTO(order))
                 .collect(Collectors.toList());
     }
     
@@ -196,7 +196,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public List<OrderDTO> getOrdersByAmountRange(Double minAmount, Double maxAmount) {
         return orderRepository.findByTotalAmountBetween(minAmount, maxAmount).stream()
-                .map(OrderDTO::fromEntity)
+                .map(order -> mapToDTO(order))
                 .collect(Collectors.toList());
     }
     
@@ -252,5 +252,48 @@ public class OrderServiceImpl implements OrderService {
             default:
                 return false;
         }
+    }
+
+    @Override
+    public OrderDTO mapToDTO(Order order) {
+        OrderDTO dto = new OrderDTO();
+        dto.setId(order.getId());
+        dto.setOrderNumber(order.getOrderNumber());
+        dto.setStatus(order.getStatus());
+        dto.setTotalAmount(order.getTotalAmount());
+        dto.setNotes(order.getNotes());
+        dto.setCreatedAt(order.getCreatedAt());
+        dto.setUpdatedAt(order.getUpdatedAt());
+        dto.setCustomerId(order.getCustomerId());
+        dto.setCustomerName(customerClient.getCustomerById(order.getCustomerId()).getName());
+        
+        if (order.getOrderItems() != null) {
+            dto.setOrderItems(order.getOrderItems().stream()
+                    .map(item -> orderItemService.mapToDTO(item))
+                    .collect(Collectors.toList()));
+        }
+        
+        return dto;
+    }
+
+    @Override
+    public Order mapToEntity(OrderDTO orderDTO) {
+        Order order = new Order();
+        order.setId(orderDTO.getId());
+        order.setOrderNumber(orderDTO.getOrderNumber());
+        order.setStatus(orderDTO.getStatus());
+        order.setTotalAmount(orderDTO.getTotalAmount());
+        order.setNotes(orderDTO.getNotes());
+        order.setCreatedAt(orderDTO.getCreatedAt());
+        order.setUpdatedAt(orderDTO.getUpdatedAt());
+        order.setCustomerId(orderDTO.getCustomerId());
+        
+        if (orderDTO.getOrderItems() != null) {
+            order.setOrderItems(orderDTO.getOrderItems().stream()
+                    .map(orderItemService::mapToEntity)
+                    .collect(Collectors.toList()));
+        }
+        
+        return order;
     }
 }
