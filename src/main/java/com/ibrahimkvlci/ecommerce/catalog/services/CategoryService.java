@@ -54,4 +54,14 @@ public interface CategoryService {
      * Check if category exists by ID
      */
     boolean existsById(Long id);
+    
+    /**
+     * Convert DTO to entity
+     */
+    Category mapToEntity(CategoryDTO categoryDTO);
+    
+    /**
+     * Create DTO from entity
+     */
+    CategoryDTO mapToDTO(Category category);
 }

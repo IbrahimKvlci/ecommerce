@@ -22,6 +22,16 @@ public interface BrandService {
     List<BrandDTO> searchBrandsByName(String name);
 
     boolean existsByName(String name);
+    
+    /**
+     * Convert DTO to entity
+     */
+    Brand mapToEntity(BrandDTO brandDTO);
+    
+    /**
+     * Create DTO from entity
+     */
+    BrandDTO mapToDTO(Brand brand);
 }
 
 

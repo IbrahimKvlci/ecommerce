@@ -29,13 +29,13 @@ public class InventoryServiceImpl implements InventoryService {
                 .orElseThrow(() -> new InventoryValidationException("Product not found with ID: " + inventory.getProduct().getId()));
 
         Inventory saved = inventoryRepository.save(inventory);
-        return InventoryDTO.fromEntity(saved);
+        return this.mapToDTO(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<InventoryDTO> getAllInventories() {
-        return inventoryRepository.findAll().stream().map(InventoryDTO::fromEntity).collect(Collectors.toList());
+        return inventoryRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -43,7 +43,7 @@ public class InventoryServiceImpl implements InventoryService {
     public InventoryDTO getInventoryById(Long id) {
         Inventory inventory = inventoryRepository.findById(id)
                 .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + id));
-        return InventoryDTO.fromEntity(inventory);
+        return this.mapToDTO(inventory);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class InventoryServiceImpl implements InventoryService {
         if (inventories.isEmpty()) {
             throw new InventoryNotFoundException("No inventories found for product ID: " + productId);
         }
-        return inventories.stream().map(InventoryDTO::fromEntity).collect(Collectors.toList());
+        return inventories.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -67,7 +67,7 @@ public class InventoryServiceImpl implements InventoryService {
 
         existing.setQuantity(inventory.getQuantity());
         Inventory updated = inventoryRepository.save(existing);
-        return InventoryDTO.fromEntity(updated);
+        return this.mapToDTO(updated);
     }
 
     @Override
@@ -76,6 +76,28 @@ public class InventoryServiceImpl implements InventoryService {
             throw new InventoryNotFoundException("Inventory not found with ID: " + id);
         }
         inventoryRepository.deleteById(id);
+    }
+    
+    /**
+     * Convert DTO to entity
+     */
+    public Inventory mapToEntity(InventoryDTO inventoryDTO) {
+        Inventory inventory = new Inventory();
+        inventory.setId(inventoryDTO.getId());
+        inventory.setQuantity(inventoryDTO.getQuantity());
+        // Note: Product needs to be set by the caller since it requires a Product entity
+        return inventory;
+    }
+    
+    /**
+     * Create DTO from entity
+     */
+    public InventoryDTO mapToDTO(Inventory inventory) {
+        InventoryDTO dto = new InventoryDTO();
+        dto.setId(inventory.getId());
+        dto.setProductId(inventory.getProduct().getId());
+        dto.setQuantity(inventory.getQuantity());
+        return dto;
     }
 }
 

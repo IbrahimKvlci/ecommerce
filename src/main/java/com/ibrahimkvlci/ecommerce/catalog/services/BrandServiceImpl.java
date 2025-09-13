@@ -30,13 +30,13 @@ public class BrandServiceImpl implements BrandService {
         }
 
         Brand saved = brandRepository.save(brand);
-        return BrandDTO.fromEntity(saved);
+        return this.mapToDTO(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<BrandDTO> getAllBrands() {
-        return brandRepository.findAll().stream().map(BrandDTO::fromEntity).collect(Collectors.toList());
+        return brandRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -44,7 +44,7 @@ public class BrandServiceImpl implements BrandService {
     public BrandDTO getBrandById(Long id) {
         Brand brand = brandRepository.findById(id)
                 .orElseThrow(() -> new BrandNotFoundException("Brand not found with ID: " + id));
-        return BrandDTO.fromEntity(brand);
+        return this.mapToDTO(brand);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class BrandServiceImpl implements BrandService {
     public BrandDTO getBrandByName(String name) {
         Brand brand = brandRepository.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new BrandNotFoundException("Brand not found with name: " + name));
-        return BrandDTO.fromEntity(brand);
+        return this.mapToDTO(brand);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class BrandServiceImpl implements BrandService {
 
         existing.setName(brand.getName());
         Brand updated = brandRepository.save(existing);
-        return BrandDTO.fromEntity(updated);
+        return this.mapToDTO(updated);
     }
 
     @Override
@@ -81,13 +81,33 @@ public class BrandServiceImpl implements BrandService {
     @Override
     @Transactional(readOnly = true)
     public List<BrandDTO> searchBrandsByName(String name) {
-        return brandRepository.findByNameContainingIgnoreCase(name).stream().map(BrandDTO::fromEntity).collect(Collectors.toList());
+        return brandRepository.findByNameContainingIgnoreCase(name).stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean existsByName(String name) {
         return brandRepository.existsByNameIgnoreCase(name);
+    }
+    
+    /**
+     * Convert DTO to entity
+     */
+    public Brand mapToEntity(BrandDTO brandDTO) {
+        Brand brand = new Brand();
+        brand.setId(brandDTO.getId());
+        brand.setName(brandDTO.getName());
+        return brand;
+    }
+    
+    /**
+     * Create DTO from entity
+     */
+    public BrandDTO mapToDTO(Brand brand) {
+        BrandDTO dto = new BrandDTO();
+        dto.setId(brand.getId());
+        dto.setName(brand.getName());
+        return dto;
     }
 }
 

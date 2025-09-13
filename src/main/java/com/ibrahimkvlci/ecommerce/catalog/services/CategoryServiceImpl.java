@@ -34,14 +34,14 @@ public class CategoryServiceImpl implements CategoryService {
         Category savedCategory = categoryRepository.save(category);
         
         log.info("Category created successfully with ID: {}", savedCategory.getId());
-        return CategoryDTO.fromEntity(savedCategory);
+        return this.mapToDTO(savedCategory);
     }
     
     @Override
     @Transactional(readOnly = true)
     public List<CategoryDTO> getAllCategories() {
         log.info("Retrieving all categories");
-        return categoryRepository.findAll().stream().map(CategoryDTO::fromEntity).collect(Collectors.toList());
+        return categoryRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
     }
     
     @Override
@@ -50,7 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("Retrieving category by ID: {}", id);
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with ID: " + id));
-        return CategoryDTO.fromEntity(category);
+        return this.mapToDTO(category);
     }
     
     @Override
@@ -59,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("Retrieving category by name: {}", name);
         Category category = categoryRepository.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with name: " + name));
-        return CategoryDTO.fromEntity(category);
+        return this.mapToDTO(category);
     }
     
     @Override
@@ -80,7 +80,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category updatedCategory = categoryRepository.save(existingCategory);
         
         log.info("Category updated successfully with ID: {}", updatedCategory.getId());
-        return CategoryDTO.fromEntity(updatedCategory);
+        return this.mapToDTO(updatedCategory);
     }
     
     @Override
@@ -99,7 +99,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public List<CategoryDTO> searchCategoriesByName(String name) {
         log.info("Searching categories by name: {}", name);
-        return categoryRepository.findByNameContainingIgnoreCase(name).stream().map(CategoryDTO::fromEntity).collect(Collectors.toList());
+        return categoryRepository.findByNameContainingIgnoreCase(name).stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -111,5 +111,25 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public boolean existsById(Long id) {
         return categoryRepository.existsById(id);
+    }
+    
+    /**
+     * Convert DTO to entity
+     */
+    public Category mapToEntity(CategoryDTO categoryDTO) {
+        Category category = new Category();
+        category.setId(categoryDTO.getId());
+        category.setName(categoryDTO.getName());
+        return category;
+    }
+    
+    /**
+     * Create DTO from entity
+     */
+    public CategoryDTO mapToDTO(Category category) {
+        CategoryDTO dto = new CategoryDTO();
+        dto.setId(category.getId());
+        dto.setName(category.getName());
+        return dto;
     }
 }

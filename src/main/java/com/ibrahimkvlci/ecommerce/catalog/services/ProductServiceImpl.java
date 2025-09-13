@@ -6,6 +6,7 @@ import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.BrandRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.CategoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -217,5 +218,45 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public boolean isProductAvailable(Long productId) {
         return productRepository.existsById(productId);
+    }
+    
+    /**
+     * Convert DTO to entity
+     */
+    public Product mapToEntity(ProductDTO productDTO) {
+        Product product = new Product();
+        product.setId(productDTO.getId());
+        product.setTitle(productDTO.getTitle());
+        product.setDescription(productDTO.getDescription());
+        product.setPrice(productDTO.getPrice());
+        if (productDTO.getCategoryId() != null) {
+            Category category = new Category();
+            category.setId(productDTO.getCategoryId());
+            product.setCategory(category);
+        }
+        if (productDTO.getBrandId() != null) {
+            Brand brand = new Brand();
+            brand.setId(productDTO.getBrandId());
+            product.setBrand(brand);
+        }
+        return product;
+    }
+    
+    /**
+     * Create DTO from entity
+     */
+    public ProductDTO mapToDTO(Product product) {
+        ProductDTO dto = new ProductDTO();
+        dto.setId(product.getId());
+        dto.setTitle(product.getTitle());
+        dto.setDescription(product.getDescription());
+        dto.setPrice(product.getPrice());
+        if (product.getCategory() != null) {
+            dto.setCategoryId(product.getCategory().getId());
+        }
+        if (product.getBrand() != null) {
+            dto.setBrandId(product.getBrand().getId());
+        }
+        return dto;
     }
 }

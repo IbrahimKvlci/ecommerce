@@ -1,8 +1,5 @@
 package com.ibrahimkvlci.ecommerce.catalog.dto;
 
-import com.ibrahimkvlci.ecommerce.catalog.models.Product;
-import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
-import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,44 +36,4 @@ public class ProductDTO {
 
     @NotNull(message = "Brand is required")
     private Long brandId;
-    
-    /**
-     * Convert DTO to entity
-     */
-    public Product toEntity() {
-        Product product = new Product();
-        product.setId(this.id);
-        product.setTitle(this.title);
-        product.setDescription(this.description);
-        product.setPrice(this.price);
-        if (this.categoryId != null) {
-            Category category = new Category();
-            category.setId(this.categoryId);
-            product.setCategory(category);
-        }
-        if (this.brandId != null) {
-            Brand brand = new Brand();
-            brand.setId(this.brandId);
-            product.setBrand(brand);
-        }
-        return product;
-    }
-    
-    /**
-     * Create DTO from entity
-     */
-    public static ProductDTO fromEntity(Product product) {
-        ProductDTO dto = new ProductDTO();
-        dto.setId(product.getId());
-        dto.setTitle(product.getTitle());
-        dto.setDescription(product.getDescription());
-        dto.setPrice(product.getPrice());
-        if (product.getCategory() != null) {
-            dto.setCategoryId(product.getCategory().getId());
-        }
-        if (product.getBrand() != null) {
-            dto.setBrandId(product.getBrand().getId());
-        }
-        return dto;
-    }
 }

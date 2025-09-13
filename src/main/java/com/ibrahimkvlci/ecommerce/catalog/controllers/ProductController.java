@@ -33,8 +33,8 @@ public class ProductController {
      */
     @PostMapping
     public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDTO) {
-        Product product = productService.createProduct(productDTO.toEntity());
-        ProductDTO createdDTO = ProductDTO.fromEntity(product);
+        Product product = productService.createProduct(productService.mapToEntity(productDTO));
+        ProductDTO createdDTO = productService.mapToDTO(product);
         return new ResponseEntity<>(createdDTO, HttpStatus.CREATED);
     }
     
@@ -45,7 +45,7 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
         List<ProductDTO> productDTOs = products.stream()
-                .map(ProductDTO::fromEntity)
+                .map(productService::mapToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
@@ -56,7 +56,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
         return productService.getProductById(id)
-                .map(product -> ResponseEntity.ok(ProductDTO.fromEntity(product)))
+                .map(product -> ResponseEntity.ok(productService.mapToDTO(product)))
                 .orElse(ResponseEntity.notFound().build());
     }
     
@@ -66,8 +66,8 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, 
                                                  @Valid @RequestBody ProductDTO productDTO) {
-        Product updatedProduct = productService.updateProduct(id, productDTO.toEntity());
-        ProductDTO updatedDTO = ProductDTO.fromEntity(updatedProduct);
+        Product updatedProduct = productService.updateProduct(id, productService.mapToEntity(productDTO));
+        ProductDTO updatedDTO = productService.mapToDTO(updatedProduct);
         return ResponseEntity.ok(updatedDTO);
     }
     
@@ -87,7 +87,7 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> searchProductsByTitle(@RequestParam String title) {
         List<Product> products = productService.searchProductsByTitle(title);
         List<ProductDTO> productDTOs = products.stream()
-                .map(ProductDTO::fromEntity)
+                .map(productService::mapToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
@@ -99,7 +99,7 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> searchProductsByDescription(@RequestParam String keyword) {
         List<Product> products = productService.searchProductsByDescription(keyword);
         List<ProductDTO> productDTOs = products.stream()
-                .map(ProductDTO::fromEntity)
+                .map(productService::mapToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
@@ -113,7 +113,7 @@ public class ProductController {
             @RequestParam double maxPrice) {
         List<Product> products = productService.getProductsByPriceRange(minPrice, maxPrice);
         List<ProductDTO> productDTOs = products.stream()
-                .map(ProductDTO::fromEntity)
+                .map(productService::mapToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
@@ -125,7 +125,7 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> getProductsByMaxPrice(@RequestParam double maxPrice) {
         List<Product> products = productService.getProductsByMaxPrice(maxPrice);
         List<ProductDTO> productDTOs = products.stream()
-                .map(ProductDTO::fromEntity)
+                .map(productService::mapToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
@@ -137,7 +137,7 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> getProductsByMinPrice(@RequestParam double minPrice) {
         List<Product> products = productService.getProductsByMinPrice(minPrice);
         List<ProductDTO> productDTOs = products.stream()
-                .map(ProductDTO::fromEntity)
+                .map(productService::mapToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
@@ -149,7 +149,7 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> getProductsByCategoryId(@PathVariable Long categoryId) {
         List<Product> products = productService.getProductsByCategoryId(categoryId);
         List<ProductDTO> productDTOs = products.stream()
-                .map(ProductDTO::fromEntity)
+                .map(productService::mapToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
@@ -161,7 +161,7 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> getProductsByBrandId(@PathVariable Long brandId) {
         List<Product> products = productService.getProductsByBrandId(brandId);
         List<ProductDTO> productDTOs = products.stream()
-                .map(ProductDTO::fromEntity)
+                .map(productService::mapToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }

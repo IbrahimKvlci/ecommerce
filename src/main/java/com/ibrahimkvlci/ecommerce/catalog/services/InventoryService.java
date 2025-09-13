@@ -18,6 +18,16 @@ public interface InventoryService {
     InventoryDTO updateInventory(Long id, Inventory inventory);
 
     void deleteInventory(Long id);
+    
+    /**
+     * Convert DTO to entity
+     */
+    Inventory mapToEntity(InventoryDTO inventoryDTO);
+    
+    /**
+     * Create DTO from entity
+     */
+    InventoryDTO mapToDTO(Inventory inventory);
 }
 
 

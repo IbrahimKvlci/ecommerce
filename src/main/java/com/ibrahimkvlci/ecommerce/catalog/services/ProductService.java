@@ -3,6 +3,7 @@ package com.ibrahimkvlci.ecommerce.catalog.services;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -88,4 +89,14 @@ public interface ProductService {
      * Get products by brand ID
      */
     List<Product> getProductsByBrandId(Long brandId);
+    
+    /**
+     * Convert DTO to entity
+     */
+    Product mapToEntity(ProductDTO productDTO);
+    
+    /**
+     * Create DTO from entity
+     */
+    ProductDTO mapToDTO(Product product);
 }

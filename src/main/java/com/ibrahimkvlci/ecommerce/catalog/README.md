@@ -52,7 +52,7 @@ productDTO.setTitle("Sample Product");
 productDTO.setDescription("A sample product description");
 productDTO.setPrice(29.99);
 
-Product createdProduct = productService.createProduct(productDTO.toEntity());
+Product createdProduct = productService.createProduct(productService.mapToEntity(productDTO));
 
 // Search products by title
 List<Product> products = productService.searchProductsByTitle("Sample");
