@@ -99,6 +99,12 @@ public class InventoryServiceImpl implements InventoryService {
         dto.setQuantity(inventory.getQuantity());
         return dto;
     }
+
+    @Override
+    public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId) {
+        return this.mapToDTO(inventoryRepository.findByProductIdAndSellerId(productId, sellerId).orElseThrow(() -> new InventoryNotFoundException("Inventory not found for product ID: " + productId + " and seller ID: " + sellerId)));
+    }
+
 }
 
 

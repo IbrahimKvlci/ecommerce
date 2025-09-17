@@ -3,11 +3,13 @@ package com.ibrahimkvlci.ecommerce.bus.order;
 import org.springframework.stereotype.Component;
 
 import com.ibrahimkvlci.ecommerce.bus.catalog.CategoryBus;
+import com.ibrahimkvlci.ecommerce.bus.catalog.InventoryBus;
 import com.ibrahimkvlci.ecommerce.bus.catalog.ProductBus;
 import com.ibrahimkvlci.ecommerce.bus.auth.CustomerBus;
 import com.ibrahimkvlci.ecommerce.order.dto.CategoryDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.CustomerDTO;
+import com.ibrahimkvlci.ecommerce.order.dto.InventoryDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,9 +20,10 @@ public class OrderBus {
     private final ProductBus productBus;
     private final CategoryBus categoryBus;
     private final CustomerBus customerBus;
+    private final InventoryBus inventoryBus;
 
     public ProductDTO getProductById(Long productId){
-        return new ProductDTO(productBus.getProductById(productId).getId(), productBus.getProductById(productId).getTitle());
+        return new ProductDTO(productBus.getProductById(productId).getId(), productBus.getProductById(productId).getTitle(), productBus.getProductById(productId).g(), productBus.getProductById(productId).getPrice());
     }
 
     public boolean isProductAvailable(Long productId){
@@ -59,5 +62,12 @@ public class OrderBus {
 
     public boolean existsCustomerByEmail(String email){
         return customerBus.existsByEmail(email);
+    }
+
+    public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId){
+        return new InventoryDTO(
+            inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getProductId(),
+            inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getQuantity()
+        );
     }
 }
