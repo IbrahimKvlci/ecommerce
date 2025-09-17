@@ -66,9 +66,9 @@ public class ShipmentDetailServiceImpl implements ShipmentDetailService {
         
         // Update fields
         existingShipmentDetail.setOrderId(shipmentDetailDTO.getOrderId());
-        if (shipmentDetailDTO.getAddressDetail() != null) {
-            existingShipmentDetail.setAddressDetail(addressDetailService.mapToEntity(shipmentDetailDTO.getAddressDetail()));
-        }
+        existingShipmentDetail.setAddressDetail(addressDetailService.getAddressDetailById(shipmentDetailDTO.getAddressDetailId())
+                .map(addressDetailService::mapToEntity)
+                .orElse(null));
         existingShipmentDetail.setShippingMethod(shipmentDetailDTO.getShippingMethod());
         
         ShipmentDetail updatedShipmentDetail = shipmentDetailRepository.save(existingShipmentDetail);
@@ -135,7 +135,7 @@ public class ShipmentDetailServiceImpl implements ShipmentDetailService {
         dto.setId(shipmentDetail.getId());
         dto.setOrderId(shipmentDetail.getOrderId());
         if (shipmentDetail.getAddressDetail() != null) {
-            dto.setAddressDetail(addressDetailService.mapToDTO(shipmentDetail.getAddressDetail()));
+            dto.setAddressDetailId(shipmentDetail.getAddressDetail().getId());
         }
         dto.setShippingMethod(shipmentDetail.getShippingMethod());
         return dto;
@@ -146,8 +146,10 @@ public class ShipmentDetailServiceImpl implements ShipmentDetailService {
         ShipmentDetail shipmentDetail = new ShipmentDetail();
         shipmentDetail.setId(shipmentDetailDTO.getId());
         shipmentDetail.setOrderId(shipmentDetailDTO.getOrderId());
-        if (shipmentDetailDTO.getAddressDetail() != null) {
-            shipmentDetail.setAddressDetail(addressDetailService.mapToEntity(shipmentDetailDTO.getAddressDetail()));
+        if (shipmentDetailDTO.getAddressDetailId() != null) {
+            shipmentDetail.setAddressDetail(addressDetailService.getAddressDetailById(shipmentDetailDTO.getAddressDetailId())
+                .map(addressDetailService::mapToEntity)
+                .orElse(null));
         }
         shipmentDetail.setShippingMethod(shipmentDetailDTO.getShippingMethod());
         return shipmentDetail;

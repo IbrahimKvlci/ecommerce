@@ -21,7 +21,7 @@ public class ShipmentDetailDTO {
     @NotNull(message = "Order ID is required")
     private Long orderId;
     
-    private AddressDetailDTO addressDetail;
+    private Long addressDetailId;
     
     @NotNull(message = "Shipping method is required")
     private ShippingMethod shippingMethod;
