@@ -16,4 +16,8 @@ public class InventoryBus {
     public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId){
         return inventoryApp.getInventoryByProductIdAndSellerId(productId, sellerId);
     }
+
+    public InventoryDTO updateInventory(Long id, InventoryDTO inventoryDTO){
+        return inventoryApp.updateInventory(id, inventoryDTO);
+    }
 }

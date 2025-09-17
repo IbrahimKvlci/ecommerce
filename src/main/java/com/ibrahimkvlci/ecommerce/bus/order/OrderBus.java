@@ -23,7 +23,7 @@ public class OrderBus {
     private final InventoryBus inventoryBus;
 
     public ProductDTO getProductById(Long productId){
-        return new ProductDTO(productBus.getProductById(productId).getId(), productBus.getProductById(productId).getTitle(), productBus.getProductById(productId).g(), productBus.getProductById(productId).getPrice());
+        return new ProductDTO(productBus.getProductById(productId).getId(), productBus.getProductById(productId).getTitle(), productBus.getProductById(productId).getPrice());
     }
 
     public boolean isProductAvailable(Long productId){
@@ -66,8 +66,21 @@ public class OrderBus {
 
     public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId){
         return new InventoryDTO(
+            inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getId(),
             inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getProductId(),
-            inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getQuantity()
+            inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getQuantity(),
+            sellerId
+        );
+    }
+
+    public InventoryDTO updateInventory(Long id, InventoryDTO inventoryDTO){
+        com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO inventory = inventoryBus.updateInventory(id, new com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO(inventoryDTO.getId(), inventoryDTO.getProductId(),inventoryDTO.getQuantity(), inventoryDTO.getSellerId()));
+
+        return new InventoryDTO(
+            inventory.getId(),
+            inventory.getProductId(),
+            inventory.getQuantity(),
+            inventory.getSellerId()
         );
     }
 }

@@ -18,4 +18,9 @@ public class InventoryClientModularMonolith implements InventoryClient {
         return orderBus.getInventoryByProductIdAndSellerId(productId, sellerId);
     }
 
+    @Override
+    public InventoryDTO updateInventory(Long id, InventoryDTO inventoryDTO) {
+        return orderBus.updateInventory(id, inventoryDTO);
+    }
+
 }

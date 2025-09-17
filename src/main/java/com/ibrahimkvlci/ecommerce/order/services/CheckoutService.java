@@ -4,5 +4,8 @@ import com.ibrahimkvlci.ecommerce.order.dto.OrderDTO;
 
 public interface CheckoutService {
 
-    OrderDTO checkout(Long cartId);
+    OrderDTO checkoutPending(Long cartId);
+
+    OrderDTO completeCheckout(Long orderId);
+
 }

@@ -26,6 +26,9 @@ public class OrderItem {
     @Column(name = "product_id", nullable = false)
     private Long productId;
 
+    @Column(name = "seller_id", nullable = false)
+    private Long sellerId;
+
     @Column(name = "quantity", nullable = false)
     @NotNull(message = "Quantity is required")
     @Positive(message = "Quantity must be positive")

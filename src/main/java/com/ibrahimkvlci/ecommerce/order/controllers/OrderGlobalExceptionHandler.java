@@ -5,6 +5,9 @@ import com.ibrahimkvlci.ecommerce.order.exceptions.OrderValidationException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.OrderItemNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.OrderStatusException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.InsufficientInventoryException;
+import com.ibrahimkvlci.ecommerce.order.exceptions.CartNotFoundException;
+import com.ibrahimkvlci.ecommerce.order.exceptions.CartItemNotFoundException;
+import com.ibrahimkvlci.ecommerce.order.exceptions.CheckoutException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -73,6 +76,39 @@ public class OrderGlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
             HttpStatus.BAD_REQUEST.value(),
             "Insufficient Inventory",
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(CartNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCartNotFoundException(CartNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.NOT_FOUND.value(),
+            "Cart Not Found",
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(CartItemNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCartItemNotFoundException(CartItemNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.NOT_FOUND.value(),
+            "Cart Item Not Found",
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(CheckoutException.class)
+    public ResponseEntity<ErrorResponse> handleCheckoutException(CheckoutException ex) {
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            "Checkout Failed",
             ex.getMessage(),
             LocalDateTime.now()
         );

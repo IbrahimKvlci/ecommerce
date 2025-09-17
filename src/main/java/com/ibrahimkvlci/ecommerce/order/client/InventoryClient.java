@@ -5,4 +5,6 @@ import com.ibrahimkvlci.ecommerce.order.dto.InventoryDTO;
 public interface InventoryClient {
 
     InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId);
+
+    InventoryDTO updateInventory(Long id, InventoryDTO inventoryDTO);
 }

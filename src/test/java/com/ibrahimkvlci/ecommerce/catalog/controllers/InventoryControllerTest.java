@@ -30,8 +30,8 @@ public class InventoryControllerTest {
 
 	@Test
 	public void testCreateInventory() {
-		InventoryDTO dto = new InventoryDTO(null, 1L, 5);
-		InventoryDTO saved = new InventoryDTO(10L, 1L, 5);
+		InventoryDTO dto = new InventoryDTO(1L,null, 5, 1L);
+		InventoryDTO saved = new InventoryDTO(10L, 1L, 5, 1L);
 		Product product = new Product();
 		product.setId(1L);
 		when(inventoryService.createInventory(inventoryService.mapToEntity(dto))).thenReturn(saved);
@@ -47,7 +47,7 @@ public class InventoryControllerTest {
 
 	@Test
 	public void testGetAllInventories() {
-		List<InventoryDTO> list = Arrays.asList(new InventoryDTO(1L, 2L, 3));
+		List<InventoryDTO> list = Arrays.asList(new InventoryDTO(1L,1L, 2, 3l));
 		when(inventoryService.getAllInventories()).thenReturn(list);
 
 		ResponseEntity<List<InventoryDTO>> response = inventoryController.getAllInventories();
@@ -59,7 +59,7 @@ public class InventoryControllerTest {
 
 	@Test
 	public void testGetInventoryById() {
-		InventoryDTO dto = new InventoryDTO(3L, 4L, 7);
+		InventoryDTO dto = new InventoryDTO(3L, 4L, 7, 3L);
 		when(inventoryService.getInventoryById(3L)).thenReturn(dto);
 
 		ResponseEntity<InventoryDTO> response = inventoryController.getInventoryById(3L);
@@ -71,7 +71,7 @@ public class InventoryControllerTest {
 
 	@Test
 	public void testGetInventoriesByProductId() {
-		List<InventoryDTO> list = Arrays.asList(new InventoryDTO(5L, 9L, 1));
+		List<InventoryDTO> list = Arrays.asList(new InventoryDTO(5L, 9L, 1, 5L));
 		when(inventoryService.getInventoriesByProductId(9L)).thenReturn(list);
 
 		ResponseEntity<List<InventoryDTO>> response = inventoryController.getInventoriesByProductId(9L);
@@ -83,8 +83,8 @@ public class InventoryControllerTest {
 
 	@Test
 	public void testUpdateInventory() {
-		InventoryDTO update = new InventoryDTO(null, 1L, 20);
-		InventoryDTO updated = new InventoryDTO(7L, 1L, 20);
+		InventoryDTO update = new InventoryDTO(null, 1L, 20, 1L);
+		InventoryDTO updated = new InventoryDTO(7L, 1L, 20, 1L);
 		Product product = new Product();
 		product.setId(1L);
 		when(inventoryService.updateInventory(7L, inventoryService.mapToEntity(update))).thenReturn(updated);

@@ -37,6 +37,10 @@ public class CartItem {
     @NotNull(message = "Product ID is required")
     private Long productId;
 
+    @Column(name = "seller_id")
+    @NotNull(message = "Seller ID is required")
+    private Long sellerId;
+
     @Column(name = "quantity")
     @NotNull(message = "Quantity is required")
     private Integer quantity;
