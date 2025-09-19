@@ -33,9 +33,6 @@ public class Product {
     @Column(name = "description")
     private String description;
     
-    @Column(name = "price")
-    private double price;
-    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     @NotNull(message = "Category is required")

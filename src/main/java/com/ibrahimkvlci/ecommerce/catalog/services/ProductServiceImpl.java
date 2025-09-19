@@ -31,12 +31,7 @@ public class ProductServiceImpl implements ProductService {
         // Validate product data
         if (product.getTitle() == null || product.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Product title cannot be null or empty");
-        }
-        
-        if (product.getPrice() < 0) {
-            throw new IllegalArgumentException("Product price cannot be negative");
-        }
-        
+        }        
         // Check if product with same title already exists
         if (productExistsByTitle(product.getTitle())) {
             throw new IllegalArgumentException("Product with title '" + product.getTitle() + "' already exists");
@@ -89,10 +84,6 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Product title cannot be null or empty");
         }
         
-        if (product.getPrice() < 0) {
-            throw new IllegalArgumentException("Product price cannot be negative");
-        }
-        
         // Check if another product with same title exists (excluding current product)
         Product existing = existingProduct.get();
         if (!existing.getTitle().equals(product.getTitle()) && productExistsByTitle(product.getTitle())) {
@@ -102,7 +93,6 @@ public class ProductServiceImpl implements ProductService {
         // Update fields
         existing.setTitle(product.getTitle());
         existing.setDescription(product.getDescription());
-        existing.setPrice(product.getPrice());
         
         return productRepository.save(existing);
     }
@@ -127,38 +117,6 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Search title cannot be null or empty");
         }
         return productRepository.findByTitleContainingIgnoreCase(title.trim());
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<Product> getProductsByPriceRange(double minPrice, double maxPrice) {
-        if (minPrice < 0 || maxPrice < 0) {
-            throw new IllegalArgumentException("Prices cannot be negative");
-        }
-        
-        if (minPrice > maxPrice) {
-            throw new IllegalArgumentException("Minimum price cannot be greater than maximum price");
-        }
-        
-        return productRepository.findByPriceBetween(minPrice, maxPrice);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<Product> getProductsByMaxPrice(double maxPrice) {
-        if (maxPrice < 0) {
-            throw new IllegalArgumentException("Maximum price cannot be negative");
-        }
-        return productRepository.findByPriceLessThanEqual(maxPrice);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<Product> getProductsByMinPrice(double minPrice) {
-        if (minPrice < 0) {
-            throw new IllegalArgumentException("Minimum price cannot be negative");
-        }
-        return productRepository.findByPriceGreaterThanEqual(minPrice);
     }
     
     @Override
@@ -228,7 +186,6 @@ public class ProductServiceImpl implements ProductService {
         product.setId(productDTO.getId());
         product.setTitle(productDTO.getTitle());
         product.setDescription(productDTO.getDescription());
-        product.setPrice(productDTO.getPrice());
         if (productDTO.getCategoryId() != null) {
             Category category = new Category();
             category.setId(productDTO.getCategoryId());
@@ -250,7 +207,6 @@ public class ProductServiceImpl implements ProductService {
         dto.setId(product.getId());
         dto.setTitle(product.getTitle());
         dto.setDescription(product.getDescription());
-        dto.setPrice(product.getPrice());
         if (product.getCategory() != null) {
             dto.setCategoryId(product.getCategory().getId());
         }

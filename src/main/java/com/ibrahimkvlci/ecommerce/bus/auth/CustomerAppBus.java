@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class CustomerBus {
+public class CustomerAppBus {
 
     private final CustomerApp customerApp;
 
@@ -28,4 +28,6 @@ public class CustomerBus {
     public boolean existsByEmail(String email) {
         return customerApp.existsByEmail(email);
     }
+
+
 }

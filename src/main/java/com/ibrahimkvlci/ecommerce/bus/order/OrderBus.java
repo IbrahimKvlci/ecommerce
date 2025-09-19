@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import com.ibrahimkvlci.ecommerce.bus.catalog.CategoryBus;
 import com.ibrahimkvlci.ecommerce.bus.catalog.InventoryBus;
 import com.ibrahimkvlci.ecommerce.bus.catalog.ProductBus;
-import com.ibrahimkvlci.ecommerce.bus.auth.CustomerBus;
+import com.ibrahimkvlci.ecommerce.bus.auth.CustomerAppBus;
 import com.ibrahimkvlci.ecommerce.order.dto.CategoryDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.CustomerDTO;
@@ -19,11 +19,11 @@ public class OrderBus {
 
     private final ProductBus productBus;
     private final CategoryBus categoryBus;
-    private final CustomerBus customerBus;
+    private final CustomerAppBus customerBus;
     private final InventoryBus inventoryBus;
 
     public ProductDTO getProductById(Long productId){
-        return new ProductDTO(productBus.getProductById(productId).getId(), productBus.getProductById(productId).getTitle(), productBus.getProductById(productId).getPrice());
+        return new ProductDTO(productBus.getProductById(productId).getId(), productBus.getProductById(productId).getTitle());
     }
 
     public boolean isProductAvailable(Long productId){
@@ -69,18 +69,20 @@ public class OrderBus {
             inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getId(),
             inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getProductId(),
             inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getQuantity(),
-            sellerId
+            sellerId,
+            inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getPrice()
         );
     }
 
-    public InventoryDTO updateInventory(Long id, InventoryDTO inventoryDTO){
-        com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO inventory = inventoryBus.updateInventory(id, new com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO(inventoryDTO.getId(), inventoryDTO.getProductId(),inventoryDTO.getQuantity(), inventoryDTO.getSellerId()));
+    public InventoryDTO updateInventory(Long id, int quantity, double price){
+        com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO inventory = inventoryBus.updateInventory(id, quantity, price);
 
         return new InventoryDTO(
             inventory.getId(),
             inventory.getProductId(),
             inventory.getQuantity(),
-            inventory.getSellerId()
+            inventory.getSellerId(),
+            inventory.getPrice()
         );
     }
 }

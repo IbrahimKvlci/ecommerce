@@ -45,13 +45,6 @@ public class CartItem {
     @NotNull(message = "Quantity is required")
     private Integer quantity;
 
-    @Column(name = "price")
-    @NotNull(message = "Price is required")
-    private Double price;
-
-    @Column(name = "total_price")
-    private Double totalPrice;
-
     @Column(name = "created_at")
     @NotNull(message = "Created at is required")
     private LocalDateTime createdAt;
@@ -64,12 +57,10 @@ public class CartItem {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        this.totalPrice = this.price * this.quantity;
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
-        this.totalPrice = this.price * this.quantity;
     }
 }

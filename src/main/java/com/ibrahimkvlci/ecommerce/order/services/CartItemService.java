@@ -33,7 +33,7 @@ public interface CartItemService {
     /**
      * Get cart item by cart ID and product ID
      */
-    Optional<CartItemDTO> getCartItemByCartIdAndProductId(Long cartId, Long productId);
+    Optional<CartItemDTO> getCartItemByCartIdAndProductIdAndSellerId(Long cartId, Long productId, Long sellerId);
     
     /**
      * Update cart item
@@ -64,11 +64,6 @@ public interface CartItemService {
      * Get total quantity of items in cart
      */
     Long getTotalQuantityByCartId(Long cartId);
-    
-    /**
-     * Get total price of cart items by cart
-     */
-    Double getTotalPriceByCartId(Long cartId);
     
     /**
      * Map cart item to DTO

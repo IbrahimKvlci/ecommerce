@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerRequest;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerResponse;
+import com.ibrahimkvlci.ecommerce.auth.client.CartClient;
 import com.ibrahimkvlci.ecommerce.auth.dto.CustomerDTO;
 import com.ibrahimkvlci.ecommerce.auth.exceptions.RegistrationException;
 import com.ibrahimkvlci.ecommerce.auth.models.Customer;
@@ -33,6 +34,8 @@ public class CustomerServiceImpl implements CustomerService{
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final CartClient cartClient;
+
     @Override
     public RegisterCustomerResponse registerAsCustomer(RegisterCustomerRequest request) {
         if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
@@ -52,6 +55,8 @@ public class CustomerServiceImpl implements CustomerService{
         customer.setRoles(roles);
 
         Customer saved = customerRepository.save(customer);
+
+        cartClient.createCart(saved.getId());
 
         return new RegisterCustomerResponse(saved.getEmail(), saved.getName(), saved.getSurname(), saved.getPhoneNumber());
     }

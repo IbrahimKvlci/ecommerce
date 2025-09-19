@@ -37,7 +37,7 @@ public class InventoryServiceTest {
 
 	@Test
 	public void testCreateInventorySuccess() {
-		InventoryDTO dto = new InventoryDTO(null, 1L, 10, 1L);
+		InventoryDTO dto = new InventoryDTO(null, 1L, 10, 1L,2.0);
 		Product product = new Product();
 		product.setId(1L);
 		when(productRepository.findById(1L)).thenReturn(Optional.of(product));
@@ -55,7 +55,7 @@ public class InventoryServiceTest {
 
 	@Test
 	public void testCreateInventoryProductNotFound() {
-		InventoryDTO dto = new InventoryDTO(null, 99L, 10, 99L);
+		InventoryDTO dto = new InventoryDTO(null, 99L, 10, 99L,2.0);
 		Product product = new Product();
 		product.setId(99L);
 		when(productRepository.findById(99L)).thenReturn(Optional.empty());
@@ -66,7 +66,7 @@ public class InventoryServiceTest {
 	public void testGetAllInventories() {
 		Product p = new Product();
 		p.setId(2L);
-		List<Inventory> list = Arrays.asList(new Inventory(1L, 1L,p, 3));
+		List<Inventory> list = Arrays.asList(new Inventory(1L, 1L,p,2.0, 3));
 		when(inventoryRepository.findAll()).thenReturn(list);
 		List<InventoryDTO> result = inventoryService.getAllInventories();
 		assertEquals(1, result.size());
@@ -88,9 +88,9 @@ public class InventoryServiceTest {
 	public void testUpdateInventoryMismatchProductId() {
 		Product p = new Product();
 		p.setId(1L);
-		Inventory existing = new Inventory(7L,1L, p, 10);
+		Inventory existing = new Inventory(7L,1L, p,2.0, 10);
 		when(inventoryRepository.findById(7L)).thenReturn(Optional.of(existing));
-		InventoryDTO update = new InventoryDTO(null, 2L, 20, 2L);
+		InventoryDTO update = new InventoryDTO(null, 2L, 20, 2L,2.0);
 		Product product = new Product();
 		product.setId(2L);
 		assertThrows(InventoryValidationException.class, () -> inventoryService.updateInventory(7L, inventoryService.mapToEntity(update)));
@@ -100,10 +100,10 @@ public class InventoryServiceTest {
 	public void testUpdateInventorySuccess() {
 		Product p = new Product();
 		p.setId(1L);
-		Inventory existing = new Inventory(7L, 1L, p, 10);
+		Inventory existing = new Inventory(7L, 1L, p,2.0, 10);
 		when(inventoryRepository.findById(7L)).thenReturn(Optional.of(existing));
 		when(inventoryRepository.save(any(Inventory.class))).thenAnswer(inv -> inv.getArgument(0));
-		InventoryDTO update = new InventoryDTO(null, 1L, 25, 1L);
+		InventoryDTO update = new InventoryDTO(null, 1L, 25, 1L,2.0);
 		InventoryDTO updated = inventoryService.updateInventory(7L, inventoryService.mapToEntity(update));
 		assertEquals(25, updated.getQuantity());
 	}

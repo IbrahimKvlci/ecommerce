@@ -15,11 +15,6 @@ public interface PaymentDetailRepository extends JpaRepository<PaymentDetail, Lo
     List<PaymentDetail> findByOrderId(Long orderId);
     
     /**
-     * Find payment details by customer ID
-     */
-    List<PaymentDetail> findByCustomerId(Long customerId);
-    
-    /**
      * Find payment details by payment status
      */
     List<PaymentDetail> findByIsPaid(boolean isPaid);

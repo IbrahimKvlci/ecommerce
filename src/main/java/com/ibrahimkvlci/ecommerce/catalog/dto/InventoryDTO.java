@@ -22,6 +22,9 @@ public class InventoryDTO {
 
     @NotNull(message = "Seller ID is required")
     private Long sellerId;
+
+    @NotNull(message = "Price is required")
+    private Double price;
 }
 
 

@@ -97,15 +97,6 @@ public class PaymentDetailServiceImpl implements PaymentDetailService {
     
     @Override
     @Transactional(readOnly = true)
-    public List<PaymentDetail> getPaymentDetailsByCustomerId(Long customerId) {
-        if (customerId == null) {
-            throw new PaymentDetailValidationException("Customer ID cannot be null");
-        }
-        return paymentDetailRepository.findByCustomerId(customerId);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
     public List<PaymentDetail> getPaymentDetailsByStatus(boolean isPaid) {
         return paymentDetailRepository.findByIsPaid(isPaid);
     }

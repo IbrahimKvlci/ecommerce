@@ -36,9 +36,6 @@ public class Cart {
     @OneToMany(mappedBy = "cart", fetch = FetchType.LAZY)
     private List<CartItem> cartItems;
 
-    @Column(name = "total_price")
-    private Double totalPrice;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -49,20 +46,10 @@ public class Cart {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        if (this.cartItems != null && !this.cartItems.isEmpty()) {
-            this.totalPrice = this.cartItems.stream().mapToDouble(CartItem::getTotalPrice).sum();
-        } else {
-            this.totalPrice = 0.0;
-        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
-        if (this.cartItems != null && !this.cartItems.isEmpty()) {
-            this.totalPrice = this.cartItems.stream().mapToDouble(CartItem::getTotalPrice).sum();
-        } else {
-            this.totalPrice = 0.0;
-        }
     }
 }

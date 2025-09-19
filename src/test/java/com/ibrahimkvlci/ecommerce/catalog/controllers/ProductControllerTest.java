@@ -38,7 +38,6 @@ public class ProductControllerTest {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setTitle("Test Product");
         productDTO.setDescription("Test Description");
-        productDTO.setPrice(100.0);
         productDTO.setCategoryId(1L);
         productDTO.setBrandId(1L);
 
@@ -50,7 +49,6 @@ public class ProductControllerTest {
         assertNotNull(body);
         assertEquals(productService.mapToEntity(productDTO).getTitle(), body.getTitle());
         assertEquals(productService.mapToEntity(productDTO).getDescription(), body.getDescription());
-        assertEquals(productService.mapToEntity(productDTO).getPrice(), body.getPrice());
         assertEquals(productService.mapToEntity(productDTO).getCategory().getId(), body.getCategoryId());
         assertEquals(productService.mapToEntity(productDTO).getBrand().getId(), body.getBrandId());
         
@@ -58,11 +56,11 @@ public class ProductControllerTest {
 
     @Test
     public void testGetAllProducts() {
-        Product p1 = new Product(1L, "P1", "D1", 10.0,
+        Product p1 = new Product(1L, "P1", "D1",
                 new Category(1L, "C1", new ArrayList<Product>()),
                 new Brand(1L, "B1", new ArrayList<Product>()),
                 new ArrayList<Inventory>());
-        Product p2 = new Product(2L, "P2", "D2", 20.0,
+        Product p2 = new Product(2L, "P2", "D2",
                 new Category(2L, "C2", new ArrayList<Product>()),
                 new Brand(2L, "B2", new ArrayList<Product>()),
                 new ArrayList<Inventory>());
@@ -80,7 +78,7 @@ public class ProductControllerTest {
 
     @Test
     public void testGetProductByIdFound() {
-        Product p = new Product(1L, "P1", "D1", 10.0,
+        Product p = new Product(1L, "P1", "D1",
                 new Category(1L, "C1", new ArrayList<Product>()),
                 new Brand(1L, "B1", new ArrayList<Product>()),
                 new ArrayList<Inventory>());
@@ -106,7 +104,7 @@ public class ProductControllerTest {
 
     @Test
     public void testUpdateProduct() {
-        ProductDTO updateDTO = new ProductDTO(1L, "Updated", "Desc", 30.0, 3L, 4L);
+        ProductDTO updateDTO = new ProductDTO(1L, "Updated", "Desc", 3L, 4L);
         Product updated = productService.mapToEntity(updateDTO);
 
         when(productService.updateProduct(1L, productService.mapToEntity(updateDTO))).thenReturn(updated);
@@ -128,7 +126,7 @@ public class ProductControllerTest {
 
     @Test
     public void testSearchProductsByTitle() {
-        Product p = new Product(1L, "Phone", "Great", 100.0,
+        Product p = new Product(1L, "Phone", "Great",
                 new Category(1L, "C1", new ArrayList<Product>()),
                 new Brand(1L, "B1", new ArrayList<Product>()),
                 new ArrayList<Inventory>());
@@ -144,7 +142,7 @@ public class ProductControllerTest {
 
     @Test
     public void testSearchProductsByDescription() {
-        Product p = new Product(2L, "Laptop", "Gaming", 1500.0,
+        Product p = new Product(2L, "Laptop", "Gaming",
                 new Category(2L, "C2", new ArrayList<Product>()),
                 new Brand(2L, "B2", new ArrayList<Product>()),
                 new ArrayList<Inventory>());
@@ -157,58 +155,9 @@ public class ProductControllerTest {
         assertEquals(1, body.size());
         assertEquals("Laptop", body.get(0).getTitle());
     }
-
-    @Test
-    public void testGetProductsByPriceRange() {
-        Product p = new Product(3L, "Mouse", "Wireless", 25.0,
-                new Category(3L, "C3", new ArrayList<Product>()),
-                new Brand(3L, "B3", new ArrayList<Product>()),
-                new ArrayList<Inventory>());
-        when(productService.getProductsByPriceRange(20.0, 30.0)).thenReturn(Arrays.asList(p));
-
-        ResponseEntity<List<ProductDTO>> response = productController.getProductsByPriceRange(20.0, 30.0);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        List<ProductDTO> body = response.getBody();
-        assertNotNull(body);
-        assertEquals(1, body.size());
-        assertEquals("Mouse", body.get(0).getTitle());
-    }
-
-    @Test
-    public void testGetProductsByMaxPrice() {
-        Product p = new Product(4L, "Cable", "USB-C", 9.0,
-                new Category(4L, "C4", new ArrayList<Product>()),
-                new Brand(4L, "B4", new ArrayList<Product>()),
-                new ArrayList<Inventory>());
-        when(productService.getProductsByMaxPrice(10.0)).thenReturn(Arrays.asList(p));
-
-        ResponseEntity<List<ProductDTO>> response = productController.getProductsByMaxPrice(10.0);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        List<ProductDTO> body = response.getBody();
-        assertNotNull(body);
-        assertEquals(1, body.size());
-        assertEquals("Cable", body.get(0).getTitle());
-    }
-
-    @Test
-    public void testGetProductsByMinPrice() {
-        Product p = new Product(5L, "Monitor", "4K", 300.0,
-                new Category(5L, "C5", new ArrayList<Product>()),
-                new Brand(5L, "B5", new ArrayList<Product>()),
-                new ArrayList<Inventory>());
-        when(productService.getProductsByMinPrice(299.0)).thenReturn(Arrays.asList(p));
-
-        ResponseEntity<List<ProductDTO>> response = productController.getProductsByMinPrice(299.0);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        List<ProductDTO> body = response.getBody();
-        assertNotNull(body);
-        assertEquals(1, body.size());
-        assertEquals("Monitor", body.get(0).getTitle());
-    }
-
     @Test
     public void testGetProductsByCategoryId() {
-        Product p = new Product(6L, "Desk", "Office", 120.0,
+        Product p = new Product(6L, "Desk", "Office",
                 new Category(10L, "Furniture", new ArrayList<Product>()),
                 new Brand(6L, "B6", new ArrayList<Product>()),
                 new ArrayList<Inventory>());
@@ -224,7 +173,7 @@ public class ProductControllerTest {
 
     @Test
     public void testGetProductsByBrandId() {
-        Product p = new Product(7L, "Chair", "Ergonomic", 200.0,
+        Product p = new Product(7L, "Chair", "Ergonomic",
                 new Category(7L, "C7", new ArrayList<Product>()),
                 new Brand(20L, "Seating", new ArrayList<Product>()),
                 new ArrayList<Inventory>());

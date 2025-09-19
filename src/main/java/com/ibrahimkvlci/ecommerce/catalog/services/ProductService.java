@@ -41,21 +41,6 @@ public interface ProductService {
     List<Product> searchProductsByTitle(String title);
     
     /**
-     * Get products by price range
-     */
-    List<Product> getProductsByPriceRange(double minPrice, double maxPrice);
-    
-    /**
-     * Get products with price less than or equal to given price
-     */
-    List<Product> getProductsByMaxPrice(double maxPrice);
-    
-    /**
-     * Get products with price greater than or equal to given price
-     */
-    List<Product> getProductsByMinPrice(double minPrice);
-    
-    /**
      * Search products by description
      */
     List<Product> searchProductsByDescription(String keyword);

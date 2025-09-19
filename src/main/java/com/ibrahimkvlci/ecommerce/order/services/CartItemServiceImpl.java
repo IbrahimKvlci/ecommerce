@@ -1,5 +1,6 @@
 package com.ibrahimkvlci.ecommerce.order.services;
 
+import com.ibrahimkvlci.ecommerce.order.client.InventoryClient;
 import com.ibrahimkvlci.ecommerce.order.dto.AddCartItemRequest;
 import com.ibrahimkvlci.ecommerce.order.dto.CartItemDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.UpdateCartItemRequest;
@@ -9,7 +10,9 @@ import com.ibrahimkvlci.ecommerce.order.models.Cart;
 import com.ibrahimkvlci.ecommerce.order.models.CartItem;
 import com.ibrahimkvlci.ecommerce.order.repositories.CartItemRepository;
 import com.ibrahimkvlci.ecommerce.order.repositories.CartRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,13 +22,13 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CartItemServiceImpl implements CartItemService {
     
-    @Autowired
-    private CartItemRepository cartItemRepository;
-    
-    @Autowired
-    private CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
+    private final CartRepository cartRepository;
+
+    private final InventoryClient inventoryClient;
     
     @Override
     public CartItemDTO addCartItem(AddCartItemRequest request) {
@@ -34,22 +37,21 @@ public class CartItemServiceImpl implements CartItemService {
                 .orElseThrow(() -> new CartNotFoundException("Cart not found with id: " + request.getCartId()));
         
         // Check if item already exists in cart
-        Optional<CartItem> existingItem = cartItemRepository.findByCartIdAndProductId(
-                request.getCartId(), request.getProductId());
+        Optional<CartItem> existingItem = cartItemRepository.findByCartIdAndProductIdAndSellerId(
+                request.getCartId(), request.getProductId(), request.getSellerId());
         
         CartItem cartItem;
         if (existingItem.isPresent()) {
             // Update existing item quantity
             cartItem = existingItem.get();
             cartItem.setQuantity(cartItem.getQuantity() + request.getQuantity());
-            cartItem.setPrice(request.getPrice());
         } else {
             // Create new cart item
             cartItem = new CartItem();
             cartItem.setCart(cart);
             cartItem.setProductId(request.getProductId());
             cartItem.setQuantity(request.getQuantity());
-            cartItem.setPrice(request.getPrice());
+            cartItem.setSellerId(request.getSellerId());
         }
         
         CartItem savedCartItem = cartItemRepository.save(cartItem);
@@ -81,8 +83,8 @@ public class CartItemServiceImpl implements CartItemService {
     
     @Override
     @Transactional(readOnly = true)
-    public Optional<CartItemDTO> getCartItemByCartIdAndProductId(Long cartId, Long productId) {
-        return cartItemRepository.findByCartIdAndProductId(cartId, productId)
+    public Optional<CartItemDTO> getCartItemByCartIdAndProductIdAndSellerId(Long cartId, Long productId, Long sellerId) {
+        return cartItemRepository.findByCartIdAndProductIdAndSellerId(cartId, productId, sellerId)
                 .map(this::mapToDTO);
     }
     
@@ -132,21 +134,17 @@ public class CartItemServiceImpl implements CartItemService {
     }
     
     @Override
-    @Transactional(readOnly = true)
-    public Double getTotalPriceByCartId(Long cartId) {
-        Double totalPrice = cartItemRepository.getTotalPriceByCartId(cartId);
-        return totalPrice != null ? totalPrice : 0.0;
-    }
-    
-    @Override
     public CartItemDTO mapToDTO(CartItem cartItem) {
         CartItemDTO cartItemDTO = new CartItemDTO();
         cartItemDTO.setId(cartItem.getId());
         cartItemDTO.setCartId(cartItem.getCart().getId());
         cartItemDTO.setProductId(cartItem.getProductId());
         cartItemDTO.setQuantity(cartItem.getQuantity());
-        cartItemDTO.setPrice(cartItem.getPrice());
-        cartItemDTO.setTotalPrice(cartItem.getTotalPrice());
+
+        var inventory = inventoryClient.getInventoryByProductIdAndSellerId(cartItem.getProductId(), cartItem.getSellerId());
+        cartItemDTO.setPrice(inventory.getPrice());
+        cartItemDTO.setTotalPrice(inventory.getPrice() * cartItem.getQuantity());
+        
         cartItemDTO.setCreatedAt(cartItem.getCreatedAt());
         cartItemDTO.setUpdatedAt(cartItem.getUpdatedAt());
         
@@ -159,8 +157,6 @@ public class CartItemServiceImpl implements CartItemService {
         cartItem.setId(cartItemDTO.getId());
         cartItem.setProductId(cartItemDTO.getProductId());
         cartItem.setQuantity(cartItemDTO.getQuantity());
-        cartItem.setPrice(cartItemDTO.getPrice());
-        cartItem.setTotalPrice(cartItemDTO.getTotalPrice());
         cartItem.setCreatedAt(cartItemDTO.getCreatedAt());
         cartItem.setUpdatedAt(cartItemDTO.getUpdatedAt());
         

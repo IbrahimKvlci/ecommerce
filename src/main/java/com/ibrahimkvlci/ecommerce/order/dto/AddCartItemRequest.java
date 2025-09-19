@@ -16,12 +16,11 @@ public class AddCartItemRequest {
     
     @NotNull(message = "Product ID is required")
     private Long productId;
+
+    @NotNull(message = "Seller ID is required")
+    private Long sellerId;
     
     @NotNull(message = "Quantity is required")
     @Positive(message = "Quantity must be positive")
     private Integer quantity;
-    
-    @NotNull(message = "Price is required")
-    @Positive(message = "Price must be positive")
-    private Double price;
 }

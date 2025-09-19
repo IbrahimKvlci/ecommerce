@@ -1,13 +1,14 @@
 package com.ibrahimkvlci.ecommerce.order.services;
 
+import com.ibrahimkvlci.ecommerce.order.client.InventoryClient;
 import com.ibrahimkvlci.ecommerce.order.dto.CartDTO;
-import com.ibrahimkvlci.ecommerce.order.dto.CartItemDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.CreateCartRequest;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CartNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.models.Cart;
-import com.ibrahimkvlci.ecommerce.order.models.CartItem;
 import com.ibrahimkvlci.ecommerce.order.repositories.CartRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,11 +18,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     
-    @Autowired
-    private CartRepository cartRepository;
-    
+    private final CartRepository cartRepository;
+
+    private final InventoryClient inventoryClient;
+    private final CartItemService cartItemService;
+
     @Override
     public CartDTO createCart(CreateCartRequest request) {
         // Check if cart already exists for customer
@@ -31,7 +35,6 @@ public class CartServiceImpl implements CartService {
         
         Cart cart = new Cart();
         cart.setCustomerId(request.getCustomerId());
-        cart.setTotalPrice(0.0);
         
         Cart savedCart = cartRepository.save(cart);
         return mapToDTO(savedCart);
@@ -74,7 +77,7 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new CartNotFoundException("Cart not found with id: " + cartId));
         
         return cart.getCartItems().stream()
-                .mapToDouble(item -> item.getTotalPrice() != null ? item.getTotalPrice() : 0.0)
+                .mapToDouble(item -> inventoryClient.getInventoryByProductIdAndSellerId(item.getProductId(), item.getSellerId()).getPrice() * item.getQuantity())
                 .sum();
     }
     
@@ -84,7 +87,6 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new CartNotFoundException("Cart not found with id: " + cartId));
         
         cart.getCartItems().clear();
-        cart.setTotalPrice(0.0);
         
         Cart savedCart = cartRepository.save(cart);
         return mapToDTO(savedCart);
@@ -109,13 +111,17 @@ public class CartServiceImpl implements CartService {
         CartDTO cartDTO = new CartDTO();
         cartDTO.setId(cart.getId());
         cartDTO.setCustomerId(cart.getCustomerId());
-        cartDTO.setTotalPrice(cart.getTotalPrice());
+
+        cartDTO.setTotalPrice(cart.getCartItems().stream()
+                .mapToDouble(item -> inventoryClient.getInventoryByProductIdAndSellerId(item.getProductId(), item.getSellerId()).getPrice() * item.getQuantity())
+                .sum());
+
         cartDTO.setCreatedAt(cart.getCreatedAt());
         cartDTO.setUpdatedAt(cart.getUpdatedAt());
         
         if (cart.getCartItems() != null) {
             cartDTO.setCartItems(cart.getCartItems().stream()
-                    .map(this::mapCartItemToDTO)
+                    .map(cartItemService::mapToDTO)
                     .collect(Collectors.toList()));
         }
         
@@ -127,24 +133,9 @@ public class CartServiceImpl implements CartService {
         Cart cart = new Cart();
         cart.setId(cartDTO.getId());
         cart.setCustomerId(cartDTO.getCustomerId());
-        cart.setTotalPrice(cartDTO.getTotalPrice());
         cart.setCreatedAt(cartDTO.getCreatedAt());
         cart.setUpdatedAt(cartDTO.getUpdatedAt());
         
         return cart;
-    }
-    
-    private CartItemDTO mapCartItemToDTO(CartItem cartItem) {
-        CartItemDTO cartItemDTO = new CartItemDTO();
-        cartItemDTO.setId(cartItem.getId());
-        cartItemDTO.setCartId(cartItem.getCart().getId());
-        cartItemDTO.setProductId(cartItem.getProductId());
-        cartItemDTO.setQuantity(cartItem.getQuantity());
-        cartItemDTO.setPrice(cartItem.getPrice());
-        cartItemDTO.setTotalPrice(cartItem.getTotalPrice());
-        cartItemDTO.setCreatedAt(cartItem.getCreatedAt());
-        cartItemDTO.setUpdatedAt(cartItem.getUpdatedAt());
-        
-        return cartItemDTO;
     }
 }

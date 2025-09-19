@@ -93,20 +93,6 @@ public class PaymentDetailController {
     }
     
     /**
-     * Get payment details by customer ID
-     */
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<PaymentDetailDTO>> getPaymentDetailsByCustomerId(@PathVariable Long customerId) {
-        List<PaymentDetail> paymentDetails = paymentDetailService.getPaymentDetailsByCustomerId(customerId);
-        List<PaymentDetailDTO> paymentDetailDTOs = paymentDetails.stream()
-                .map(paymentDetailService::mapToDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(paymentDetailDTOs);
-    }
-    
-    
-    
-    /**
      * Get payment details by payment status
      */
     @GetMapping("/status/{isPaid}")

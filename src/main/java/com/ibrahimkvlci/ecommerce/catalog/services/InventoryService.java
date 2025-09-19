@@ -8,6 +8,7 @@ import java.util.List;
 public interface InventoryService {
 
     InventoryDTO createInventory(Inventory inventory);
+    InventoryDTO createInventory(InventoryDTO inventoryDTO);
 
     List<InventoryDTO> getAllInventories();
 
@@ -18,6 +19,8 @@ public interface InventoryService {
     InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId);
 
     InventoryDTO updateInventory(Long id, Inventory inventory);
+
+    InventoryDTO updateInventory(Long id, int quantity, double price);
 
     void deleteInventory(Long id);
     

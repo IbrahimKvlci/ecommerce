@@ -10,7 +10,6 @@ import com.ibrahimkvlci.ecommerce.order.client.InventoryClient;
 import com.ibrahimkvlci.ecommerce.order.client.ProductClient;
 import com.ibrahimkvlci.ecommerce.order.dto.InventoryDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.OrderDTO;
-import com.ibrahimkvlci.ecommerce.order.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CartNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.OrderNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CheckoutException;
@@ -45,22 +44,24 @@ public class CheckoutServiceImpl implements CheckoutService {
             if(!productClient.isProductAvailable(cartItem.getProductId())){
                 throw new CheckoutException(cartId, "Product with ID " + cartItem.getProductId() + " is not available");
             }
-            ProductDTO product = productClient.getProductById(cartItem.getProductId());
-            if(inventoryClient.getInventoryByProductIdAndSellerId(cartItem.getProductId(), cartItem.getSellerId()).getQuantity() < cartItem.getQuantity()){
+            InventoryDTO inventory = inventoryClient.getInventoryByProductIdAndSellerId(cartItem.getProductId(), cartItem.getSellerId());
+            if(inventory.getQuantity() < cartItem.getQuantity()){
                 throw new CheckoutException(cartId, "Insufficient inventory for product ID " + cartItem.getProductId());
             }
 
             OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
             orderItem.setProductId(cartItem.getProductId());
+            orderItem.setSellerId(cartItem.getSellerId());
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setUnitPrice(product.getPrice());
-            orderItem.setTotalPrice(cartItem.getTotalPrice());
+            orderItem.setUnitPrice(inventory.getPrice());
+            orderItem.setTotalPrice(inventory.getPrice() * cartItem.getQuantity());
             orderItems.add(orderItem);
         }
 
         
         order.setStatus(OrderStatus.PENDING);
-        order.setTotalAmount(cart.getTotalPrice());
+        order.setTotalAmount(orderItems.stream().mapToDouble(OrderItem::getTotalPrice).sum());
         order.setCustomerId(cart.getCustomerId());
         order.setOrderItems(orderItems);
         orderRepository.save(order);
@@ -78,7 +79,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         }
         for(OrderItem orderItem : order.getOrderItems()){
             InventoryDTO inventory = inventoryClient.getInventoryByProductIdAndSellerId(orderItem.getProductId(), orderItem.getSellerId());
-            inventoryClient.updateInventory(inventory.getId(), new InventoryDTO(inventory.getId(), inventory.getProductId(), inventory.getQuantity() - orderItem.getQuantity(), inventory.getSellerId()));
+            inventoryClient.updateInventory(inventory.getId(), inventory.getQuantity() - orderItem.getQuantity(), inventory.getPrice());
         }
         order.setStatus(OrderStatus.CONFIRMED);
         orderRepository.save(order);

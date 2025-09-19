@@ -13,4 +13,5 @@ public class InventoryDTO {
     private Long productId;
     private Integer quantity;
     private Long sellerId;
+    private Double price;
 }

@@ -38,7 +38,7 @@ public class ProductServiceTest {
     public void testCreateProduct() {
         Brand mockBrand = new Brand(1L, "Mock Brand",new ArrayList<Product>());
         Category mockCategory = new Category(1L, "Mock Category",new ArrayList<Product>());
-        Product mockProduct = new Product(1L, "Mock Product", "TEST", 100.0, mockCategory, mockBrand,new ArrayList<Inventory>());
+        Product mockProduct = new Product(1L, "Mock Product", "TEST", mockCategory, mockBrand,new ArrayList<Inventory>());
 
         when(productRepository.save(mockProduct)).thenReturn(mockProduct);
         when(brandRepository.findById(mockProduct.getBrand().getId())).thenReturn(Optional.of(mockBrand));
@@ -54,7 +54,7 @@ public class ProductServiceTest {
     public void testCreateProductWithInvalidBrand() {
         Category mockCategory = new Category(1L, "Mock Category", new ArrayList<Product>());
         Brand invalidBrand = new Brand(2L, "Invalid Brand", new ArrayList<Product>());
-        Product mockProduct = new Product(1L, "Mock Product", "TEST", 100.0, mockCategory, invalidBrand, new ArrayList<Inventory>());
+        Product mockProduct = new Product(1L, "Mock Product", "TEST", mockCategory, invalidBrand, new ArrayList<Inventory>());
 
         when(brandRepository.findById(invalidBrand.getId())).thenReturn(Optional.empty());
 
@@ -65,7 +65,7 @@ public class ProductServiceTest {
     public void testCreateProductWithInvalidCategory() {
         Brand mockBrand = new Brand(1L, "Mock Brand",new ArrayList<Product>());
         Category invalidCategory = new Category(2L, "Invalid Category", new ArrayList<Product>());
-        Product mockProduct = new Product(1L, "Mock Product", "TEST", 100.0, invalidCategory, mockBrand, new ArrayList<Inventory>());
+        Product mockProduct = new Product(1L, "Mock Product", "TEST", invalidCategory, mockBrand, new ArrayList<Inventory>());
 
         when(brandRepository.findById(mockBrand.getId())).thenReturn(Optional.of(mockBrand));
         when(categoryRepository.findById(invalidCategory.getId())).thenReturn(Optional.empty());
@@ -84,21 +84,8 @@ public class ProductServiceTest {
     public void testSearchProductsByTitleWithBlankKeyword() {
         assertThrows(IllegalArgumentException.class, () -> productService.searchProductsByTitle("   "));
     }
-    
-    @Test
-    public void testGetProductsByPriceRangeWithInvalidRange() {
-        assertThrows(IllegalArgumentException.class, () -> productService.getProductsByPriceRange(200.0, 100.0));
-    }
-    
-    @Test
-    public void testGetProductsByMaxPriceNegative() {
-        assertThrows(IllegalArgumentException.class, () -> productService.getProductsByMaxPrice(-1.0));
-    }
-    
-    @Test
-    public void testGetProductsByMinPriceNegative() {
-        assertThrows(IllegalArgumentException.class, () -> productService.getProductsByMinPrice(-1.0));
-    }
+
+
     
     @Test
     public void testGetProductsByCategoryNull() {
@@ -137,7 +124,7 @@ public class ProductServiceTest {
     public void testCreateProductWithDuplicateTitle() {
         Brand mockBrand = new Brand(1L, "Mock Brand", new ArrayList<Product>());
         Category mockCategory = new Category(1L, "Mock Category", new ArrayList<Product>());
-        Product mockProduct = new Product(1L, "Duplicate Title", "TEST", 100.0, mockCategory, mockBrand, new ArrayList<Inventory>());
+        Product mockProduct = new Product(1L, "Duplicate Title", "TEST", mockCategory, mockBrand, new ArrayList<Inventory>());
 
         when(productRepository.existsByTitle("Duplicate Title")).thenReturn(true);
 
@@ -148,7 +135,7 @@ public class ProductServiceTest {
     public void testCreateProductWithEmptyTitle() {
         Brand mockBrand = new Brand(1L, "Mock Brand", new ArrayList<Product>());
         Category mockCategory = new Category(1L, "Mock Category", new ArrayList<Product>());
-        Product mockProduct = new Product(1L, "", "TEST", 50.0, mockCategory, mockBrand, new ArrayList<Inventory>());
+        Product mockProduct = new Product(1L, "", "TEST", mockCategory, mockBrand, new ArrayList<Inventory>());
 
         assertThrows(IllegalArgumentException.class, () -> productService.createProduct(mockProduct));
     }
@@ -157,7 +144,7 @@ public class ProductServiceTest {
     public void testCreateProductWithNegativePrice() {
         Brand mockBrand = new Brand(1L, "Mock Brand", new ArrayList<Product>());
         Category mockCategory = new Category(1L, "Mock Category", new ArrayList<Product>());
-        Product mockProduct = new Product(1L, "Mock Product", "TEST", -10.0, mockCategory, mockBrand, new ArrayList<Inventory>());
+        Product mockProduct = new Product(1L, "Mock Product", "TEST", mockCategory, mockBrand, new ArrayList<Inventory>());
 
         assertThrows(IllegalArgumentException.class, () -> productService.createProduct(mockProduct));
     }

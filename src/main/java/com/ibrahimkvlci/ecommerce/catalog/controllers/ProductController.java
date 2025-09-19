@@ -103,44 +103,7 @@ public class ProductController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
-    
-    /**
-     * Get products by price range
-     */
-    @GetMapping("/search/price-range")
-    public ResponseEntity<List<ProductDTO>> getProductsByPriceRange(
-            @RequestParam double minPrice, 
-            @RequestParam double maxPrice) {
-        List<Product> products = productService.getProductsByPriceRange(minPrice, maxPrice);
-        List<ProductDTO> productDTOs = products.stream()
-                .map(productService::mapToDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(productDTOs);
-    }
-    
-    /**
-     * Get products by maximum price
-     */
-    @GetMapping("/search/max-price")
-    public ResponseEntity<List<ProductDTO>> getProductsByMaxPrice(@RequestParam double maxPrice) {
-        List<Product> products = productService.getProductsByMaxPrice(maxPrice);
-        List<ProductDTO> productDTOs = products.stream()
-                .map(productService::mapToDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(productDTOs);
-    }
-    
-    /**
-     * Get products by minimum price
-     */
-    @GetMapping("/search/min-price")
-    public ResponseEntity<List<ProductDTO>> getProductsByMinPrice(@RequestParam double minPrice) {
-        List<Product> products = productService.getProductsByMinPrice(minPrice);
-        List<ProductDTO> productDTOs = products.stream()
-                .map(productService::mapToDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(productDTOs);
-    }
+
     
     /**
      * Get products by category ID

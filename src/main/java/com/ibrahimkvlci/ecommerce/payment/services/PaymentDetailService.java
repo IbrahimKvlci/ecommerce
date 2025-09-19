@@ -39,11 +39,6 @@ public interface PaymentDetailService {
     List<PaymentDetail> getPaymentDetailsByOrderId(Long orderId);
     
     /**
-     * Get payment details by customer ID
-     */
-    List<PaymentDetail> getPaymentDetailsByCustomerId(Long customerId);
-    
-    /**
      * Get payment details by payment status
      */
     List<PaymentDetail> getPaymentDetailsByStatus(boolean isPaid);

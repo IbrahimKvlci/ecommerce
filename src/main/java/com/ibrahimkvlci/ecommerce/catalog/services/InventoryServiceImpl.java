@@ -85,6 +85,9 @@ public class InventoryServiceImpl implements InventoryService {
         Inventory inventory = new Inventory();
         inventory.setId(inventoryDTO.getId());
         inventory.setQuantity(inventoryDTO.getQuantity());
+        inventory.setPrice(inventoryDTO.getPrice());
+        inventory.setSellerId(inventoryDTO.getSellerId());
+        inventory.setProduct(productRepository.findById(inventoryDTO.getProductId()).orElseThrow(() -> new InventoryValidationException("Product not found with ID: " + inventoryDTO.getProductId())));
         // Note: Product needs to be set by the caller since it requires a Product entity
         return inventory;
     }
@@ -97,12 +100,29 @@ public class InventoryServiceImpl implements InventoryService {
         dto.setId(inventory.getId());
         dto.setProductId(inventory.getProduct().getId());
         dto.setQuantity(inventory.getQuantity());
+        dto.setPrice(inventory.getPrice());
+        dto.setSellerId(inventory.getSellerId());
         return dto;
     }
 
     @Override
     public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId) {
         return this.mapToDTO(inventoryRepository.findByProductIdAndSellerId(productId, sellerId).orElseThrow(() -> new InventoryNotFoundException("Inventory not found for product ID: " + productId + " and seller ID: " + sellerId)));
+    }
+
+    @Override
+    public InventoryDTO updateInventory(Long id, int quantity, double price) {
+        InventoryDTO inventoryDTO = this.getInventoryById(id);
+        inventoryDTO.setQuantity(quantity);
+        inventoryDTO.setPrice(price);
+        Inventory inventory = this.mapToEntity(inventoryDTO);
+        return this.updateInventory(id, inventory);
+    }
+
+    @Override
+    public InventoryDTO createInventory(InventoryDTO inventoryDTO) {
+        Inventory inventory = this.mapToEntity(inventoryDTO);
+        return this.createInventory(inventory);
     }
 
 }

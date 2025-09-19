@@ -72,8 +72,9 @@ public class CartItemController {
     @GetMapping("/cart/{cartId}/product/{productId}")
     public ResponseEntity<CartItemDTO> getCartItemByCartIdAndProductId(
             @PathVariable Long cartId, 
-            @PathVariable Long productId) {
-        return cartItemService.getCartItemByCartIdAndProductId(cartId, productId)
+            @PathVariable Long productId,
+            @PathVariable Long sellerId) {
+        return cartItemService.getCartItemByCartIdAndProductIdAndSellerId(cartId, productId, sellerId)
                 .map(cartItem -> ResponseEntity.ok(cartItem))
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -147,14 +148,5 @@ public class CartItemController {
     public ResponseEntity<Long> getTotalQuantityByCartId(@PathVariable Long cartId) {
         Long totalQuantity = cartItemService.getTotalQuantityByCartId(cartId);
         return ResponseEntity.ok(totalQuantity);
-    }
-    
-    /**
-     * Get total price of cart items by cart
-     */
-    @GetMapping("/cart/{cartId}/total-price")
-    public ResponseEntity<Double> getTotalPriceByCartId(@PathVariable Long cartId) {
-        Double totalPrice = cartItemService.getTotalPriceByCartId(cartId);
-        return ResponseEntity.ok(totalPrice);
     }
 }

@@ -25,11 +25,7 @@ public class InventoryController {
     @PostMapping
     public ResponseEntity<InventoryDTO> createInventory(@Valid @RequestBody InventoryDTO inventoryDTO) {
         log.info("Creating inventory for product ID: {}", inventoryDTO.getProductId());
-        Product product = new Product();
-        product.setId(inventoryDTO.getProductId());
-        Inventory inventory = inventoryService.mapToEntity(inventoryDTO);
-        inventory.setProduct(product);
-        InventoryDTO created = inventoryService.createInventory(inventory);
+        InventoryDTO created = inventoryService.createInventory(inventoryDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
