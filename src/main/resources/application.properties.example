@@ -21,3 +21,6 @@ spring.datasource.hikari.connection-timeout=20000
 jwt.secret={YOUR_JWT_SECRET}
 jwt.expiration-time.access-token=1800000
 jwt.expiration-time.refresh-token=2592000000
+
+# Kuveyt Turk Payment Gateway Configuration
+kuveyt.turk.card.check.url=https://boatest.kuveytturk.com.tr/boa.virtualpos.services/Home/ThreeDModelPayGate
