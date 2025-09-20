@@ -29,16 +29,6 @@ public class PaymentDetailController {
     }
     
     /**
-     * Create a new payment detail
-     */
-    @PostMapping
-    public ResponseEntity<PaymentDetailDTO> createPaymentDetail(@Valid @RequestBody PaymentDetailDTO paymentDetailDTO) {
-        PaymentDetail paymentDetail = paymentDetailService.createPaymentDetail(paymentDetailService.mapToEntity(paymentDetailDTO));
-        PaymentDetailDTO createdDTO = paymentDetailService.mapToDTO(paymentDetail);
-        return new ResponseEntity<>(createdDTO, HttpStatus.CREATED);
-    }
-    
-    /**
      * Get all payment details
      */
     @GetMapping
