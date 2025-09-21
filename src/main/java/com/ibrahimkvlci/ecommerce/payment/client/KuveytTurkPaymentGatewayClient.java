@@ -17,12 +17,29 @@ public class KuveytTurkPaymentGatewayClient implements PaymentGatewayClient {
     @Value("${kuveyt.turk.card.check.url}")
     private String cardCheckUrl;
 
+    @Value("${kuveyt.turk.pay.url}")
+    private String payUrl;
+
     @Override
     public String cardCheck(String xmlString) {
         RestClient restClient = RestClient.create();
 
         ResponseEntity<String> response = restClient.post()
             .uri(cardCheckUrl)
+            .contentType(MediaType.APPLICATION_XML)
+            .body(xmlString)
+            .retrieve()
+            .toEntity(String.class);
+
+        return response.getBody();
+    }
+
+    @Override
+    public String pay(String xmlString) {
+        RestClient restClient = RestClient.create();
+
+        ResponseEntity<String> response = restClient.post()
+            .uri(payUrl)
             .contentType(MediaType.APPLICATION_XML)
             .body(xmlString)
             .retrieve()
