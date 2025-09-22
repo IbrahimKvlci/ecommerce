@@ -4,5 +4,5 @@ import com.ibrahimkvlci.ecommerce.payment.dto.PaymentDTO;
 
 public interface PaymentService {
 
-    void pay(PaymentDTO paymentDTO);
+    String payCheck(PaymentDTO paymentDTO);
 }

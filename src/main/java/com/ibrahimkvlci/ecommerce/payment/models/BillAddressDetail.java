@@ -23,6 +23,4 @@ public class BillAddressDetail {
 
     @Column(name = "address_detail_id", nullable = false)
     private Long addressDetailId;
-
-
 }
