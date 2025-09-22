@@ -14,17 +14,7 @@ public interface AddressDetailService {
     AddressDetail createAddressDetail(AddressDetailDTO addressDetailDTO);
     Optional<AddressDetail> getAddressDetailById(Long id);
     List<AddressDetail> getAllAddressDetails();
-    List<AddressDetail> getAddressDetailsByCountryId(Long countryId);
-    List<AddressDetail> getAddressDetailsByCityId(Long cityId);
-    List<AddressDetail> getAddressDetailsByDistrictId(Long districtId);
-    List<AddressDetail> getAddressDetailsByNeighborhoodId(Long neighborhoodId);
-    List<AddressDetail> searchAddressDetailsByName(String name);
-    List<AddressDetail> searchAddressDetailsBySurname(String surname);
-    List<AddressDetail> searchAddressDetailsByPhone(String phone);
-    List<AddressDetail> searchAddressDetailsByAddress(String address);
-    List<AddressDetail> searchAddressDetailsByNameAndSurname(String name, String surname);
-    List<AddressDetail> getAddressDetailsByCountryAndCity(Long countryId, Long cityId);
-    List<AddressDetail> getAddressDetailsByCountryCityAndDistrict(Long countryId, Long cityId, Long districtId);
+    Optional<AddressDetail> getAddressDetailByCustomerId(Long id);
     AddressDetail updateAddressDetail(Long id, AddressDetailDTO addressDetailDTO);
     void deleteAddressDetail(Long id);
     AddressDetailDTO mapToDTO(AddressDetail addressDetail);

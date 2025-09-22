@@ -78,72 +78,6 @@ public class AddressDetailServiceImpl implements AddressDetailService {
     }
     
     @Override
-    @Transactional(readOnly = true)
-    public List<AddressDetail> getAddressDetailsByCountryId(Long countryId) {
-        return addressDetailRepository.findByCountryId(countryId);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<AddressDetail> getAddressDetailsByCityId(Long cityId) {
-        return addressDetailRepository.findByCityId(cityId);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<AddressDetail> getAddressDetailsByDistrictId(Long districtId) {
-        return addressDetailRepository.findByDistrictId(districtId);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<AddressDetail> getAddressDetailsByNeighborhoodId(Long neighborhoodId) {
-        return addressDetailRepository.findByNeighborhoodId(neighborhoodId);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<AddressDetail> searchAddressDetailsByName(String name) {
-        return addressDetailRepository.findByNameContainingIgnoreCase(name);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<AddressDetail> searchAddressDetailsBySurname(String surname) {
-        return addressDetailRepository.findBySurnameContainingIgnoreCase(surname);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<AddressDetail> searchAddressDetailsByPhone(String phone) {
-        return addressDetailRepository.findByPhoneContaining(phone);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<AddressDetail> searchAddressDetailsByAddress(String address) {
-        return addressDetailRepository.findByAddressContainingIgnoreCase(address);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<AddressDetail> searchAddressDetailsByNameAndSurname(String name, String surname) {
-        return addressDetailRepository.findByNameAndSurnameContaining(name, surname);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<AddressDetail> getAddressDetailsByCountryAndCity(Long countryId, Long cityId) {
-        return addressDetailRepository.findByCountryAndCity(countryId, cityId);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<AddressDetail> getAddressDetailsByCountryCityAndDistrict(Long countryId, Long cityId, Long districtId) {
-        return addressDetailRepository.findByCountryCityAndDistrict(countryId, cityId, districtId);
-    }
-    
-    @Override
     public AddressDetail updateAddressDetail(Long id, AddressDetailDTO addressDetailDTO) {
         AddressDetail addressDetail = addressDetailRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Address detail not found with id: " + id));
@@ -207,5 +141,10 @@ public class AddressDetailServiceImpl implements AddressDetailService {
         // Relations will be set in service methods
         
         return addressDetail;
+    }
+
+    @Override
+    public Optional<AddressDetail> getAddressDetailByCustomerId(Long id) {
+        return addressDetailRepository.findByCustomerId(id);
     }
 }
