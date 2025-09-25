@@ -19,4 +19,8 @@ public class CartBus {
         request.setCustomerId(customerId);
         return cartApp.createCart(request);
     }
+
+    public CartDTO getCartByCustomerId(Long id){
+        return cartApp.getCartByCustomerId(id);
+    }
 }

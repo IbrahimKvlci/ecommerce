@@ -5,7 +5,10 @@ import org.springframework.stereotype.Component;
 import com.ibrahimkvlci.ecommerce.bus.catalog.CategoryBus;
 import com.ibrahimkvlci.ecommerce.bus.catalog.InventoryBus;
 import com.ibrahimkvlci.ecommerce.bus.catalog.ProductBus;
+import com.ibrahimkvlci.ecommerce.bus.payment.PaymentBus;
 import com.ibrahimkvlci.ecommerce.bus.auth.CustomerAppBus;
+import com.ibrahimkvlci.ecommerce.bus.auth.UserAppBus;
+import com.ibrahimkvlci.ecommerce.order.dto.CardCheckDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.CategoryDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.CustomerDTO;
@@ -21,6 +24,8 @@ public class OrderBus {
     private final CategoryBus categoryBus;
     private final CustomerAppBus customerBus;
     private final InventoryBus inventoryBus;
+    private final UserAppBus userAppBus;
+    private final PaymentBus paymentBus;
 
     public ProductDTO getProductById(Long productId){
         return new ProductDTO(productBus.getProductById(productId).getId(), productBus.getProductById(productId).getTitle());
@@ -84,5 +89,19 @@ public class OrderBus {
             inventory.getSellerId(),
             inventory.getPrice()
         );
+    }
+
+    public Long getCustomerIdFromJWT(){
+        return userAppBus.getUserIdFromJWT();
+    }
+
+    public String payCheck(CardCheckDTO cardCheckDTO){
+        com.ibrahimkvlci.ecommerce.payment.dto.CardCheckDTO cardCheckDTONew=new com.ibrahimkvlci.ecommerce.payment.dto.CardCheckDTO(cardCheckDTO.getCardNumber(),cardCheckDTO.getCardHolderName(),cardCheckDTO.getExpirationDateYear(),cardCheckDTO.getExpirationDateYMonth(),cardCheckDTO.getCvv(),null,cardCheckDTO.getClientIp(),cardCheckDTO.getOrderNumber(),cardCheckDTO.getOrderAmount(),cardCheckDTO.getBillAddressDetailDTO());
+        if(cardCheckDTO.getDeviceChannelEnum()==CardCheckDTO.DeviceChannelEnum.WebBrowser){
+            cardCheckDTONew.setDeviceChannelEnum(com.ibrahimkvlci.ecommerce.payment.dto.CardCheckDTO.DeviceChannelEnum.WebBrowser);
+        }else{
+            cardCheckDTONew.setDeviceChannelEnum(com.ibrahimkvlci.ecommerce.payment.dto.CardCheckDTO.DeviceChannelEnum.Mobile);
+        }
+        return paymentBus.payCheck(cardCheckDTONew);
     }
 }
