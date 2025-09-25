@@ -46,6 +46,9 @@ public class AddressDetail {
     @Column(name = "address", nullable = false)
     private String address;
 
+    @Column(name="address_poastal_code",nullable=false)
+    private String addressPostalCode;
+
     @Column(name = "name", nullable = false)
     private String name;
 
