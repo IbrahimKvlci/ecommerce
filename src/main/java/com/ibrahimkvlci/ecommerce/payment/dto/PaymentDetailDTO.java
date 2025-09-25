@@ -19,17 +19,9 @@ public class PaymentDetailDTO {
     private Long id;
     
     @NotNull(message = "Order ID is required")
-    private Long orderId;
-    
-    @NotNull(message = "Customer ID is required")
-    private Long customerId;
+    private Long orderNumberId;
     
     @NotNull(message = "Payment method ID is required")
     private Long paymentMethodId;
     
-    @NotNull(message = "Amount is required")
-    @Positive(message = "Amount must be positive")
-    private Double amount;
-    
-    private Boolean isPaid;
 }

@@ -109,9 +109,9 @@ public class PaymentDetailServiceImpl implements PaymentDetailService {
         
         PaymentDetail paymentDetail = new PaymentDetail();
         paymentDetail.setId(paymentDetailDTO.getId());
-        paymentDetail.setOrderId(paymentDetailDTO.getOrderId());
-        paymentDetail.setAmount(paymentDetailDTO.getAmount());
-        paymentDetail.setPaid(paymentDetailDTO.getIsPaid() != null ? paymentDetailDTO.getIsPaid() : false);
+        //paymentDetail.setOrderId(paymentDetailDTO.getOrderId());
+        //paymentDetail.setAmount(paymentDetailDTO.getAmount());
+        //paymentDetail.setPaid(paymentDetailDTO.getIsPaid() != null ? paymentDetailDTO.getIsPaid() : false);
         
         // Set payment method if ID is provided
         if (paymentDetailDTO.getPaymentMethodId() != null) {
@@ -131,9 +131,9 @@ public class PaymentDetailServiceImpl implements PaymentDetailService {
         
         PaymentDetailDTO paymentDetailDTO = new PaymentDetailDTO();
         paymentDetailDTO.setId(paymentDetail.getId());
-        paymentDetailDTO.setOrderId(paymentDetail.getOrderId());
-        paymentDetailDTO.setAmount(paymentDetail.getAmount());
-        paymentDetailDTO.setIsPaid(paymentDetail.isPaid());
+        //paymentDetailDTO.setOrderId(paymentDetail.getOrderId());
+       // paymentDetailDTO.setAmount(paymentDetail.getAmount());
+        //paymentDetailDTO.setIsPaid(paymentDetail.isPaid());
         
         if (paymentDetail.getPaymentMethod() != null) {
             paymentDetailDTO.setPaymentMethodId(paymentDetail.getPaymentMethod().getId());

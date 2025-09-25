@@ -1,5 +1,8 @@
 package com.ibrahimkvlci.ecommerce.payment.utils.KuveytTurkUtil;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class KuveytTurkXmlUtilImpl implements KuveytTurkXmlUtil{
 
     @Override
