@@ -28,4 +28,5 @@ public class CustomerApp {
     public boolean existsByEmail(String email) {
         return customerService.existsByEmail(email);
     }
+
 }

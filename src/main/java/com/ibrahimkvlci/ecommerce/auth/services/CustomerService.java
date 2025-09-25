@@ -20,4 +20,5 @@ public interface CustomerService {
     boolean existsById(Long id);
     
     boolean existsByEmail(String email);
+
 }
