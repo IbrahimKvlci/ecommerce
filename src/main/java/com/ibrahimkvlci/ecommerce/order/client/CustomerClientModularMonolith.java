@@ -32,4 +32,9 @@ public class CustomerClientModularMonolith implements CustomerClient {
     public boolean existsByEmail(String email) {
         return orderBus.existsCustomerByEmail(email);
     }
+
+    @Override
+    public Long getCustomerIdFromJWT() {
+        return orderBus.getCustomerIdFromJWT();
+    }
 }

@@ -4,10 +4,11 @@ import com.ibrahimkvlci.ecommerce.order.dto.CheckoutRequestDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.CheckoutResponseDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.OrderDTO;
 import com.ibrahimkvlci.ecommerce.order.services.CheckoutService;
+import com.ibrahimkvlci.ecommerce.order.utils.RequestUtils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,15 +33,13 @@ public class CheckoutController {
      * Creates a pending order from cart items
      */
     @PostMapping("/initiate")
-    public ResponseEntity<CheckoutResponseDTO> initiateCheckout(@Valid @RequestBody CheckoutRequestDTO request) {
-        OrderDTO order = checkoutService.checkoutPending(request.getCartId());
+    public ResponseEntity<String> initiateCheckout(@Valid @RequestBody CheckoutRequestDTO request,HttpServletRequest httpRequest) {
+        String clientIp=RequestUtils.getClientIp(httpRequest);
+        RequestUtils.ClientType clientType=RequestUtils.getClientType(httpRequest);
         
-        CheckoutResponseDTO response = new CheckoutResponseDTO(
-            order, 
-            "Checkout initiated successfully. Order is pending confirmation."
-        );
+        String response = checkoutService.checkoutPending(request,clientIp,clientType);
         
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
     
     /**

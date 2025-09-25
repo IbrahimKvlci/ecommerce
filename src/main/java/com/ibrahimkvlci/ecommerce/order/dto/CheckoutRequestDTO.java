@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.ibrahimkvlci.ecommerce.payment.dto.BillAddressDetailDTO;
+
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 
 /**
  * Data Transfer Object for checkout requests.
@@ -16,9 +17,24 @@ import jakarta.validation.constraints.Positive;
 @AllArgsConstructor
 public class CheckoutRequestDTO {
     
-    @NotNull(message = "Cart ID is required")
-    @Positive(message = "Cart ID must be positive")
-    private Long cartId;
-    
+    @NotNull
+    private String cardNumber;
+
+    @NotNull
+    private String cardExpireDateYear;
+
+    @NotNull
+    private String cardExpiteDateMonth;
+
+    @NotNull
+    private String cardCVV;
+
+    @NotNull
+    private String cardHolderName;
+
+    @NotNull
+    private BillAddressDetailDTO billAddressDetailDTO;
+
     private String notes;
+
 }

@@ -7,7 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ibrahimkvlci.ecommerce.order.client.InventoryClient;
+import com.ibrahimkvlci.ecommerce.order.client.PaymentClient;
 import com.ibrahimkvlci.ecommerce.order.client.ProductClient;
+import com.ibrahimkvlci.ecommerce.order.client.UserClient;
+import com.ibrahimkvlci.ecommerce.order.dto.CardCheckDTO;
+import com.ibrahimkvlci.ecommerce.order.dto.CheckoutRequestDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.InventoryDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.OrderDTO;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CartNotFoundException;
@@ -20,6 +24,7 @@ import com.ibrahimkvlci.ecommerce.order.models.OrderItem;
 import com.ibrahimkvlci.ecommerce.order.models.OrderStatus;
 import com.ibrahimkvlci.ecommerce.order.repositories.CartRepository;
 import com.ibrahimkvlci.ecommerce.order.repositories.OrderRepository;
+import com.ibrahimkvlci.ecommerce.order.utils.RequestUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,9 +39,12 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final OrderService orderService;
     private final ProductClient productClient;
     private final InventoryClient inventoryClient;
+    private final UserClient userClient;
+    private final PaymentClient paymentClient;
 
     @Override
-    public OrderDTO checkoutPending(Long cartId) {
+    public String checkoutPending(CheckoutRequestDTO request,String clientIp,RequestUtils.ClientType clientType) {
+        Long cartId=cartRepository.findByCustomerId(userClient.getCustomerIdFromJWT()).get().getId();
         Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new CartNotFoundException("Cart not found with ID: " + cartId));
         Order order = new Order();
         List<OrderItem> orderItems = new ArrayList<>();
@@ -65,7 +73,37 @@ public class CheckoutServiceImpl implements CheckoutService {
         order.setCustomerId(cart.getCustomerId());
         order.setOrderItems(orderItems);
         orderRepository.save(order);
-        return orderService.getOrderById(order.getId()).orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + order.getId()));
+
+        CardCheckDTO cardCheckDTO = new CardCheckDTO();
+        cardCheckDTO.setCardNumber(request.getCardNumber());
+        cardCheckDTO.setCardHolderName(request.getCardHolderName());
+        cardCheckDTO.setExpirationDateYear(request.getCardExpireDateYear());
+        cardCheckDTO.setExpirationDateYMonth(request.getCardExpiteDateMonth());
+        cardCheckDTO.setCvv(request.getCardCVV());
+        cardCheckDTO.setClientIp(clientIp);
+        cardCheckDTO.setBillAddressDetailDTO(request.getBillAddressDetailDTO());
+        switch (clientType) {
+            case DESKTOP:
+                cardCheckDTO.setDeviceChannelEnum(CardCheckDTO.DeviceChannelEnum.WebBrowser);
+                break;
+            case MOBILE:
+                cardCheckDTO.setDeviceChannelEnum(CardCheckDTO.DeviceChannelEnum.Mobile);
+                break;
+            case TABLET:
+                cardCheckDTO.setDeviceChannelEnum(CardCheckDTO.DeviceChannelEnum.Mobile);
+                break;
+            case BOT:
+                // Logic specific to bot clients
+                break;
+            case UNKNOWN:
+            default:
+                // Logic for unknown or other client types
+                break;
+        }
+
+        return paymentClient.payCheck(cardCheckDTO);
+
+        //return orderService.getOrderById(order.getId()).orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + order.getId()));
     }
 
     @Override

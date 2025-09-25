@@ -11,4 +11,7 @@ public interface CustomerClient {
     boolean existsById(Long id);
 
     boolean existsByEmail(String email);
+
+    Long getCustomerIdFromJWT();
+
 }
