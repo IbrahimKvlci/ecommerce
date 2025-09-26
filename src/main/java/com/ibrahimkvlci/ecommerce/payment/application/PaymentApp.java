@@ -1,8 +1,12 @@
 package com.ibrahimkvlci.ecommerce.payment.application;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 import org.springframework.stereotype.Component;
 
-import com.ibrahimkvlci.ecommerce.payment.dto.CardCheckDTO;
+import com.ibrahimkvlci.ecommerce.payment.dto.SaleRequest;
+import com.ibrahimkvlci.ecommerce.payment.dto.SaleResponse;
 import com.ibrahimkvlci.ecommerce.payment.services.PaymentService;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +18,7 @@ public class PaymentApp {
 
     private final PaymentService paymentService;
 
-    public String payCheck(CardCheckDTO cardCheckDTO){
-        return paymentService.payCheck(cardCheckDTO);
+    public SaleResponse sale(SaleRequest saleRequest) throws NoSuchAlgorithmException, InvalidKeyException{
+        return paymentService.sale(saleRequest);
     }
 }
