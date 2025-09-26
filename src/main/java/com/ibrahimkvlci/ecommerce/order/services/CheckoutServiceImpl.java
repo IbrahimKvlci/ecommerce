@@ -1,11 +1,14 @@
 package com.ibrahimkvlci.ecommerce.order.services;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ibrahimkvlci.ecommerce.order.client.CustomerClient;
 import com.ibrahimkvlci.ecommerce.order.client.InventoryClient;
 import com.ibrahimkvlci.ecommerce.order.client.PaymentClient;
 import com.ibrahimkvlci.ecommerce.order.client.ProductClient;
@@ -14,6 +17,9 @@ import com.ibrahimkvlci.ecommerce.order.dto.CardCheckDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.CheckoutRequestDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.InventoryDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.OrderDTO;
+import com.ibrahimkvlci.ecommerce.order.dto.SaleRequest;
+import com.ibrahimkvlci.ecommerce.order.dto.SaleResponse;
+import com.ibrahimkvlci.ecommerce.order.dto.CustomerDTO;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CartNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.OrderNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CheckoutException;
@@ -41,9 +47,10 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final InventoryClient inventoryClient;
     private final UserClient userClient;
     private final PaymentClient paymentClient;
+    private final CustomerClient customerClient;
 
     @Override
-    public String checkoutPending(CheckoutRequestDTO request,String clientIp,RequestUtils.ClientType clientType) {
+    public SaleResponse checkoutPending(CheckoutRequestDTO request,String clientIp,RequestUtils.ClientType clientType) {
         Long cartId=cartRepository.findByCustomerId(userClient.getCustomerIdFromJWT()).get().getId();
         Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new CartNotFoundException("Cart not found with ID: " + cartId));
         Order order = new Order();
@@ -74,36 +81,44 @@ public class CheckoutServiceImpl implements CheckoutService {
         order.setOrderItems(orderItems);
         orderRepository.save(order);
 
+        SaleRequest saleRequest=new SaleRequest();
+        
+        // Card info setters
         CardCheckDTO cardCheckDTO = new CardCheckDTO();
         cardCheckDTO.setCardNumber(request.getCardNumber());
         cardCheckDTO.setCardHolderName(request.getCardHolderName());
         cardCheckDTO.setExpirationDateYear(request.getCardExpireDateYear());
-        cardCheckDTO.setExpirationDateYMonth(request.getCardExpiteDateMonth());
+        cardCheckDTO.setExpirationDateMonth(request.getCardExpiteDateMonth());
         cardCheckDTO.setCvv(request.getCardCVV());
-        cardCheckDTO.setClientIp(clientIp);
-        cardCheckDTO.setBillAddressDetailDTO(request.getBillAddressDetailDTO());
-        switch (clientType) {
-            case DESKTOP:
-                cardCheckDTO.setDeviceChannelEnum(CardCheckDTO.DeviceChannelEnum.WebBrowser);
-                break;
-            case MOBILE:
-                cardCheckDTO.setDeviceChannelEnum(CardCheckDTO.DeviceChannelEnum.Mobile);
-                break;
-            case TABLET:
-                cardCheckDTO.setDeviceChannelEnum(CardCheckDTO.DeviceChannelEnum.Mobile);
-                break;
-            case BOT:
-                // Logic specific to bot clients
-                break;
-            case UNKNOWN:
-            default:
-                // Logic for unknown or other client types
-                break;
+        
+        // Order info setters
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setId(order.getId());
+        orderDTO.setOrderNumber(order.getId().toString());
+        orderDTO.setCustomerId(order.getCustomerId());
+        orderDTO.setStatus(order.getStatus());
+        orderDTO.setTotalAmount(order.getTotalAmount());
+        orderDTO.setCurrencyCode(949);
+        orderDTO.setInstallCount(1);
+        
+        // Customer info setters
+        CustomerDTO customerDTO = customerClient.getCustomerById(order.getCustomerId());
+        customerDTO.setIpAddress(clientIp);
+        
+        // SaleRequest setters
+        saleRequest.setCardCheckDTO(cardCheckDTO);
+        saleRequest.setOrderDTO(orderDTO);
+        saleRequest.setCustomerDTO(customerDTO);
+        SaleResponse saleResponse;
+        try {
+            saleResponse=paymentClient.sale(saleRequest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new CheckoutException("Invalid Algorithm");
+        }catch(InvalidKeyException ex){
+            throw new CheckoutException("Invalid Secret Key");
         }
+        return saleResponse;
 
-        return paymentClient.payCheck(cardCheckDTO);
-
-        //return orderService.getOrderById(order.getId()).orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + order.getId()));
     }
 
     @Override

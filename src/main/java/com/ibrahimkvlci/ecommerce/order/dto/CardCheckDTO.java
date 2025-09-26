@@ -1,8 +1,8 @@
 package com.ibrahimkvlci.ecommerce.order.dto;
 
-import com.ibrahimkvlci.ecommerce.payment.dto.BillAddressDetailDTO;
-import com.ibrahimkvlci.ecommerce.payment.models.BillAddressDetail;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,30 +12,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CardCheckDTO {
 
-    public enum DeviceChannelEnum{
-        Mobile,
-        WebBrowser
-    }
 
+
+    @NotBlank(message = "Card number is required")
+    @Size(min = 12, max = 19, message = "Card number length must be between 12 and 19")
     private String cardNumber;
 
+    @NotBlank(message = "Card holder name is required")
     private String cardHolderName;
 
+    @NotBlank(message = "Expiration year is required")
     private String expirationDateYear;
 
-    private String expirationDateYMonth;
+    @NotBlank(message = "Expiration month is required")
+    private String expirationDateMonth;
 
+    @NotBlank(message = "CVV is required")
+    @Size(min = 3, max = 4, message = "CVV must be 3 or 4 digits")
     private String cvv;
-
-    private DeviceChannelEnum deviceChannelEnum;
-    
-    private String clientIp;
-
-    private String orderNumber;
-
-    private double orderAmount;
-
-    private BillAddressDetailDTO billAddressDetailDTO;
 }
 
 

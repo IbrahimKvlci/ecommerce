@@ -3,6 +3,7 @@ package com.ibrahimkvlci.ecommerce.order.controllers;
 import com.ibrahimkvlci.ecommerce.order.dto.CheckoutRequestDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.CheckoutResponseDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.OrderDTO;
+import com.ibrahimkvlci.ecommerce.order.dto.SaleResponse;
 import com.ibrahimkvlci.ecommerce.order.services.CheckoutService;
 import com.ibrahimkvlci.ecommerce.order.utils.RequestUtils;
 
@@ -33,11 +34,11 @@ public class CheckoutController {
      * Creates a pending order from cart items
      */
     @PostMapping("/initiate")
-    public ResponseEntity<String> initiateCheckout(@Valid @RequestBody CheckoutRequestDTO request,HttpServletRequest httpRequest) {
+    public ResponseEntity<SaleResponse> initiateCheckout(@Valid @RequestBody CheckoutRequestDTO request,HttpServletRequest httpRequest) {
         String clientIp=RequestUtils.getClientIp(httpRequest);
         RequestUtils.ClientType clientType=RequestUtils.getClientType(httpRequest);
         
-        String response = checkoutService.checkoutPending(request,clientIp,clientType);
+        SaleResponse response = checkoutService.checkoutPending(request,clientIp,clientType);
         
         return ResponseEntity.ok(response);
     }
