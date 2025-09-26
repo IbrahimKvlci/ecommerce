@@ -1,5 +1,8 @@
 package com.ibrahimkvlci.ecommerce.bus.order;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 import org.springframework.stereotype.Component;
 
 import com.ibrahimkvlci.ecommerce.bus.catalog.CategoryBus;
@@ -8,9 +11,10 @@ import com.ibrahimkvlci.ecommerce.bus.catalog.ProductBus;
 import com.ibrahimkvlci.ecommerce.bus.payment.PaymentBus;
 import com.ibrahimkvlci.ecommerce.bus.auth.CustomerAppBus;
 import com.ibrahimkvlci.ecommerce.bus.auth.UserAppBus;
-import com.ibrahimkvlci.ecommerce.order.dto.CardCheckDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.CategoryDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.ProductDTO;
+import com.ibrahimkvlci.ecommerce.order.dto.SaleRequest;
+import com.ibrahimkvlci.ecommerce.order.dto.SaleResponse;
 import com.ibrahimkvlci.ecommerce.order.dto.CustomerDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.InventoryDTO;
 
@@ -48,7 +52,8 @@ public class OrderBus {
             customerBus.getCustomerById(customerId).getId(),
             customerBus.getCustomerById(customerId).getEmail(),
             customerBus.getCustomerById(customerId).getName(),
-            customerBus.getCustomerById(customerId).getSurname()
+            customerBus.getCustomerById(customerId).getSurname(),
+            null
         );
     }
 
@@ -57,7 +62,8 @@ public class OrderBus {
             customerBus.getCustomerByEmail(email).getId(),
             customerBus.getCustomerByEmail(email).getEmail(),
             customerBus.getCustomerByEmail(email).getName(),
-            customerBus.getCustomerByEmail(email).getSurname()
+            customerBus.getCustomerByEmail(email).getSurname(),
+            null
         );
     }
 
@@ -95,13 +101,56 @@ public class OrderBus {
         return userAppBus.getUserIdFromJWT();
     }
 
-    public String payCheck(CardCheckDTO cardCheckDTO){
-        com.ibrahimkvlci.ecommerce.payment.dto.CardCheckDTO cardCheckDTONew=new com.ibrahimkvlci.ecommerce.payment.dto.CardCheckDTO(cardCheckDTO.getCardNumber(),cardCheckDTO.getCardHolderName(),cardCheckDTO.getExpirationDateYear(),cardCheckDTO.getExpirationDateYMonth(),cardCheckDTO.getCvv(),null,cardCheckDTO.getClientIp(),cardCheckDTO.getOrderNumber(),cardCheckDTO.getOrderAmount(),cardCheckDTO.getBillAddressDetailDTO());
-        if(cardCheckDTO.getDeviceChannelEnum()==CardCheckDTO.DeviceChannelEnum.WebBrowser){
-            cardCheckDTONew.setDeviceChannelEnum(com.ibrahimkvlci.ecommerce.payment.dto.CardCheckDTO.DeviceChannelEnum.WebBrowser);
-        }else{
-            cardCheckDTONew.setDeviceChannelEnum(com.ibrahimkvlci.ecommerce.payment.dto.CardCheckDTO.DeviceChannelEnum.Mobile);
+    public SaleResponse sale(SaleRequest saleRequest) throws NoSuchAlgorithmException,InvalidKeyException{
+        var saleRequestNew=new com.ibrahimkvlci.ecommerce.payment.dto.SaleRequest();
+        // Convert and set fields for saleRequestNew using compatible types
+        var cardCheckDTO = new com.ibrahimkvlci.ecommerce.payment.dto.CardInfoDTO(
+            saleRequest.getCardCheckDTO().getCardNumber(),
+            saleRequest.getCardCheckDTO().getCardHolderName(),
+            saleRequest.getCardCheckDTO().getExpirationDateYear(),
+            saleRequest.getCardCheckDTO().getExpirationDateMonth(),
+            saleRequest.getCardCheckDTO().getCvv()
+        );
+
+        var orderDTO = new com.ibrahimkvlci.ecommerce.payment.dto.OrderDTO(
+            saleRequest.getOrderDTO().getOrderNumber(),
+            saleRequest.getOrderDTO().getTotalAmount().toString(),
+            saleRequest.getOrderDTO().getCurrencyCode(),
+            saleRequest.getOrderDTO().getInstallCount()
+        );
+
+        var customerDTO = new com.ibrahimkvlci.ecommerce.payment.dto.CustomerDTO(
+            saleRequest.getCustomerDTO().getId(),
+            saleRequest.getCustomerDTO().getEmail(),
+            saleRequest.getCustomerDTO().getIpAddress()
+        );
+
+        saleRequestNew.setCardInfoDTO(cardCheckDTO);
+        saleRequestNew.setOrderDTO(orderDTO);
+        saleRequestNew.setCustomerDTO(customerDTO);
+        com.ibrahimkvlci.ecommerce.payment.dto.SaleResponse saleResponse=paymentBus.sale(saleRequestNew);
+
+        SaleResponse saleResponseNew=new SaleResponse();
+        switch (saleResponse.getSaleStatusEnum()) {
+            case com.ibrahimkvlci.ecommerce.payment.dto.SaleResponse.SaleStatusEnum.Error:
+                saleResponseNew.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Error);
+                break;
+            case com.ibrahimkvlci.ecommerce.payment.dto.SaleResponse.SaleStatusEnum.Success:
+                saleResponseNew.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Success);
+                break;
+            case com.ibrahimkvlci.ecommerce.payment.dto.SaleResponse.SaleStatusEnum.RedirectURL:
+                saleResponseNew.setSaleStatusEnum(SaleResponse.SaleStatusEnum.RedirectURL);
+                break;
+            case com.ibrahimkvlci.ecommerce.payment.dto.SaleResponse.SaleStatusEnum.RedirectHTML:
+                saleResponseNew.setSaleStatusEnum(SaleResponse.SaleStatusEnum.RedirectHTML);
+                break;
+            default:
+                saleResponseNew.setSaleStatusEnum(null);
         }
-        return paymentBus.payCheck(cardCheckDTONew);
+        saleResponseNew.setMessage(saleResponse.getMessage());
+        saleResponseNew.setTransactionId(saleResponse.getTransactionId());
+        saleResponseNew.setOrderNumber(saleResponse.getOrderNumber());
+        saleResponseNew.setPrivateResponse(saleResponse.getPrivateResponse());
+        return saleResponseNew;
     }
 }
