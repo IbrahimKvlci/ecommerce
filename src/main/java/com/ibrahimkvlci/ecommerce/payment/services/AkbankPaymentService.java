@@ -76,8 +76,7 @@ public class AkbankPaymentService implements PaymentService{
             +"\"installCount\":"  + saleRequest.getOrderDTO().getInstallCount()
             +"},"
             +"\"customer\": {"
-            +"\"emailAddress\": \"" + "test@akbank.com" + "\","
-            +"\"ipAddress\": \"" + "192.168.1.1" + "\""
+            +"\"emailAddress\": \"" + saleRequest.getCustomerDTO().getEmailAddress() + "\""
             +"}"
             +"}";
     String hash = hashToString(json, secretKey);
