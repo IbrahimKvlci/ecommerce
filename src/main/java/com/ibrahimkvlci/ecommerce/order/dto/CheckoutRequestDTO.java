@@ -33,7 +33,7 @@ public class CheckoutRequestDTO {
     private String cardHolderName;
 
     @NotNull
-    private BillAddressDetailDTO billAddressDetailDTO;
+    private Long billAddressId;
 
     private String notes;
 
