@@ -38,11 +38,12 @@ public class UserInfoServiceImpl implements UserDetailsService,UserInfoService{
 
     @Override
     public Long getUserIdFromJWT() throws AuthException {
-        Object principal=(UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(principal instanceof UserDetails){
-            return ((UserInfo)principal).getId();
+        UserDetails principal=(UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal!=null){
+            UserInfo user= userRepository.findByEmail(principal.getUsername()).get();
+            return user.getId();
         }
-        throw new AuthException("User not authenticated");
+        throw new AuthException("User not authenticated!");
     }
 
 }
