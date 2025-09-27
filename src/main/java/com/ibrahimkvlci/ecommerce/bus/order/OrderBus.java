@@ -147,10 +147,12 @@ public class OrderBus {
             default:
                 saleResponseNew.setSaleStatusEnum(null);
         }
-        saleResponseNew.setMessage(saleResponse.getMessage());
-        saleResponseNew.setTransactionId(saleResponse.getTransactionId());
-        saleResponseNew.setOrderNumber(saleResponse.getOrderNumber());
-        saleResponseNew.setPrivateResponse(saleResponse.getPrivateResponse());
+        saleResponseNew.setHostMessage(saleResponse.getHostMessage());
+        saleResponseNew.setHostResponseCode(saleResponse.getHostResponseCode());
+        saleResponseNew.setResponseMessage(saleResponse.getResponseMessage());
+        SaleResponse.Order order=new SaleResponse.Order();
+        order.setOrderId(saleResponse.getOrder().getOrderId());
+        saleResponseNew.setOrder(order);
         return saleResponseNew;
     }
 }
