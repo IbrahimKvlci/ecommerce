@@ -1,14 +1,9 @@
 package com.ibrahimkvlci.ecommerce.payment.dto;
 
-import java.util.Dictionary;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class SaleResponse {
 
     public static enum SaleStatusEnum{
@@ -20,11 +15,29 @@ public class SaleResponse {
 
     private SaleStatusEnum saleStatusEnum;
 
-    private String message;
+    private String hostMessage;
 
-    private String orderNumber;
+    private String hostResponseCode;
 
-    private String transactionId;
+    private String responseMessage;
 
-    private Dictionary<String,Object> privateResponse;
+    private Order order;
+
+    @Data
+    public static class Order{
+
+        private String orderId;
+    }
+
+    public void setHostResponseCode(String hostResponseCode){
+        this.hostResponseCode=hostResponseCode;
+        switch (hostResponseCode) {
+            case "00":
+                this.saleStatusEnum=SaleStatusEnum.Success;
+                break;
+            default:
+                this.saleStatusEnum=SaleStatusEnum.Error;
+                break;
+        }
+    }
 }

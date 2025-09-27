@@ -41,11 +41,14 @@ public class AkbankPaymentService implements PaymentService{
     @Override
     public SaleResponse sale(SaleRequest saleRequest) throws NoSuchAlgorithmException, InvalidKeyException{
 
-        String expireMonth = String.format("%02d", saleRequest.getCardInfoDTO().getExpirationDateMonth());
-        String expireYear = String.valueOf(saleRequest.getCardInfoDTO().getExpirationDateYear());
-        if (expireYear.length() > 2) {
-            expireYear = expireYear.substring(expireYear.length() - 2);
+        if(!saleRequest.getCardInfoDTO().getExpirationDateMonth().matches("^\\d{2}$")){
+            throw new IllegalArgumentException("Expiration Date Month is not correctly formatted! Correct: 00-12");
         }
+        if(!saleRequest.getCardInfoDTO().getExpirationDateMonth().matches("^\\d{2}$")){
+            throw new IllegalArgumentException("Expiration Date Year is not correctly formatted! Correct: 00-99");
+        }
+        String expireMonth = saleRequest.getCardInfoDTO().getExpirationDateMonth();
+        String expireYear = saleRequest.getCardInfoDTO().getExpirationDateYear();
 
         String json = "{"
             +"\"version\": \"1.00\","
@@ -73,8 +76,8 @@ public class AkbankPaymentService implements PaymentService{
             +"\"installCount\":"  + saleRequest.getOrderDTO().getInstallCount()
             +"},"
             +"\"customer\": {"
-            +"\"emailAddress\": \"" + saleRequest.getCustomerDTO().getEmailAddress() + "\","
-            +"\"ipAddress\": \"" + saleRequest.getCustomerDTO().getIpAddress() + "\""
+            +"\"emailAddress\": \"" + "test@akbank.com" + "\","
+            +"\"ipAddress\": \"" + "192.168.1.1" + "\""
             +"}"
             +"}";
     String hash = hashToString(json, secretKey);
