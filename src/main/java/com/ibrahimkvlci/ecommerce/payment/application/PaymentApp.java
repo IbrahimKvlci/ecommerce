@@ -21,4 +21,8 @@ public class PaymentApp {
     public SaleResponse sale(SaleRequest saleRequest) throws NoSuchAlgorithmException, InvalidKeyException{
         return paymentService.sale(saleRequest);
     }
+
+    public SaleResponse sale3DPay(SaleRequest saleRequest){
+        return paymentService.sale3DPay(saleRequest);
+    }
 }

@@ -25,3 +25,13 @@ jwt.expiration-time.refresh-token=2592000000
 # Kuveyt Turk Payment Gateway Configuration
 kuveyt.turk.card.check.url=https://boatest.kuveytturk.com.tr/boa.virtualpos.services/Home/ThreeDModelPayGate
 kuveyt.turk.pay.url=https://boatest.kuveytturk.com.tr/boa.virtualpos.services/Home/ThreeDModelProvisionGate
+
+# Akbank Payment Configuration
+akbank.merchantUser=
+akbank.merchantPassword=
+akbank.secretKey=
+akbank.sale.url=
+akbank.securepay.url=https://virtualpospaymentgatewaypre.akbank.com/securepay
+akbank.okUrl=https://test.com/okUrl
+akbank.failUrl=https://test.com/failUrl
+akbank.lang=TR
