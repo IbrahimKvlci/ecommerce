@@ -9,4 +9,6 @@ import com.ibrahimkvlci.ecommerce.order.dto.SaleResponse;
 public interface PaymentClient {
 
     SaleResponse sale(SaleRequest saleRequest)throws NoSuchAlgorithmException,InvalidKeyException;
+
+    SaleResponse sale3DPay(SaleRequest saleRequest);
 }

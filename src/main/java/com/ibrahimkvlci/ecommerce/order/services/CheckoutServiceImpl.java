@@ -81,7 +81,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         order.setOrderItems(orderItems);
         orderRepository.save(order);
 
-        SaleRequest saleRequest=new SaleRequest();
+
         
         // Card info setters
         CardCheckDTO cardCheckDTO = new CardCheckDTO();
@@ -104,21 +104,30 @@ public class CheckoutServiceImpl implements CheckoutService {
         // Customer info setters
         CustomerDTO customerDTO = customerClient.getCustomerById(order.getCustomerId());
         customerDTO.setIpAddress(clientIp);
-        
-        // SaleRequest setters
-        saleRequest.setCardCheckDTO(cardCheckDTO);
-        saleRequest.setOrderDTO(orderDTO);
-        saleRequest.setCustomerDTO(customerDTO);
-        SaleResponse saleResponse;
-        try {
-            saleResponse=paymentClient.sale(saleRequest);
-        } catch (NoSuchAlgorithmException e) {
-            throw new CheckoutException("Invalid Algorithm");
-        }catch(InvalidKeyException ex){
-            throw new CheckoutException("Invalid Secret Key");
-        }
-        return saleResponse;
 
+        if(!request.isSecured()){
+            // SaleRequest setters
+            SaleRequest saleRequest=new SaleRequest();
+            saleRequest.setCardCheckDTO(cardCheckDTO);
+            saleRequest.setOrderDTO(orderDTO);
+            saleRequest.setCustomerDTO(customerDTO);
+            SaleResponse saleResponse;
+            try {
+                saleResponse=paymentClient.sale(saleRequest);
+            } catch (NoSuchAlgorithmException e) {
+                throw new CheckoutException("Invalid Algorithm");
+            }catch(InvalidKeyException ex){
+                throw new CheckoutException("Invalid Secret Key");
+            }
+            return saleResponse;
+        }
+        // Secured (3D Pay) flow
+        com.ibrahimkvlci.ecommerce.order.dto.SaleRequest saleRequest3D = new com.ibrahimkvlci.ecommerce.order.dto.SaleRequest();
+        saleRequest3D.setCardCheckDTO(cardCheckDTO);
+        saleRequest3D.setOrderDTO(orderDTO);
+        saleRequest3D.setCustomerDTO(customerDTO);
+        com.ibrahimkvlci.ecommerce.order.dto.SaleResponse saleResponse3D = paymentClient.sale3DPay(saleRequest3D);
+        return saleResponse3D;
     }
 
     @Override

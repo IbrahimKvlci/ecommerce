@@ -22,4 +22,9 @@ public class PaymentClientModularMonolith implements PaymentClient{
         return paymentBus.sale(saleRequest);
     }
 
+    @Override
+    public SaleResponse sale3DPay(SaleRequest saleRequest){
+        return paymentBus.sale3DPay(saleRequest);
+    }
+
 }

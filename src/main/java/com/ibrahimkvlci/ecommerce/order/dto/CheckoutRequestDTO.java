@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.ibrahimkvlci.ecommerce.payment.dto.BillAddressDetailDTO;
-
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -34,6 +32,9 @@ public class CheckoutRequestDTO {
 
     @NotNull
     private Long billAddressId;
+
+    @NotNull
+    private boolean isSecured;
 
     private String notes;
 

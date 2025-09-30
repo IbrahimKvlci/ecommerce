@@ -1,8 +1,6 @@
 package com.ibrahimkvlci.ecommerce.order.dto;
 
 
-import com.ibrahimkvlci.ecommerce.order.models.Order;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -20,4 +20,8 @@ public class PaymentBus {
     public SaleResponse sale(SaleRequest saleRequest) throws NoSuchAlgorithmException,InvalidKeyException{
         return paymentApp.sale(saleRequest);
     }
+
+    public SaleResponse sale3DPay(SaleRequest saleRequest){
+        return paymentApp.sale3DPay(saleRequest);
+    }
 }
