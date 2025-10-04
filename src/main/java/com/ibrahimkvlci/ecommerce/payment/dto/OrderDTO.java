@@ -19,7 +19,7 @@ public class OrderDTO {
 
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be positive")
-    private String amount;
+    private double amount;
 
     @NotBlank(message = "Currency code is required")
     private int currencyCode;

@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.payment.dto;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
@@ -23,21 +24,13 @@ public class SaleResponse {
 
     private Order order;
 
+    private String htmlResponse;
+
     @Data
+    @AllArgsConstructor
     public static class Order{
 
         private String orderId;
     }
 
-    public void setHostResponseCode(String hostResponseCode){
-        this.hostResponseCode=hostResponseCode;
-        switch (hostResponseCode) {
-            case "00":
-                this.saleStatusEnum=SaleStatusEnum.Success;
-                break;
-            default:
-                this.saleStatusEnum=SaleStatusEnum.Error;
-                break;
-        }
-    }
 }

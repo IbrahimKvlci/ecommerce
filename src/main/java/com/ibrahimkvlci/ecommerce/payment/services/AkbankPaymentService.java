@@ -12,11 +12,14 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.ibrahimkvlci.ecommerce.payment.dto.CardInfoDTO;
@@ -24,6 +27,7 @@ import com.ibrahimkvlci.ecommerce.payment.dto.SaleRequest;
 import com.ibrahimkvlci.ecommerce.payment.dto.SaleResponse;
 
 @Service
+@Primary
 public class AkbankPaymentService implements PaymentService{
 
 
@@ -73,6 +77,9 @@ public class AkbankPaymentService implements PaymentService{
             +"\"cvv2\": \"" +  saleRequest.getCardInfoDTO().getCvv() + "\","
             +"\"expireDate\": \"" + expireMonth + expireYear + "\""
             +"},"
+            +"\"order\": {"
+            +"\"orderId\": \"" + saleRequest.getOrderDTO().getOrderNumber() + "\""
+            +"},"
             +"\"reward\": {"
             +"\"ccbRewardAmount\": 0,"
             +"\"pcbRewardAmount\": 0,"
@@ -95,6 +102,14 @@ public class AkbankPaymentService implements PaymentService{
     httpHeaders.add("auth-hash",hash);
     HttpEntity<String> entity = new HttpEntity<>(json, httpHeaders);
     SaleResponse response = new RestTemplate().exchange(saleUrl, HttpMethod.POST, entity, SaleResponse.class).getBody();
+    switch (response.getHostResponseCode()) {
+        case "00":
+            response.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Success);
+            break;
+        default:
+            response.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Error);
+            break;
+    }
     return response; 
 
     }
@@ -128,6 +143,10 @@ public class AkbankPaymentService implements PaymentService{
         String randomNumber = getRandomNumberBase16(128);
         String requestDateTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS").format(java.time.LocalDateTime.now());
 
+        String orderId = saleRequest.getOrderDTO().getOrderNumber();
+        String amount = String.format("%.2f", saleRequest.getOrderDTO().getAmount());
+        String currencyCode = Integer.toString(saleRequest.getOrderDTO().getCurrencyCode());
+        String installCount = Integer.toString(saleRequest.getOrderDTO().getInstallCount());
         // Build a serialized string for hash calculation as per Akbank docs
         String hashItems =
             "3D_PAY" + // paymentModel
@@ -136,12 +155,12 @@ public class AkbankPaymentService implements PaymentService{
             merchantPassword + // terminalSafeId
             saleRequest.getOrderDTO().getOrderNumber() + // orderId
             lang + // lang
-            saleRequest.getOrderDTO().getAmount() + // amount
+            amount + // amount
             "0.00" + // ccbRewardAmount
             "0.00" + // pcbRewardAmount
             "0.00" + // xcbRewardAmount
-            saleRequest.getOrderDTO().getCurrencyCode() + // currencyCode
-            saleRequest.getOrderDTO().getInstallCount() + // installCount
+            currencyCode + // currencyCode
+            installCount + // installCount
             okUrl + // okUrl
             failUrl + // failUrl
             saleRequest.getCustomerDTO().getEmailAddress() + // emailAddress
@@ -158,47 +177,42 @@ public class AkbankPaymentService implements PaymentService{
             throw new RuntimeException("Hash generation failed", e);
         }
 
-        String orderId = saleRequest.getOrderDTO().getOrderNumber();
-        String amount = saleRequest.getOrderDTO().getAmount();
-        String currencyCode = Integer.toString(saleRequest.getOrderDTO().getCurrencyCode());
-        String installCount = Integer.toString(saleRequest.getOrderDTO().getInstallCount());
 
-        StringBuilder html = new StringBuilder();
-        html.append("<html><head></head><body>")
-            .append("<form id=\"akbank3d\" action=\"").append(securePayUrl).append("\" method=\"POST\">")
-            .append(hidden("paymentModel","3D_PAY"))
-            .append(hidden("txnCode","3000"))
-            .append(hidden("merchantSafeId", merchantUser))
-            .append(hidden("terminalSafeId", merchantPassword))
-            .append(hidden("orderId", orderId))
-            .append(hidden("lang", lang))
-            .append(hidden("amount", amount))
-            .append(hidden("ccbRewardAmount", "0.00"))
-            .append(hidden("pcbRewardAmount", "0.00"))
-            .append(hidden("xcbRewardAmount", "0.00"))
-            .append(hidden("currencyCode", currencyCode))
-            .append(hidden("installCount", installCount))
-            .append(hidden("okUrl", okUrl))
-            .append(hidden("failUrl", failUrl))
-            .append(hidden("emailAddress", saleRequest.getCustomerDTO().getEmailAddress()))
-            .append(hidden("creditCard", saleRequest.getCardInfoDTO().getCardNumber()))
-            .append(hidden("expiredDate", expireMonth + expireYear))
-            .append(hidden("cvv", saleRequest.getCardInfoDTO().getCvv()))
-            .append(hidden("cardHolderName", saleRequest.getCardInfoDTO().getCardHolderName()))
-            .append(hidden("randomNumber", randomNumber))
-            .append(hidden("requestDateTime", requestDateTime))
-            .append(hidden("hash", hash))
-            .append("<noscript><input type=\"submit\" value=\"Continue\"></noscript>")
-            .append("</form>")
-            .append("<script>document.getElementById('akbank3d').submit();</script>")
-            .append("</body></html>");
 
-        SaleResponse response = new SaleResponse();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("paymentModel", "3D_PAY");
+        map.add("txnCode", "3000");
+        map.add("merchantSafeId", merchantUser);
+        map.add("terminalSafeId", merchantPassword);
+        map.add("orderId", orderId);
+        map.add("lang", lang);
+        map.add("amount", amount);
+        map.add("ccbRewardAmount", "0.00");
+        map.add("pcbRewardAmount", "0.00");
+        map.add("xcbRewardAmount", "0.00");
+        map.add("currencyCode", currencyCode);
+        map.add("installCount", installCount);
+        map.add("okUrl", okUrl);
+        map.add("failUrl", failUrl);
+        map.add("emailAddress", saleRequest.getCustomerDTO().getEmailAddress());
+        map.add("creditCard", saleRequest.getCardInfoDTO().getCardNumber());
+        map.add("expiredDate", expireMonth + expireYear);
+        map.add("cvv", saleRequest.getCardInfoDTO().getCvv());
+        map.add("cardHolderName", saleRequest.getCardInfoDTO().getCardHolderName());
+        map.add("randomNumber", randomNumber);
+        map.add("requestDateTime", requestDateTime);
+        map.add("hash", hash);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, httpHeaders);
+        String requestString = new RestTemplate().postForObject(securePayUrl, request, String.class);
+        SaleResponse response=new SaleResponse();
+        response.setHtmlResponse(requestString);
         response.setSaleStatusEnum(SaleResponse.SaleStatusEnum.RedirectHTML);
-        response.setResponseMessage(html.toString());
-        SaleResponse.Order order = new SaleResponse.Order();
-        order.setOrderId(orderId);
-        response.setOrder(order);
+        response.setHostResponseCode("3000");
+        response.setOrder(new SaleResponse.Order(orderId));
         return response;
     }
 
@@ -210,26 +224,4 @@ public class AkbankPaymentService implements PaymentService{
             throw new IllegalArgumentException("Expiration Date Year is not correctly formatted! Correct: 00-99");
         }
     }
-
-    private static String hidden(String name, String value){
-        return new StringBuilder()
-            .append("<input type=\"hidden\" name=\"")
-            .append(escapeHtml(name))
-            .append("\" value=\"")
-            .append(escapeHtml(value == null ? "" : value))
-            .append("\">")
-            .toString();
-    }
-
-    private static String escapeHtml(String input){
-        if(input == null){
-            return "";
-        }
-        return input
-            .replace("&", "&amp;")
-            .replace("\"", "&quot;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;");
-    }
-    
 }
