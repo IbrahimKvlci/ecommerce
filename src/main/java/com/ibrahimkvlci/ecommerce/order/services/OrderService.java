@@ -61,7 +61,7 @@ public interface OrderService {
      * Cancel an order
      */
     OrderDTO cancelOrder(Long id);
-    
+
     /**
      * Get orders by date range
      */

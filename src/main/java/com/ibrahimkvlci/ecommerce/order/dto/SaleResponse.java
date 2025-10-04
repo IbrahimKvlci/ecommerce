@@ -31,21 +31,13 @@ public class SaleResponse {
 
     private Order order;
 
+    private String htmlResponse;
+
     @Data
     public static class Order{
 
         private String orderId;
     }
 
-    public void setHostResponseCode(String hostResponseCode){
-        this.hostResponseCode=hostResponseCode;
-        switch (hostResponseCode) {
-            case "00":
-                this.saleStatusEnum=SaleStatusEnum.Success;
-                break;
-            default:
-                this.saleStatusEnum=SaleStatusEnum.Error;
-                break;
-        }
-    }
+
 }

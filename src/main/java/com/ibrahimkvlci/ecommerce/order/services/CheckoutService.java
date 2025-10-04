@@ -9,6 +9,12 @@ public interface CheckoutService {
 
     SaleResponse checkoutPending(CheckoutRequestDTO request,String clientIp,RequestUtils.ClientType clientType);
 
+    SaleResponse checkoutPending3D(CheckoutRequestDTO request,String clientIp,RequestUtils.ClientType clientType);
+
+    SaleResponse okCheckout(SaleResponse response);
+    
+    SaleResponse failCheckout(SaleResponse response);
+
     OrderDTO completeCheckout(Long orderId);
 
 }

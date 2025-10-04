@@ -42,6 +42,16 @@ public class CheckoutController {
         
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/initiate/3d")
+    public ResponseEntity<SaleResponse> initiateCheckout3D(@Valid @RequestBody CheckoutRequestDTO request,HttpServletRequest httpRequest) {
+        String clientIp=RequestUtils.getClientIp(httpRequest);
+        RequestUtils.ClientType clientType=RequestUtils.getClientType(httpRequest);
+        
+        SaleResponse response = checkoutService.checkoutPending3D(request,clientIp,clientType);
+        
+        return ResponseEntity.ok(response);
+    }
     
     /**
      * Complete checkout process

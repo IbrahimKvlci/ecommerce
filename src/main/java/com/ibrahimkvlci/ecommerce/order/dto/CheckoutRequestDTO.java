@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -34,6 +36,7 @@ public class CheckoutRequestDTO {
     private Long billAddressId;
 
     @NotNull
+    @JsonProperty
     private boolean isSecured;
 
     private String notes;
