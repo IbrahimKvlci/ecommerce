@@ -114,7 +114,7 @@ public class OrderBus {
 
         var orderDTO = new com.ibrahimkvlci.ecommerce.payment.dto.OrderDTO(
             saleRequest.getOrderDTO().getOrderNumber(),
-            saleRequest.getOrderDTO().getTotalAmount().toString(),
+            saleRequest.getOrderDTO().getTotalAmount(),
             saleRequest.getOrderDTO().getCurrencyCode(),
             saleRequest.getOrderDTO().getInstallCount()
         );
@@ -168,7 +168,7 @@ public class OrderBus {
 
         var orderDTO = new com.ibrahimkvlci.ecommerce.payment.dto.OrderDTO(
             saleRequest.getOrderDTO().getOrderNumber(),
-            saleRequest.getOrderDTO().getTotalAmount().toString(),
+            saleRequest.getOrderDTO().getTotalAmount(),
             saleRequest.getOrderDTO().getCurrencyCode(),
             saleRequest.getOrderDTO().getInstallCount()
         );
@@ -204,6 +204,7 @@ public class OrderBus {
         saleResponseNew.setHostMessage(saleResponse.getHostMessage());
         saleResponseNew.setHostResponseCode(saleResponse.getHostResponseCode());
         saleResponseNew.setResponseMessage(saleResponse.getResponseMessage());
+        saleResponseNew.setHtmlResponse(saleResponse.getHtmlResponse());
         SaleResponse.Order order=new SaleResponse.Order();
         if(saleResponse.getOrder()!=null){
             order.setOrderId(saleResponse.getOrder().getOrderId());
