@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class PaymentBus {
+public class PaymentAppBus {
 
     private final PaymentApp paymentApp;
 
@@ -24,4 +24,5 @@ public class PaymentBus {
     public SaleResponse sale3DPay(SaleRequest saleRequest){
         return paymentApp.sale3DPay(saleRequest);
     }
+
 }

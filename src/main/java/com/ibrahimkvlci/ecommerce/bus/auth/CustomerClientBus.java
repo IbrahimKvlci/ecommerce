@@ -3,7 +3,7 @@ package com.ibrahimkvlci.ecommerce.bus.auth;
 import org.springframework.stereotype.Component;
 
 import com.ibrahimkvlci.ecommerce.auth.dto.CartDTO;
-import com.ibrahimkvlci.ecommerce.bus.order.CartBus;
+import com.ibrahimkvlci.ecommerce.bus.order.OrderCartAppBus;
 
 import lombok.RequiredArgsConstructor;
 
@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomerClientBus {
 
-    private final CartBus cartBus;
+    private final OrderCartAppBus cartBus;
 
     public CartDTO createCart(Long customerId) {
         var cartDTO = cartBus.createCart(customerId);

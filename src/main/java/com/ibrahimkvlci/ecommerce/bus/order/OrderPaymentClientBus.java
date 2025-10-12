@@ -5,102 +5,20 @@ import java.security.NoSuchAlgorithmException;
 
 import org.springframework.stereotype.Component;
 
-import com.ibrahimkvlci.ecommerce.bus.catalog.CategoryBus;
-import com.ibrahimkvlci.ecommerce.bus.catalog.InventoryBus;
-import com.ibrahimkvlci.ecommerce.bus.catalog.ProductBus;
-import com.ibrahimkvlci.ecommerce.bus.payment.PaymentBus;
-import com.ibrahimkvlci.ecommerce.bus.auth.CustomerAppBus;
-import com.ibrahimkvlci.ecommerce.bus.auth.UserAppBus;
-import com.ibrahimkvlci.ecommerce.order.dto.CategoryDTO;
-import com.ibrahimkvlci.ecommerce.order.dto.ProductDTO;
+import com.ibrahimkvlci.ecommerce.bus.payment.PaymentAppBus;
+import com.ibrahimkvlci.ecommerce.order.client.PaymentClient;
 import com.ibrahimkvlci.ecommerce.order.dto.SaleRequest;
 import com.ibrahimkvlci.ecommerce.order.dto.SaleResponse;
-import com.ibrahimkvlci.ecommerce.order.dto.CustomerDTO;
-import com.ibrahimkvlci.ecommerce.order.dto.InventoryDTO;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class OrderBus {
+public class OrderPaymentClientBus implements PaymentClient {
 
-    private final ProductBus productBus;
-    private final CategoryBus categoryBus;
-    private final CustomerAppBus customerBus;
-    private final InventoryBus inventoryBus;
-    private final UserAppBus userAppBus;
-    private final PaymentBus paymentBus;
+    private final PaymentAppBus paymentBus;
 
-    public ProductDTO getProductById(Long productId){
-        return new ProductDTO(productBus.getProductById(productId).getId(), productBus.getProductById(productId).getTitle());
-    }
-
-    public boolean isProductAvailable(Long productId){
-        return productBus.isProductAvailable(productId);
-    }
-
-    public CategoryDTO getCategoryById(Long categoryId){
-        return new CategoryDTO(categoryBus.getCategoryById(categoryId).getId(), categoryBus.getCategoryById(categoryId).getName());
-    }
-
-    public boolean existsCategoryById(Long categoryId){
-        return categoryBus.existsById(categoryId);
-    }
-
-    public CustomerDTO getCustomerById(Long customerId){
-        return new CustomerDTO(
-            customerBus.getCustomerById(customerId).getId(),
-            customerBus.getCustomerById(customerId).getEmail(),
-            customerBus.getCustomerById(customerId).getName(),
-            customerBus.getCustomerById(customerId).getSurname(),
-            null
-        );
-    }
-
-    public CustomerDTO getCustomerByEmail(String email){
-        return new CustomerDTO(
-            customerBus.getCustomerByEmail(email).getId(),
-            customerBus.getCustomerByEmail(email).getEmail(),
-            customerBus.getCustomerByEmail(email).getName(),
-            customerBus.getCustomerByEmail(email).getSurname(),
-            null
-        );
-    }
-
-    public boolean existsCustomerById(Long customerId){
-        return customerBus.existsById(customerId);
-    }
-
-    public boolean existsCustomerByEmail(String email){
-        return customerBus.existsByEmail(email);
-    }
-
-    public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId){
-        return new InventoryDTO(
-            inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getId(),
-            inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getProductId(),
-            inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getQuantity(),
-            sellerId,
-            inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getPrice()
-        );
-    }
-
-    public InventoryDTO updateInventory(Long id, int quantity, double price){
-        com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO inventory = inventoryBus.updateInventory(id, quantity, price);
-
-        return new InventoryDTO(
-            inventory.getId(),
-            inventory.getProductId(),
-            inventory.getQuantity(),
-            inventory.getSellerId(),
-            inventory.getPrice()
-        );
-    }
-
-    public Long getCustomerIdFromJWT(){
-        return userAppBus.getUserIdFromJWT();
-    }
-
+    @Override
     public SaleResponse sale(SaleRequest saleRequest) throws NoSuchAlgorithmException,InvalidKeyException{
         var saleRequestNew=new com.ibrahimkvlci.ecommerce.payment.dto.SaleRequest();
         // Convert and set fields for saleRequestNew using compatible types
@@ -156,6 +74,7 @@ public class OrderBus {
         return saleResponseNew;
     }
 
+    @Override
     public SaleResponse sale3DPay(SaleRequest saleRequest){
         var saleRequestNew=new com.ibrahimkvlci.ecommerce.payment.dto.SaleRequest();
         var cardCheckDTO = new com.ibrahimkvlci.ecommerce.payment.dto.CardInfoDTO(
@@ -212,4 +131,5 @@ public class OrderBus {
         saleResponseNew.setOrder(order);
         return saleResponseNew;
     }
+
 }

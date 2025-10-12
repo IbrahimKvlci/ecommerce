@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class CartBus {
+public class OrderCartAppBus {
 
     private final CartApp cartApp;
 
