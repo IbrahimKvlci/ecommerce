@@ -2,6 +2,7 @@ package com.ibrahimkvlci.ecommerce.payment.controllers;
 
 import com.ibrahimkvlci.ecommerce.payment.exceptions.PaymentDetailNotFoundException;
 import com.ibrahimkvlci.ecommerce.payment.exceptions.PaymentDetailValidationException;
+import com.ibrahimkvlci.ecommerce.payment.exceptions.PaymentIncorrectValuesError;
 import com.ibrahimkvlci.ecommerce.payment.exceptions.PaymentMethodNotFoundException;
 import com.ibrahimkvlci.ecommerce.payment.exceptions.PaymentMethodValidationException;
 
@@ -91,6 +92,21 @@ public class PaymentGlobalExceptionHandler {
                 request.getDescription(false)
         );
         
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PaymentIncorrectValuesError.class)
+    public ResponseEntity<ErrorResponse> handlePaymentIncorrectValuesError(
+            PaymentIncorrectValuesError ex, WebRequest request) {
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Payment Incorrect Values",
+                ex.getMessage(),
+                LocalDateTime.now(),
+                request.getDescription(false)
+        );
+
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
     
