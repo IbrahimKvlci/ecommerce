@@ -1,5 +1,6 @@
 package com.ibrahimkvlci.ecommerce.payment.services;
 
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -12,6 +13,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,12 +24,18 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.ibrahimkvlci.ecommerce.payment.client.CheckoutClient;
+import com.ibrahimkvlci.ecommerce.payment.dto.AkbankPaymentResultRequest;
 import com.ibrahimkvlci.ecommerce.payment.dto.CardInfoDTO;
 import com.ibrahimkvlci.ecommerce.payment.dto.SaleRequest;
 import com.ibrahimkvlci.ecommerce.payment.dto.SaleResponse;
+import com.ibrahimkvlci.ecommerce.payment.exceptions.PaymentIncorrectValuesError;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Primary
+@RequiredArgsConstructor
 public class AkbankPaymentService implements PaymentService{
 
 
@@ -54,6 +62,9 @@ public class AkbankPaymentService implements PaymentService{
 
     @Value("${akbank.lang:TR}")
     private String lang;
+
+    @Lazy
+    private final CheckoutClient checkoutClient;
 
     @Override
     public SaleResponse sale(SaleRequest saleRequest) throws NoSuchAlgorithmException, InvalidKeyException{
@@ -223,5 +234,50 @@ public class AkbankPaymentService implements PaymentService{
         if(!cardInfoDTO.getExpirationDateYear().matches("^\\d{2}$")){
             throw new IllegalArgumentException("Expiration Date Year is not correctly formatted! Correct: 00-99");
         }
+    }
+
+    @Override
+    public void okCheckout(AkbankPaymentResultRequest akbankPaymentResultRequest) {
+        String[] paramNames=akbankPaymentResultRequest.getHashParams().split("\\+");
+        String hashValues="";
+        Class cls=akbankPaymentResultRequest.getClass();
+
+        for (String paramName : paramNames) {
+            try {
+                Field field=cls.getDeclaredField(paramName);
+                field.setAccessible(true);
+                hashValues+=field.get(akbankPaymentResultRequest);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                
+            }
+            
+        }
+        String hashedValues;
+
+        try {
+            hashedValues=hashToString(hashValues, secretKey);
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new RuntimeException("Hash generation failed", e);
+        }
+
+        if(!hashedValues.equals(akbankPaymentResultRequest.getHash())){
+            throw new PaymentIncorrectValuesError("The payment values are incorrect!");
+        }
+
+        //SEND SUCCESS RESTULT TO ORDER MODULE 
+        SaleResponse saleResponse=new SaleResponse();
+        saleResponse.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Success);
+        saleResponse.setHostMessage(akbankPaymentResultRequest.getHostMessage());
+        saleResponse.setHostResponseCode(akbankPaymentResultRequest.getHostResponseCode());
+        saleResponse.setResponseMessage(akbankPaymentResultRequest.getResponseMessage());
+        saleResponse.setOrder(new SaleResponse.Order(akbankPaymentResultRequest.getOrderId()));
+
+        checkoutClient.okCheckout(saleResponse);
+
+    }
+
+    @Override
+    public void failCheckout(AkbankPaymentResultRequest akbankPaymentResultRequest) {
+        
     }
 }

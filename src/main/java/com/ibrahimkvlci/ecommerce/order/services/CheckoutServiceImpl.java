@@ -161,9 +161,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         Order order=orderRepository.findByOrderNumber(response.getOrder().getOrderId()).orElseThrow(()-> new OrderNotFoundException("Order not found by this order number: "+response.getOrder().getOrderId()));
         order.setStatus(OrderStatus.CONFIRMED);
         orderRepository.save(order);
-        // TODO Auto-generated method stub
-        SaleResponse saleResponse=new SaleResponse();
-        return saleResponse;
+        return response;
     }
 
     @Override
