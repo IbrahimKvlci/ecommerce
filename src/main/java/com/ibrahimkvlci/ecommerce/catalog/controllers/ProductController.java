@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.controllers;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import com.ibrahimkvlci.ecommerce.catalog.services.ProductService;
 import jakarta.validation.Valid;
@@ -43,11 +44,8 @@ public class ProductController {
      */
     @GetMapping
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
-        List<ProductDTO> productDTOs = products.stream()
-                .map(productService::mapToDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(productDTOs);
+        List<ProductDTO> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
     }
     
     /**
@@ -128,5 +126,22 @@ public class ProductController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(productDTOs);
     }
+
+    /**
+     * Get featured products by category ID
+     */
+    @GetMapping("/category/{categoryId}/featured")
+    public ResponseEntity<List<ProductDTO>> getFeaturedProductsByCategoryId(@PathVariable Long categoryId) {
+        List<ProductDTO> productDTOs = productService.getProductsByCategoryIdAndFeaturedTrue(categoryId);
+        return ResponseEntity.ok(productDTOs);
+    }
     
+    /**
+     * Get featured products by category ID with lowest price inventory
+     */
+    @GetMapping("/category/{categoryId}/displayProducts")
+    public ResponseEntity<List<ProductDisplayDTO>> getDisplayProductsByCategoryId(@PathVariable Long categoryId) {
+        List<ProductDisplayDTO> products = productService.getDisplayProductsByCategoryId(categoryId);
+        return ResponseEntity.ok(products);
+    }
 }

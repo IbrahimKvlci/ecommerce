@@ -43,7 +43,19 @@ public class Product {
     @NotNull(message = "Brand is required")
     private Brand brand;
 
+    @Column(name="featured")
+    private boolean featured;
+
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<Inventory> inventories;
+
+    public Product(Long id, String title,String description, Category category, Brand brand,List<Inventory> inventories){
+        this.id=id;
+        this.title=title;
+        this.description = description;
+        this.category = category;
+        this.brand = brand;
+        this.inventories = inventories;
+    }
 
 }

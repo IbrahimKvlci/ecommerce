@@ -35,6 +35,8 @@ public class Inventory {
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
+
+    
 }
 
 

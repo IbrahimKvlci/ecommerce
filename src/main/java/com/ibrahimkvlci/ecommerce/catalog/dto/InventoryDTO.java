@@ -14,7 +14,7 @@ public class InventoryDTO {
     private Long id;
 
     @NotNull(message = "Product ID is required")
-    private Long productId;
+    private ProductDTO productDTO;
 
     @NotNull(message = "Quantity is required")
     @Min(value = 0, message = "Quantity cannot be negative")

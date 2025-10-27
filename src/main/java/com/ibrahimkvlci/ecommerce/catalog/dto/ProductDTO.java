@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /**
@@ -26,9 +27,12 @@ public class ProductDTO {
     @Size(max = 1000, message = "Product description cannot exceed 1000 characters")
     private String description;
     
-    @NotNull(message = "Category is required")
-    private Long categoryId;
+    //@NotNull(message = "Category is required")
+    private CategoryDTO categoryDTO;
 
-    @NotNull(message = "Brand is required")
-    private Long brandId;
+    //@NotNull(message = "Brand is required")
+    private BrandDTO brandDTO;
+
+    private boolean featured;
+
 }

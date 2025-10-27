@@ -1,6 +1,8 @@
 package com.ibrahimkvlci.ecommerce.catalog.services;
 
+import com.ibrahimkvlci.ecommerce.catalog.dto.AddCategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategoryDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.CategorySubcategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 
 import java.util.List;
@@ -13,7 +15,7 @@ public interface CategoryService {
     /**
      * Create a new category
      */
-    CategoryDTO createCategory(Category category);
+    CategoryDTO createCategory(AddCategoryDTO category);
     
     /**
      * Get all categories
@@ -25,6 +27,12 @@ public interface CategoryService {
      */
     CategoryDTO getCategoryById(Long id);
     
+    List<CategoryDTO> getParentCategories();
+
+    List<CategoryDTO> getSubCategoriesByParentId(Long id);
+
+    List<CategorySubcategoryDTO> getParentCategoryWithSubcategories();
+
     /**
      * Get category by name
      */

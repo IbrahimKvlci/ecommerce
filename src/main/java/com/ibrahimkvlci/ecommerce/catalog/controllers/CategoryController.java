@@ -1,6 +1,8 @@
 package com.ibrahimkvlci.ecommerce.catalog.controllers;
 
+import com.ibrahimkvlci.ecommerce.catalog.dto.AddCategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategoryDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.CategorySubcategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +29,9 @@ public class CategoryController {
      * Create a new category
      */
     @PostMapping
-    public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
+    public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody AddCategoryDTO categoryDTO) {
         log.info("Creating new category: {}", categoryDTO.getName());
-        CategoryDTO createdCategory = categoryService.createCategory(categoryService.mapToEntity(categoryDTO));
+        CategoryDTO createdCategory = categoryService.createCategory(categoryDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
     
@@ -42,7 +44,28 @@ public class CategoryController {
         List<CategoryDTO> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
-    
+
+    @GetMapping("/parents")
+    public ResponseEntity<List<CategoryDTO>> getAllParentCategories(){
+        log.info("Retrieving all parent categories");
+        List<CategoryDTO> categories = categoryService.getParentCategories();
+        return ResponseEntity.ok(categories);
+    }
+
+    @GetMapping("/parentsWithSubcategories")
+    public ResponseEntity<List<CategorySubcategoryDTO>> getAllPatentCategoriesWithSubcategories(){
+        log.info("Retrieving all parent categories with subcategories");
+        List<CategorySubcategoryDTO> categories = categoryService.getParentCategoryWithSubcategories();
+        return ResponseEntity.ok(categories);
+    }
+
+    @GetMapping("/subcategories/{parentId}")
+    public ResponseEntity<List<CategoryDTO>> getAllSubCategoriesByParentId(@PathVariable Long parentId){
+        log.info("Retrieving all  subcategories");
+        List<CategoryDTO> categories = categoryService.getSubCategoriesByParentId(parentId);
+        return ResponseEntity.ok(categories);
+    }
+
     /**
      * Get category by ID
      */

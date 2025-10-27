@@ -7,6 +7,8 @@ import com.ibrahimkvlci.ecommerce.catalog.repositories.BrandRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.CategoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
+import com.ibrahimkvlci.ecommerce.catalog.mappers.ProductMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,12 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     
+    private final ProductMapper productMapper;
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
@@ -50,8 +54,8 @@ public class ProductServiceImpl implements ProductService {
     
     @Override
     @Transactional(readOnly = true)
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductDTO> getAllProducts() {
+        return productRepository.findAll().stream().map(productMapper::toDTO).collect(Collectors.toList());
     }
     
     @Override
@@ -182,37 +186,32 @@ public class ProductServiceImpl implements ProductService {
      * Convert DTO to entity
      */
     public Product mapToEntity(ProductDTO productDTO) {
-        Product product = new Product();
-        product.setId(productDTO.getId());
-        product.setTitle(productDTO.getTitle());
-        product.setDescription(productDTO.getDescription());
-        if (productDTO.getCategoryId() != null) {
-            Category category = new Category();
-            category.setId(productDTO.getCategoryId());
-            product.setCategory(category);
-        }
-        if (productDTO.getBrandId() != null) {
-            Brand brand = new Brand();
-            brand.setId(productDTO.getBrandId());
-            product.setBrand(brand);
-        }
-        return product;
+        return productMapper.toEntity(productDTO);
     }
     
     /**
      * Create DTO from entity
      */
     public ProductDTO mapToDTO(Product product) {
-        ProductDTO dto = new ProductDTO();
-        dto.setId(product.getId());
-        dto.setTitle(product.getTitle());
-        dto.setDescription(product.getDescription());
-        if (product.getCategory() != null) {
-            dto.setCategoryId(product.getCategory().getId());
+        return productMapper.toDTO(product);
+    }
+
+    @Override
+    public List<ProductDTO> getProductsByCategoryIdAndFeaturedTrue(Long categoryId) {
+        if (categoryId == null || categoryId <= 0) {
+            throw new IllegalArgumentException("Category ID must be a positive number");
         }
-        if (product.getBrand() != null) {
-            dto.setBrandId(product.getBrand().getId());
+        List<Product> featuredProducts = productRepository.findByCategoryIdAndFeaturedTrue(categoryId);
+        return featuredProducts.stream()
+                .map(productMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductDisplayDTO> getDisplayProductsByCategoryId(Long categoryId) {
+        if (categoryId == null || categoryId <= 0) {
+            throw new IllegalArgumentException("Category ID must be a positive number");
         }
-        return dto;
+        return productRepository.findByCategoryIdAndFeaturedTrueWithLowestPriceInventory(categoryId);
     }
 }

@@ -4,6 +4,7 @@ import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +19,7 @@ public interface ProductService {
     /**
      * Get all products
      */
-    List<Product> getAllProducts();
+    List<ProductDTO> getAllProducts();
     
     /**
      * Get product by ID
@@ -74,6 +75,10 @@ public interface ProductService {
      * Get products by brand ID
      */
     List<Product> getProductsByBrandId(Long brandId);
+
+    List<ProductDTO> getProductsByCategoryIdAndFeaturedTrue(Long categoryId);
+
+    List<ProductDisplayDTO> getDisplayProductsByCategoryId(Long categoryId);
     
     /**
      * Convert DTO to entity

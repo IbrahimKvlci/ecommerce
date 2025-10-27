@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import com.ibrahimkvlci.ecommerce.bus.catalog.InventoryBus;
 import com.ibrahimkvlci.ecommerce.order.client.InventoryClient;
 import com.ibrahimkvlci.ecommerce.order.dto.InventoryDTO;
+import com.ibrahimkvlci.ecommerce.order.dto.ProductDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,9 +17,10 @@ public class OrderInventoryClientBus implements InventoryClient {
 
     @Override
     public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId){
+        var inventory=inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId);
         return new InventoryDTO(
             inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getId(),
-            inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getProductId(),
+            new ProductDTO(inventory.getProductDTO().getId(),inventory.getProductDTO().getTitle()),
             inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getQuantity(),
             sellerId,
             inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getPrice()
@@ -31,7 +33,7 @@ public class OrderInventoryClientBus implements InventoryClient {
 
         return new InventoryDTO(
             inventory.getId(),
-            inventory.getProductId(),
+            new ProductDTO(inventory.getProductDTO().getId(),inventory.getProductDTO().getTitle()),
             inventory.getQuantity(),
             inventory.getSellerId(),
             inventory.getPrice()

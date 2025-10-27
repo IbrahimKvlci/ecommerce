@@ -6,6 +6,7 @@ import com.ibrahimkvlci.ecommerce.catalog.exceptions.InventoryValidationExceptio
 import com.ibrahimkvlci.ecommerce.catalog.models.Inventory;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.InventoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
+import com.ibrahimkvlci.ecommerce.catalog.mappers.InventoryMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
+    private final InventoryMapper inventoryMapper;
 
     @Override
     public InventoryDTO createInventory(Inventory inventory) {
@@ -35,7 +37,8 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional(readOnly = true)
     public List<InventoryDTO> getAllInventories() {
-        return inventoryRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
+        List<Inventory> inventories=inventoryRepository.findAll();
+        return inventories.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -82,27 +85,14 @@ public class InventoryServiceImpl implements InventoryService {
      * Convert DTO to entity
      */
     public Inventory mapToEntity(InventoryDTO inventoryDTO) {
-        Inventory inventory = new Inventory();
-        inventory.setId(inventoryDTO.getId());
-        inventory.setQuantity(inventoryDTO.getQuantity());
-        inventory.setPrice(inventoryDTO.getPrice());
-        inventory.setSellerId(inventoryDTO.getSellerId());
-        inventory.setProduct(productRepository.findById(inventoryDTO.getProductId()).orElseThrow(() -> new InventoryValidationException("Product not found with ID: " + inventoryDTO.getProductId())));
-        // Note: Product needs to be set by the caller since it requires a Product entity
-        return inventory;
+        return inventoryMapper.toEntity(inventoryDTO);
     }
     
     /**
      * Create DTO from entity
      */
     public InventoryDTO mapToDTO(Inventory inventory) {
-        InventoryDTO dto = new InventoryDTO();
-        dto.setId(inventory.getId());
-        dto.setProductId(inventory.getProduct().getId());
-        dto.setQuantity(inventory.getQuantity());
-        dto.setPrice(inventory.getPrice());
-        dto.setSellerId(inventory.getSellerId());
-        return dto;
+        return inventoryMapper.toDTO(inventory);
     }
 
     @Override

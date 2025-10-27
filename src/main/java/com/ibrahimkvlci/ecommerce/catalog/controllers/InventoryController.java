@@ -1,7 +1,6 @@
 package com.ibrahimkvlci.ecommerce.catalog.controllers;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO;
-import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import com.ibrahimkvlci.ecommerce.catalog.models.Inventory;
 import com.ibrahimkvlci.ecommerce.catalog.services.InventoryService;
 import jakarta.validation.Valid;
@@ -24,7 +23,8 @@ public class InventoryController {
 
     @PostMapping
     public ResponseEntity<InventoryDTO> createInventory(@Valid @RequestBody InventoryDTO inventoryDTO) {
-        log.info("Creating inventory for product ID: {}", inventoryDTO.getProductId());
+        Long productId = (inventoryDTO.getProductDTO() != null) ? inventoryDTO.getProductDTO().getId() : null;
+        log.info("Creating inventory for product ID: {}", productId);
         InventoryDTO created = inventoryService.createInventory(inventoryDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -49,10 +49,7 @@ public class InventoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<InventoryDTO> updateInventory(@PathVariable Long id, @Valid @RequestBody InventoryDTO inventoryDTO) {
-        Product product = new Product();
-        product.setId(inventoryDTO.getProductId());
         Inventory inventory = inventoryService.mapToEntity(inventoryDTO);
-        inventory.setProduct(product);
         InventoryDTO updated = inventoryService.updateInventory(id, inventory);
         return ResponseEntity.ok(updated);
     }

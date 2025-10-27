@@ -1,8 +1,11 @@
 package com.ibrahimkvlci.ecommerce.catalog.services;
 
+import com.ibrahimkvlci.ecommerce.catalog.dto.AddCategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategoryDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.CategorySubcategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.CategoryNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.CategoryValidationException;
+import com.ibrahimkvlci.ecommerce.catalog.mappers.CategoryMapper;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,18 +23,18 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
     
     private final CategoryRepository categoryRepository;
-
+    private final CategoryMapper categoryMapper;
     
     @Override
-    public CategoryDTO createCategory(Category category) {
+    public CategoryDTO createCategory(AddCategoryDTO category) {
         log.info("Creating new category: {}", category.getName());
         
         // Check if category with same name already exists
         if (categoryRepository.existsByNameIgnoreCase(category.getName())) {
             throw new CategoryValidationException("Category with name '" + category.getName() + "' already exists");
         }
-        
-        Category savedCategory = categoryRepository.save(category);
+        Category newCategory=categoryMapper.fromAddCategoryDTOTOEntity(category);
+        Category savedCategory = categoryRepository.save(newCategory);
         
         log.info("Category created successfully with ID: {}", savedCategory.getId());
         return this.mapToDTO(savedCategory);
@@ -117,19 +120,31 @@ public class CategoryServiceImpl implements CategoryService {
      * Convert DTO to entity
      */
     public Category mapToEntity(CategoryDTO categoryDTO) {
-        Category category = new Category();
-        category.setId(categoryDTO.getId());
-        category.setName(categoryDTO.getName());
-        return category;
+        return categoryMapper.toEntity(categoryDTO);
     }
     
     /**
      * Create DTO from entity
      */
     public CategoryDTO mapToDTO(Category category) {
-        CategoryDTO dto = new CategoryDTO();
-        dto.setId(category.getId());
-        dto.setName(category.getName());
-        return dto;
+        return categoryMapper.toDTO(category);
+    }
+
+    @Override
+    public List<CategoryDTO> getParentCategories() {
+        List<Category> categories=categoryRepository.findByParentIsNull();
+        return categories.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CategoryDTO> getSubCategoriesByParentId(Long id) {
+        List<Category> categories=categoryRepository.findByParentId(id);
+        return categories.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CategorySubcategoryDTO> getParentCategoryWithSubcategories() {
+        List<Category> categories=categoryRepository.findByParentIsNull();
+        return categories.stream().map(categoryMapper::toParentCategorySubcategoryDTO).toList();
     }
 }
