@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.order.models;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -34,7 +35,7 @@ public class Cart {
     private Long customerId;
 
     @OneToMany(mappedBy = "cart", fetch = FetchType.LAZY)
-    private List<CartItem> cartItems;
+    private List<CartItem> cartItems=new ArrayList<CartItem>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

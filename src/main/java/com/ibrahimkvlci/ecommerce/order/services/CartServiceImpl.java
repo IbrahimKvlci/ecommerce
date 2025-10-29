@@ -111,7 +111,7 @@ public class CartServiceImpl implements CartService {
         CartDTO cartDTO = new CartDTO();
         cartDTO.setId(cart.getId());
         cartDTO.setCustomerId(cart.getCustomerId());
-
+        
         cartDTO.setTotalPrice(cart.getCartItems().stream()
                 .mapToDouble(item -> inventoryClient.getInventoryByProductIdAndSellerId(item.getProductId(), item.getSellerId()).getPrice() * item.getQuantity())
                 .sum());
