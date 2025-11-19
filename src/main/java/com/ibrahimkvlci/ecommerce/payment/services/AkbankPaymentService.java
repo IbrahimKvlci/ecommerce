@@ -8,6 +8,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Objects;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -36,8 +37,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Primary
 @RequiredArgsConstructor
-public class AkbankPaymentService implements PaymentService{
-
+public class AkbankPaymentService implements PaymentService {
 
     @Value("${akbank.merchantUser}")
     private String merchantUser;
@@ -67,77 +67,82 @@ public class AkbankPaymentService implements PaymentService{
     private final CheckoutClient checkoutClient;
 
     @Override
-    public SaleResponse sale(SaleRequest saleRequest) throws NoSuchAlgorithmException, InvalidKeyException{
+    public SaleResponse sale(SaleRequest saleRequest) throws NoSuchAlgorithmException, InvalidKeyException {
 
         checkCardInformations(saleRequest.getCardInfoDTO());
-        
+
         String expireMonth = saleRequest.getCardInfoDTO().getExpirationDateMonth();
         String expireYear = saleRequest.getCardInfoDTO().getExpirationDateYear();
 
         String json = "{"
-            +"\"version\": \"1.00\","
-            +"\"txnCode\": \""+ 1000 + "\","
-            +"\"requestDateTime\": \""+ java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS").format(java.time.LocalDateTime.now()) + "\","
-            +"\"randomNumber\": \"" + getRandomNumberBase16(128) + "\","
-            +"\"terminal\" :{"
-            +"\"merchantSafeId\": \"" + merchantUser + "\","
-            +"\"terminalSafeId\": \"" + merchantPassword + "\""
-            +"},"
-            +"\"card\": {"
-            +"\"cardNumber\": \"" + saleRequest.getCardInfoDTO().getCardNumber() + "\","
-            +"\"cvv2\": \"" +  saleRequest.getCardInfoDTO().getCvv() + "\","
-            +"\"expireDate\": \"" + expireMonth + expireYear + "\""
-            +"},"
-            +"\"order\": {"
-            +"\"orderId\": \"" + saleRequest.getOrderDTO().getOrderNumber() + "\""
-            +"},"
-            +"\"reward\": {"
-            +"\"ccbRewardAmount\": 0,"
-            +"\"pcbRewardAmount\": 0,"
-            +"\"xcbRewardAmount\": 0"
-            +"},"
-            +"\"transaction\": {"
-            +"\"amount\":"  + saleRequest.getOrderDTO().getAmount() + ","
-            +"\"currencyCode\":"  + saleRequest.getOrderDTO().getCurrencyCode() + ","
-            +"\"motoInd\":"  + 0 + ","
-            +"\"installCount\":"  + saleRequest.getOrderDTO().getInstallCount()
-            +"},"
-            +"\"customer\": {"
-            +"\"emailAddress\": \"" + saleRequest.getCustomerDTO().getEmailAddress() + "\""
-            +"}"
-            +"}";
-    String hash = hashToString(json, secretKey);
-    HttpHeaders httpHeaders = new HttpHeaders();
-    httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-    httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-    httpHeaders.add("auth-hash",hash);
-    HttpEntity<String> entity = new HttpEntity<>(json, httpHeaders);
-    SaleResponse response = new RestTemplate().exchange(saleUrl, HttpMethod.POST, entity, SaleResponse.class).getBody();
-    switch (response.getHostResponseCode()) {
-        case "00":
-            response.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Success);
-            break;
-        default:
-            response.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Error);
-            break;
-    }
-    return response; 
+                + "\"version\": \"1.00\","
+                + "\"txnCode\": \"" + 1000 + "\","
+                + "\"requestDateTime\": \""
+                + java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")
+                        .format(java.time.LocalDateTime.now())
+                + "\","
+                + "\"randomNumber\": \"" + getRandomNumberBase16(128) + "\","
+                + "\"terminal\" :{"
+                + "\"merchantSafeId\": \"" + merchantUser + "\","
+                + "\"terminalSafeId\": \"" + merchantPassword + "\""
+                + "},"
+                + "\"card\": {"
+                + "\"cardNumber\": \"" + saleRequest.getCardInfoDTO().getCardNumber() + "\","
+                + "\"cvv2\": \"" + saleRequest.getCardInfoDTO().getCvv() + "\","
+                + "\"expireDate\": \"" + expireMonth + expireYear + "\""
+                + "},"
+                + "\"order\": {"
+                + "\"orderId\": \"" + saleRequest.getOrderDTO().getOrderNumber() + "\""
+                + "},"
+                + "\"reward\": {"
+                + "\"ccbRewardAmount\": 0,"
+                + "\"pcbRewardAmount\": 0,"
+                + "\"xcbRewardAmount\": 0"
+                + "},"
+                + "\"transaction\": {"
+                + "\"amount\":" + saleRequest.getOrderDTO().getAmount() + ","
+                + "\"currencyCode\":" + saleRequest.getOrderDTO().getCurrencyCode() + ","
+                + "\"motoInd\":" + 0 + ","
+                + "\"installCount\":" + saleRequest.getOrderDTO().getInstallCount()
+                + "},"
+                + "\"customer\": {"
+                + "\"emailAddress\": \"" + saleRequest.getCustomerDTO().getEmailAddress() + "\""
+                + "}"
+                + "}";
+        String hash = hashToString(json, secretKey);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.setAccept(Objects.requireNonNull(Collections.singletonList(MediaType.APPLICATION_JSON)));
+        httpHeaders.add("auth-hash", hash);
+        HttpEntity<String> entity = new HttpEntity<>(json, httpHeaders);
+        SaleResponse response = new RestTemplate().exchange(Objects.requireNonNull(saleUrl),
+                Objects.requireNonNull(HttpMethod.POST), entity, SaleResponse.class).getBody();
+        switch (response.getHostResponseCode()) {
+            case "00":
+                response.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Success);
+                break;
+            default:
+                response.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Error);
+                break;
+        }
+        return response;
 
     }
-    
-    public static String getRandomNumberBase16(int length){
+
+    public static String getRandomNumberBase16(int length) {
         StringBuilder sb = new StringBuilder();
         String processName = java.lang.management.ManagementFactory.getRuntimeMXBean().getName();
         String processId = processName.split("@")[0];
         String secret = processId + Thread.currentThread().threadId() + new Date().getTime();
         SecureRandom srandom = new SecureRandom(secret.getBytes());
-        for(int i = 0; i < length; i++){
-          sb.append(Integer.toString(srandom.nextInt(16),16));
+        for (int i = 0; i < length; i++) {
+            sb.append(Integer.toString(srandom.nextInt(16), 16));
         }
         return sb.toString();
     }
-    
-    public static String hashToString(String serializedModel, String secretKey) throws NoSuchAlgorithmException, InvalidKeyException {
+
+    public static String hashToString(String serializedModel, String secretKey)
+            throws NoSuchAlgorithmException, InvalidKeyException {
         Mac hmacSha512 = Mac.getInstance("HmacSHA512");
         SecretKeySpec secretkey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA512");
         hmacSha512.init(secretkey);
@@ -152,43 +157,41 @@ public class AkbankPaymentService implements PaymentService{
         String expireYear = saleRequest.getCardInfoDTO().getExpirationDateYear();
 
         String randomNumber = getRandomNumberBase16(128);
-        String requestDateTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS").format(java.time.LocalDateTime.now());
+        String requestDateTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")
+                .format(java.time.LocalDateTime.now());
 
         String orderId = saleRequest.getOrderDTO().getOrderNumber();
         String amount = String.format("%.2f", saleRequest.getOrderDTO().getAmount());
         String currencyCode = Integer.toString(saleRequest.getOrderDTO().getCurrencyCode());
         String installCount = Integer.toString(saleRequest.getOrderDTO().getInstallCount());
         // Build a serialized string for hash calculation as per Akbank docs
-        String hashItems =
-            "3D_PAY" + // paymentModel
-            "3000" + // txnCode
-            merchantUser + // merchantSafeId
-            merchantPassword + // terminalSafeId
-            saleRequest.getOrderDTO().getOrderNumber() + // orderId
-            lang + // lang
-            amount + // amount
-            "0.00" + // ccbRewardAmount
-            "0.00" + // pcbRewardAmount
-            "0.00" + // xcbRewardAmount
-            currencyCode + // currencyCode
-            installCount + // installCount
-            okUrl + // okUrl
-            failUrl + // failUrl
-            saleRequest.getCustomerDTO().getEmailAddress() + // emailAddress
-            saleRequest.getCardInfoDTO().getCardNumber() + // creditCard
-            (expireMonth + expireYear) + // expiredDate
-            saleRequest.getCardInfoDTO().getCvv() + // cvv
-            saleRequest.getCardInfoDTO().getCardHolderName() + // cardHolderName
-            randomNumber + // randomNumber
-            requestDateTime; // requestDateTime
+        String hashItems = "3D_PAY" + // paymentModel
+                "3000" + // txnCode
+                merchantUser + // merchantSafeId
+                merchantPassword + // terminalSafeId
+                saleRequest.getOrderDTO().getOrderNumber() + // orderId
+                lang + // lang
+                amount + // amount
+                "0.00" + // ccbRewardAmount
+                "0.00" + // pcbRewardAmount
+                "0.00" + // xcbRewardAmount
+                currencyCode + // currencyCode
+                installCount + // installCount
+                okUrl + // okUrl
+                failUrl + // failUrl
+                saleRequest.getCustomerDTO().getEmailAddress() + // emailAddress
+                saleRequest.getCardInfoDTO().getCardNumber() + // creditCard
+                (expireMonth + expireYear) + // expiredDate
+                saleRequest.getCardInfoDTO().getCvv() + // cvv
+                saleRequest.getCardInfoDTO().getCardHolderName() + // cardHolderName
+                randomNumber + // randomNumber
+                requestDateTime; // requestDateTime
         String hash;
         try {
             hash = hashToString(hashItems, secretKey);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException("Hash generation failed", e);
         }
-
-
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -218,8 +221,9 @@ public class AkbankPaymentService implements PaymentService{
         map.add("hash", hash);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, httpHeaders);
-        String requestString = new RestTemplate().postForObject(securePayUrl, request, String.class);
-        SaleResponse response=new SaleResponse();
+        String requestString = new RestTemplate().postForObject(Objects.requireNonNull(securePayUrl), request,
+                String.class);
+        SaleResponse response = new SaleResponse();
         response.setHtmlResponse(requestString);
         response.setSaleStatusEnum(SaleResponse.SaleStatusEnum.RedirectHTML);
         response.setHostResponseCode("3000");
@@ -227,45 +231,45 @@ public class AkbankPaymentService implements PaymentService{
         return response;
     }
 
-    private void checkCardInformations(CardInfoDTO cardInfoDTO){
-        if(!cardInfoDTO.getExpirationDateMonth().matches("^\\d{2}$")){
+    private void checkCardInformations(CardInfoDTO cardInfoDTO) {
+        if (!cardInfoDTO.getExpirationDateMonth().matches("^\\d{2}$")) {
             throw new IllegalArgumentException("Expiration Date Month is not correctly formatted! Correct: 00-12");
         }
-        if(!cardInfoDTO.getExpirationDateYear().matches("^\\d{2}$")){
+        if (!cardInfoDTO.getExpirationDateYear().matches("^\\d{2}$")) {
             throw new IllegalArgumentException("Expiration Date Year is not correctly formatted! Correct: 00-99");
         }
     }
 
     @Override
     public void okCheckout(AkbankPaymentResultRequest akbankPaymentResultRequest) {
-        String[] paramNames=akbankPaymentResultRequest.getHashParams().split("\\+");
-        String hashValues="";
-        Class cls=akbankPaymentResultRequest.getClass();
+        String[] paramNames = akbankPaymentResultRequest.getHashParams().split("\\+");
+        String hashValues = "";
+        Class<?> cls = akbankPaymentResultRequest.getClass();
 
         for (String paramName : paramNames) {
             try {
-                Field field=cls.getDeclaredField(paramName);
+                Field field = cls.getDeclaredField(paramName);
                 field.setAccessible(true);
-                hashValues+=field.get(akbankPaymentResultRequest);
+                hashValues += field.get(akbankPaymentResultRequest);
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                
+
             }
-            
+
         }
         String hashedValues;
 
         try {
-            hashedValues=hashToString(hashValues, secretKey);
+            hashedValues = hashToString(hashValues, secretKey);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException("Hash generation failed", e);
         }
 
-        if(!hashedValues.equals(akbankPaymentResultRequest.getHash())){
+        if (!hashedValues.equals(akbankPaymentResultRequest.getHash())) {
             throw new PaymentIncorrectValuesError("The payment values are incorrect!");
         }
 
-        //SEND SUCCESS RESTULT TO ORDER MODULE 
-        SaleResponse saleResponse=new SaleResponse();
+        // SEND SUCCESS RESTULT TO ORDER MODULE
+        SaleResponse saleResponse = new SaleResponse();
         saleResponse.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Success);
         saleResponse.setHostMessage(akbankPaymentResultRequest.getHostMessage());
         saleResponse.setHostResponseCode(akbankPaymentResultRequest.getHostResponseCode());
@@ -278,6 +282,6 @@ public class AkbankPaymentService implements PaymentService{
 
     @Override
     public void failCheckout(AkbankPaymentResultRequest akbankPaymentResultRequest) {
-        
+
     }
 }

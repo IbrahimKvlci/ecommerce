@@ -18,46 +18,46 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-    
+
     private final ProductMapper productMapper;
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
-    
-    
+
     @Override
     public Product createProduct(Product product) {
         // Validate product data
         if (product.getTitle() == null || product.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Product title cannot be null or empty");
-        }        
+        }
         // Check if product with same title already exists
         if (productExistsByTitle(product.getTitle())) {
             throw new IllegalArgumentException("Product with title '" + product.getTitle() + "' already exists");
         }
 
-        if(brandRepository.findById(product.getBrand().getId()).isEmpty()) {
+        if (brandRepository.findById(Objects.requireNonNull(product.getBrand().getId())).isEmpty()) {
             throw new IllegalArgumentException("Brand with ID " + product.getBrand().getId() + " not found");
         }
-        if(categoryRepository.findById(product.getCategory().getId()).isEmpty()) {
+        if (categoryRepository.findById(Objects.requireNonNull(product.getCategory().getId())).isEmpty()) {
             throw new IllegalArgumentException("Category with ID " + product.getCategory().getId() + " not found");
         }
 
-        return productRepository.save(product);            
+        return productRepository.save(product);
 
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<ProductDTO> getAllProducts() {
         return productRepository.findAll().stream().map(productMapper::toDTO).collect(Collectors.toList());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Optional<Product> getProductById(Long id) {
@@ -66,54 +66,54 @@ public class ProductServiceImpl implements ProductService {
         }
         return productRepository.findById(id);
     }
-    
+
     @Override
     public Product updateProduct(Long id, Product product) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Product ID must be a positive number");
         }
-        
+
         if (product == null) {
             throw new IllegalArgumentException("Product cannot be null");
         }
-        
+
         // Check if product exists
         Optional<Product> existingProduct = productRepository.findById(id);
         if (existingProduct.isEmpty()) {
             throw new IllegalArgumentException("Product with ID " + id + " not found");
         }
-        
+
         // Validate product data
         if (product.getTitle() == null || product.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Product title cannot be null or empty");
         }
-        
+
         // Check if another product with same title exists (excluding current product)
         Product existing = existingProduct.get();
         if (!existing.getTitle().equals(product.getTitle()) && productExistsByTitle(product.getTitle())) {
             throw new IllegalArgumentException("Product with title '" + product.getTitle() + "' already exists");
         }
-        
+
         // Update fields
         existing.setTitle(product.getTitle());
         existing.setDescription(product.getDescription());
-        
+
         return productRepository.save(existing);
     }
-    
+
     @Override
     public void deleteProduct(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Product ID must be a positive number");
         }
-        
+
         if (!productRepository.existsById(id)) {
             throw new IllegalArgumentException("Product with ID " + id + " not found");
         }
-        
+
         productRepository.deleteById(id);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<Product> searchProductsByTitle(String title) {
@@ -122,7 +122,7 @@ public class ProductServiceImpl implements ProductService {
         }
         return productRepository.findByTitleContainingIgnoreCase(title.trim());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<Product> searchProductsByDescription(String keyword) {
@@ -131,7 +131,7 @@ public class ProductServiceImpl implements ProductService {
         }
         return productRepository.findByDescriptionContaining(keyword.trim());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public boolean productExistsByTitle(String title) {
@@ -140,7 +140,7 @@ public class ProductServiceImpl implements ProductService {
         }
         return productRepository.existsByTitle(title.trim());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<Product> getProductsByCategory(Category category) {
@@ -149,7 +149,7 @@ public class ProductServiceImpl implements ProductService {
         }
         return productRepository.findByCategory(category);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<Product> getProductsByCategoryId(Long categoryId) {
@@ -179,16 +179,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public boolean isProductAvailable(Long productId) {
-        return productRepository.existsById(productId);
+        return productRepository.existsById(Objects.requireNonNull(productId));
     }
-    
+
     /**
      * Convert DTO to entity
      */
     public Product mapToEntity(ProductDTO productDTO) {
         return productMapper.toEntity(productDTO);
     }
-    
+
     /**
      * Create DTO from entity
      */

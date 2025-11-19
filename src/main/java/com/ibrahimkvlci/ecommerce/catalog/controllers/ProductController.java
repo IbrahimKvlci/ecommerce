@@ -42,7 +42,8 @@ public class ProductController {
      * Get all products
      */
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+    public ResponseEntity<List<ProductDTO>> getAllProducts(@CookieValue(value = "jwt", required = false) String jwtToken) {
+        System.out.println("JWT Token: " + jwtToken);
         List<ProductDTO> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }

@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.ibrahimkvlci.ecommerce.auth.models.UserInfo;
 
-public class UserMyDetails implements UserDetails{
+public class UserMyDetails implements UserDetails {
     private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
@@ -32,10 +32,10 @@ public class UserMyDetails implements UserDetails{
     public String getPassword() {
         return password;
     }
-    
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
-    
+
 }

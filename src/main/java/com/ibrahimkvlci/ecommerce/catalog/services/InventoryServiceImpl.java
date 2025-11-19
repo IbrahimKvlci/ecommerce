@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +28,9 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public InventoryDTO createInventory(Inventory inventory) {
-        productRepository.findById(inventory.getProduct().getId())
-                .orElseThrow(() -> new InventoryValidationException("Product not found with ID: " + inventory.getProduct().getId()));
+        productRepository.findById(Objects.requireNonNull(inventory.getProduct().getId()))
+                .orElseThrow(() -> new InventoryValidationException(
+                        "Product not found with ID: " + inventory.getProduct().getId()));
 
         Inventory saved = inventoryRepository.save(inventory);
         return this.mapToDTO(saved);
@@ -37,14 +39,14 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     @Transactional(readOnly = true)
     public List<InventoryDTO> getAllInventories() {
-        List<Inventory> inventories=inventoryRepository.findAll();
+        List<Inventory> inventories = inventoryRepository.findAll();
         return inventories.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
     public InventoryDTO getInventoryById(Long id) {
-        Inventory inventory = inventoryRepository.findById(id)
+        Inventory inventory = inventoryRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + id));
         return this.mapToDTO(inventory);
     }
@@ -61,7 +63,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public InventoryDTO updateInventory(Long id, Inventory inventory) {
-        Inventory existing = inventoryRepository.findById(id)
+        Inventory existing = inventoryRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + id));
 
         if (!existing.getProduct().getId().equals(inventory.getProduct().getId())) {
@@ -75,19 +77,19 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public void deleteInventory(Long id) {
-        if (!inventoryRepository.existsById(id)) {
+        if (!inventoryRepository.existsById(Objects.requireNonNull(id))) {
             throw new InventoryNotFoundException("Inventory not found with ID: " + id);
         }
-        inventoryRepository.deleteById(id);
+        inventoryRepository.deleteById(Objects.requireNonNull(id));
     }
-    
+
     /**
      * Convert DTO to entity
      */
     public Inventory mapToEntity(InventoryDTO inventoryDTO) {
         return inventoryMapper.toEntity(inventoryDTO);
     }
-    
+
     /**
      * Create DTO from entity
      */
@@ -97,7 +99,9 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId) {
-        return this.mapToDTO(inventoryRepository.findByProductIdAndSellerId(productId, sellerId).orElseThrow(() -> new InventoryNotFoundException("Inventory not found for product ID: " + productId + " and seller ID: " + sellerId)));
+        return this.mapToDTO(inventoryRepository.findByProductIdAndSellerId(productId, sellerId)
+                .orElseThrow(() -> new InventoryNotFoundException(
+                        "Inventory not found for product ID: " + productId + " and seller ID: " + sellerId)));
     }
 
     @Override
@@ -116,5 +120,3 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
 }
-
-

@@ -19,27 +19,28 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class CartItemServiceImpl implements CartItemService {
-    
+
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
 
     private final InventoryClient inventoryClient;
-    
+
     @Override
     public CartItemDTO addCartItem(AddCartItemRequest request) {
         // Check if cart exists
-        Cart cart = cartRepository.findById(request.getCartId())
+        Cart cart = cartRepository.findById(Objects.requireNonNull(request.getCartId()))
                 .orElseThrow(() -> new CartNotFoundException("Cart not found with id: " + request.getCartId()));
-        
+
         // Check if item already exists in cart
         Optional<CartItem> existingItem = cartItemRepository.findByCartIdAndProductIdAndSellerId(
                 request.getCartId(), request.getProductId(), request.getSellerId());
-        
+
         CartItem cartItem;
         if (existingItem.isPresent()) {
             // Update existing item quantity
@@ -53,11 +54,11 @@ public class CartItemServiceImpl implements CartItemService {
             cartItem.setQuantity(request.getQuantity());
             cartItem.setSellerId(request.getSellerId());
         }
-        
+
         CartItem savedCartItem = cartItemRepository.save(cartItem);
         return mapToDTO(savedCartItem);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<CartItemDTO> getAllCartItems() {
@@ -65,14 +66,14 @@ public class CartItemServiceImpl implements CartItemService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Optional<CartItemDTO> getCartItemById(Long id) {
-        return cartItemRepository.findById(id)
+        return cartItemRepository.findById(Objects.requireNonNull(id))
                 .map(this::mapToDTO);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<CartItemDTO> getCartItemsByCartId(Long cartId) {
@@ -80,86 +81,79 @@ public class CartItemServiceImpl implements CartItemService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
-    public Optional<CartItemDTO> getCartItemByCartIdAndProductIdAndSellerId(Long cartId, Long productId, Long sellerId) {
+    public Optional<CartItemDTO> getCartItemByCartIdAndProductIdAndSellerId(Long cartId, Long productId,
+            Long sellerId) {
         return cartItemRepository.findByCartIdAndProductIdAndSellerId(cartId, productId, sellerId)
                 .map(this::mapToDTO);
     }
-    
+
     @Override
     public CartItemDTO updateCartItem(Long id, UpdateCartItemRequest request) {
-        CartItem cartItem = cartItemRepository.findById(id)
+        CartItem cartItem = cartItemRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new CartItemNotFoundException("Cart item not found with id: " + id));
-        
+
         cartItem.setQuantity(request.getQuantity());
-        
+
         CartItem savedCartItem = cartItemRepository.save(cartItem);
         return mapToDTO(savedCartItem);
     }
-    
+
     @Override
     public void deleteCartItem(Long id) {
-        if (!cartItemRepository.existsById(id)) {
+        if (!cartItemRepository.existsById(Objects.requireNonNull(id))) {
             throw new CartItemNotFoundException("Cart item not found with id: " + id);
         }
-        cartItemRepository.deleteById(id);
+        cartItemRepository.deleteById(Objects.requireNonNull(id));
     }
-    
+
     @Override
     public void deleteCartItemByCartIdAndProductId(Long cartId, Long productId) {
         if (!cartItemRepository.existsByCartIdAndProductId(cartId, productId)) {
-            throw new CartItemNotFoundException("Cart item not found for cart: " + cartId + " and product: " + productId);
+            throw new CartItemNotFoundException(
+                    "Cart item not found for cart: " + cartId + " and product: " + productId);
         }
         cartItemRepository.deleteByCartIdAndProductId(cartId, productId);
     }
-    
+
     @Override
     public void deleteCartItemsByCartId(Long cartId) {
         cartItemRepository.deleteByCartId(cartId);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public boolean cartItemExistsForCartAndProduct(Long cartId, Long productId) {
         return cartItemRepository.existsByCartIdAndProductId(cartId, productId);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Long getTotalQuantityByCartId(Long cartId) {
         Long totalQuantity = cartItemRepository.getTotalQuantityByCartId(cartId);
         return totalQuantity != null ? totalQuantity : 0L;
     }
-    
+
     @Override
     public CartItemDTO mapToDTO(CartItem cartItem) {
         CartItemDTO cartItemDTO = new CartItemDTO();
         cartItemDTO.setId(cartItem.getId());
-        cartItemDTO.setCartId(cartItem.getCart().getId());
-        cartItemDTO.setProductId(cartItem.getProductId());
         cartItemDTO.setQuantity(cartItem.getQuantity());
 
-        var inventory = inventoryClient.getInventoryByProductIdAndSellerId(cartItem.getProductId(), cartItem.getSellerId());
-        cartItemDTO.setPrice(inventory.getPrice());
+        var inventory = inventoryClient.getInventoryByProductIdAndSellerId(cartItem.getProductId(),
+                cartItem.getSellerId());
         cartItemDTO.setTotalPrice(inventory.getPrice() * cartItem.getQuantity());
-        
-        cartItemDTO.setCreatedAt(cartItem.getCreatedAt());
-        cartItemDTO.setUpdatedAt(cartItem.getUpdatedAt());
-        
+        cartItemDTO.setInventory(inventory);
         return cartItemDTO;
     }
-    
+
     @Override
     public CartItem mapToEntity(CartItemDTO cartItemDTO) {
         CartItem cartItem = new CartItem();
-        cartItem.setId(cartItemDTO.getId());
-        cartItem.setProductId(cartItemDTO.getProductId());
         cartItem.setQuantity(cartItemDTO.getQuantity());
-        cartItem.setCreatedAt(cartItemDTO.getCreatedAt());
-        cartItem.setUpdatedAt(cartItemDTO.getUpdatedAt());
-        
+
         return cartItem;
     }
 }

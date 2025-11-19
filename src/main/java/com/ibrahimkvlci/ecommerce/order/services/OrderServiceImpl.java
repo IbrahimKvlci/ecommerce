@@ -24,37 +24,38 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
-    
+
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final ProductClient productClient;
     private final CustomerClient customerClient;
     private final OrderItemService orderItemService;
-    
+
     @Override
     public OrderDTO createOrder(CreateOrderRequest request) {
-        
+
         // Calculate total amount
         Double totalAmount = calculateOrderTotal(request.getOrderItems());
-        
+
         // Create order
         Order order = new Order();
         order.setTotalAmount(totalAmount);
-        order.setNotes(request.getNotes()); 
+        order.setNotes(request.getNotes());
 
-        if(!customerClient.existsById(request.getCustomerId())){
+        if (!customerClient.existsById(request.getCustomerId())) {
             throw new OrderValidationException("Customer not available with ID: " + request.getCustomerId());
         }
 
         order.setCustomerId(request.getCustomerId());
 
         Order savedOrder = orderRepository.save(order);
-        
+
         // Create order items
         List<OrderItem> orderItems = request.getOrderItems().stream()
                 .map(itemRequest -> {
@@ -64,22 +65,23 @@ public class OrderServiceImpl implements OrderService {
                     orderItem.setUnitPrice(itemRequest.getUnitPrice());
                     orderItem.setTotalPrice(itemRequest.getQuantity() * itemRequest.getUnitPrice());
 
-                    if(!productClient.isProductAvailable(itemRequest.getProductId())){
-                        throw new OrderValidationException("Product not available with ID: " + itemRequest.getProductId());
+                    if (!productClient.isProductAvailable(itemRequest.getProductId())) {
+                        throw new OrderValidationException(
+                                "Product not available with ID: " + itemRequest.getProductId());
                     }
 
                     orderItem.setProductId(itemRequest.getProductId());
-                    
+
                     return orderItem;
                 })
                 .collect(Collectors.toList());
-        
-        orderItemRepository.saveAll(orderItems);
+
+        orderItemRepository.saveAll(Objects.requireNonNull(orderItems));
         savedOrder.setOrderItems(orderItems);
-        
+
         return mapToDTO(savedOrder);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<OrderDTO> getAllOrders() {
@@ -87,56 +89,56 @@ public class OrderServiceImpl implements OrderService {
                 .map(order -> mapToDTO(order))
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Optional<OrderDTO> getOrderById(Long id) {
-        return orderRepository.findById(id)
+        return orderRepository.findById(Objects.requireNonNull(id))
                 .map(order -> mapToDTO(order));
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public Optional<OrderDTO> getOrderByOrderNumber(String orderNumber) {
         return orderRepository.findByOrderNumber(orderNumber)
                 .map(order -> mapToDTO(order));
     }
-    
+
     @Override
     public OrderDTO updateOrder(Long id, UpdateOrderRequest request) {
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new OrderNotFoundException(id));
-        
+
         if (!canUpdateOrder(id)) {
             throw new OrderStatusException(order.getStatus(), "update");
         }
-        
+
         if (request.getStatus() != null) {
             order.setStatus(request.getStatus());
         }
         if (request.getNotes() != null) {
             order.setNotes(request.getNotes());
         }
-        
-        Order updatedOrder = orderRepository.save(order);
+
+        Order updatedOrder = orderRepository.save(Objects.requireNonNull(order));
         return mapToDTO(updatedOrder);
     }
-    
+
     @Override
     public void deleteOrder(Long id) {
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new OrderNotFoundException(id));
-        
+
         if (!canUpdateOrder(id)) {
             throw new OrderStatusException(order.getStatus(), "delete");
         }
-        
+
         // Delete order items first
         List<OrderItem> orderItems = orderItemRepository.findByOrderId(id);
-        orderItemRepository.deleteAll(orderItems);
-        orderRepository.deleteById(id);
+        orderItemRepository.deleteAll(Objects.requireNonNull(orderItems));
+        orderRepository.deleteById(Objects.requireNonNull(id));
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<OrderDTO> getOrdersByCustomerId(Long customerId) {
@@ -144,7 +146,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(order -> mapToDTO(order))
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<OrderDTO> getOrdersByStatus(OrderStatus status) {
@@ -152,38 +154,38 @@ public class OrderServiceImpl implements OrderService {
                 .map(order -> mapToDTO(order))
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     public OrderDTO updateOrderStatus(Long id, OrderStatus status) {
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new OrderNotFoundException(id));
-        
+
         OrderStatus currentStatus = order.getStatus();
-        
+
         // Validate status transition
         if (!isValidStatusTransition(currentStatus, status)) {
             throw new OrderStatusException(currentStatus, status);
         }
-        
+
         order.setStatus(status);
         Order updatedOrder = orderRepository.save(order);
         return mapToDTO(updatedOrder);
     }
-    
+
     @Override
     public OrderDTO cancelOrder(Long id) {
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new OrderNotFoundException(id));
-        
+
         if (!canCancelOrder(id)) {
             throw new OrderStatusException(order.getStatus(), "cancel");
         }
-        
+
         order.setStatus(OrderStatus.CANCELLED);
         Order updatedOrder = orderRepository.save(order);
         return mapToDTO(updatedOrder);
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<OrderDTO> getOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
@@ -191,7 +193,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(order -> mapToDTO(order))
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<OrderDTO> getOrdersByAmountRange(Double minAmount, Double maxAmount) {
@@ -199,40 +201,40 @@ public class OrderServiceImpl implements OrderService {
                 .map(order -> mapToDTO(order))
                 .collect(Collectors.toList());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public List<OrderDTO> getCustomerOrderHistory(Long customerId) {
         return getOrdersByCustomerId(customerId);
     }
-    
+
     @Override
     public Double calculateOrderTotal(List<CreateOrderRequest.CreateOrderItemRequest> orderItems) {
         return orderItems.stream()
                 .mapToDouble(item -> item.getQuantity() * item.getUnitPrice())
                 .sum();
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public boolean canCancelOrder(Long id) {
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new OrderNotFoundException(id));
-        
-        return order.getStatus() == OrderStatus.PENDING || 
-               order.getStatus() == OrderStatus.CONFIRMED;
+
+        return order.getStatus() == OrderStatus.PENDING ||
+                order.getStatus() == OrderStatus.CONFIRMED;
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public boolean canUpdateOrder(Long id) {
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new OrderNotFoundException(id));
-        
-        return order.getStatus() == OrderStatus.PENDING || 
-               order.getStatus() == OrderStatus.CONFIRMED;
+
+        return order.getStatus() == OrderStatus.PENDING ||
+                order.getStatus() == OrderStatus.CONFIRMED;
     }
-    
+
     private boolean isValidStatusTransition(OrderStatus current, OrderStatus target) {
         // Define valid status transitions
         switch (current) {
@@ -266,13 +268,13 @@ public class OrderServiceImpl implements OrderService {
         dto.setUpdatedAt(order.getUpdatedAt());
         dto.setCustomerId(order.getCustomerId());
         dto.setCustomerName(customerClient.getCustomerById(order.getCustomerId()).getName());
-        
+
         if (order.getOrderItems() != null) {
             dto.setOrderItems(order.getOrderItems().stream()
                     .map(item -> orderItemService.mapToDTO(item))
                     .collect(Collectors.toList()));
         }
-        
+
         return dto;
     }
 
@@ -287,13 +289,13 @@ public class OrderServiceImpl implements OrderService {
         order.setCreatedAt(orderDTO.getCreatedAt());
         order.setUpdatedAt(orderDTO.getUpdatedAt());
         order.setCustomerId(orderDTO.getCustomerId());
-        
+
         if (orderDTO.getOrderItems() != null) {
             order.setOrderItems(orderDTO.getOrderItems().stream()
                     .map(orderItemService::mapToEntity)
                     .collect(Collectors.toList()));
         }
-        
+
         return order;
     }
 }

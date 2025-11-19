@@ -48,6 +48,7 @@ public class SecurityConfig {
                 })
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/api/auth/customer/**").permitAll()
+                .requestMatchers("/api/catalog/products/**").authenticated()
                 .anyRequest().permitAll()
                 )
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -84,8 +85,7 @@ public class SecurityConfig {
             "http://127.0.0.1:3000"
         ));
         config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
-        config.setExposedHeaders(java.util.List.of("Authorization", "Location"));
+        config.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "Cookie"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

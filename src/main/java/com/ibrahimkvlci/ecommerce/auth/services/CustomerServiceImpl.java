@@ -22,12 +22,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class CustomerServiceImpl implements CustomerService{
+public class CustomerServiceImpl implements CustomerService {
 
     private final UserInfoRepository userRepository;
     private final CustomerRepository customerRepository;
@@ -58,12 +59,13 @@ public class CustomerServiceImpl implements CustomerService{
 
         cartClient.createCart(saved.getId());
 
-        return new RegisterCustomerResponse(saved.getEmail(), saved.getName(), saved.getSurname(), saved.getPhoneNumber());
+        return new RegisterCustomerResponse(saved.getEmail(), saved.getName(), saved.getSurname(),
+                saved.getPhoneNumber());
     }
 
     @Override
     public Optional<CustomerDTO> getCustomerById(Long id) {
-        return customerRepository.findById(id)
+        return customerRepository.findById(Objects.requireNonNull(id))
                 .map(CustomerDTO::fromEntity);
     }
 
@@ -75,7 +77,7 @@ public class CustomerServiceImpl implements CustomerService{
 
     @Override
     public boolean existsById(Long id) {
-        return customerRepository.existsById(id);
+        return customerRepository.existsById(Objects.requireNonNull(id));
     }
 
     @Override

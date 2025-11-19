@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +43,7 @@ public class BrandServiceImpl implements BrandService {
     @Override
     @Transactional(readOnly = true)
     public BrandDTO getBrandById(Long id) {
-        Brand brand = brandRepository.findById(id)
+        Brand brand = brandRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new BrandNotFoundException("Brand not found with ID: " + id));
         return this.mapToDTO(brand);
     }
@@ -57,7 +58,7 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public BrandDTO updateBrand(Long id, Brand brand) {
-        Brand existing = brandRepository.findById(id)
+        Brand existing = brandRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new BrandNotFoundException("Brand not found with ID: " + id));
 
         if (!existing.getName().equalsIgnoreCase(brand.getName())
@@ -72,16 +73,17 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public void deleteBrand(Long id) {
-        if (!brandRepository.existsById(id)) {
+        if (!brandRepository.existsById(Objects.requireNonNull(id))) {
             throw new BrandNotFoundException("Brand not found with ID: " + id);
         }
-        brandRepository.deleteById(id);
+        brandRepository.deleteById(Objects.requireNonNull(id));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<BrandDTO> searchBrandsByName(String name) {
-        return brandRepository.findByNameContainingIgnoreCase(name).stream().map(this::mapToDTO).collect(Collectors.toList());
+        return brandRepository.findByNameContainingIgnoreCase(name).stream().map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -89,7 +91,7 @@ public class BrandServiceImpl implements BrandService {
     public boolean existsByName(String name) {
         return brandRepository.existsByNameIgnoreCase(name);
     }
-    
+
     /**
      * Convert DTO to entity
      */
@@ -99,7 +101,7 @@ public class BrandServiceImpl implements BrandService {
         brand.setName(brandDTO.getName());
         return brand;
     }
-    
+
     /**
      * Create DTO from entity
      */
@@ -110,5 +112,3 @@ public class BrandServiceImpl implements BrandService {
         return dto;
     }
 }
-
-

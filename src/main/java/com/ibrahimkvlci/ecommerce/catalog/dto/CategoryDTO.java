@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -17,9 +15,9 @@ import jakarta.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDTO {
-    
+
     private Long id;
-    
+
     @NotBlank(message = "Category name is required")
     @Size(min = 1, max = 100, message = "Category name must be between 1 and 100 characters")
     private String name;

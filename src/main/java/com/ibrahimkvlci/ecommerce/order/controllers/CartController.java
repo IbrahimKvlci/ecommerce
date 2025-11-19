@@ -20,14 +20,14 @@ import java.util.List;
 @RequestMapping("/api/orders/carts")
 @CrossOrigin(origins = "*")
 public class CartController {
-    
+
     private final CartService cartService;
-    
+
     @Autowired
     public CartController(CartService cartService) {
         this.cartService = cartService;
     }
-    
+
     /**
      * Create a new cart
      */
@@ -36,7 +36,7 @@ public class CartController {
         CartDTO cart = cartService.createCart(request);
         return new ResponseEntity<>(cart, HttpStatus.CREATED);
     }
-    
+
     /**
      * Get all carts
      */
@@ -45,7 +45,7 @@ public class CartController {
         List<CartDTO> carts = cartService.getAllCarts();
         return ResponseEntity.ok(carts);
     }
-    
+
     /**
      * Get cart by ID
      */
@@ -55,7 +55,7 @@ public class CartController {
                 .map(cart -> ResponseEntity.ok(cart))
                 .orElse(ResponseEntity.notFound().build());
     }
-    
+
     /**
      * Get cart by customer ID
      */
@@ -65,7 +65,7 @@ public class CartController {
                 .map(cart -> ResponseEntity.ok(cart))
                 .orElse(ResponseEntity.notFound().build());
     }
-    
+
     /**
      * Get cart with items by ID
      */
@@ -75,7 +75,7 @@ public class CartController {
                 .map(cart -> ResponseEntity.ok(cart))
                 .orElse(ResponseEntity.notFound().build());
     }
-    
+
     /**
      * Get cart with items by customer ID
      */
@@ -85,7 +85,7 @@ public class CartController {
                 .map(cart -> ResponseEntity.ok(cart))
                 .orElse(ResponseEntity.notFound().build());
     }
-    
+
     /**
      * Delete a cart
      */
@@ -98,7 +98,7 @@ public class CartController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     /**
      * Clear cart items
      */
@@ -111,7 +111,7 @@ public class CartController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     /**
      * Calculate cart total price
      */

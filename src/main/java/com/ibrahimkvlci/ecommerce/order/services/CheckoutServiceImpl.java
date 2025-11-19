@@ -4,6 +4,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +41,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CheckoutServiceImpl implements CheckoutService {
 
-
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final OrderService orderService;
@@ -51,17 +51,17 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final CustomerClient customerClient;
 
     @Override
-    public SaleResponse checkoutPending(CheckoutRequestDTO request,String clientIp,RequestUtils.ClientType clientType) {
-        
-        SaleRequest saleRequest=saleRequest(request, clientIp, clientType);
+    public SaleResponse checkoutPending(CheckoutRequestDTO request, String clientIp,
+            RequestUtils.ClientType clientType) {
 
+        SaleRequest saleRequest = saleRequest(request, clientIp, clientType);
 
         SaleResponse saleResponse;
         try {
-            saleResponse=paymentClient.sale(saleRequest);
+            saleResponse = paymentClient.sale(saleRequest);
         } catch (NoSuchAlgorithmException e) {
             throw new CheckoutException("Invalid Algorithm");
-        }catch(InvalidKeyException ex){
+        } catch (InvalidKeyException ex) {
             throw new CheckoutException("Invalid Secret Key");
         }
         return saleResponse;
@@ -69,42 +69,49 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     @Override
     public OrderDTO completeCheckout(Long orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
-        for(OrderItem orderItem : order.getOrderItems()){
-            InventoryDTO inventory = inventoryClient.getInventoryByProductIdAndSellerId(orderItem.getProductId(), orderItem.getSellerId());
-            if(inventory.getQuantity() < orderItem.getQuantity()){
-                throw new CheckoutException(orderId, "Insufficient inventory for product ID " + orderItem.getProductId(), true);
+        Order order = orderRepository.findById(Objects.requireNonNull(orderId))
+                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
+        for (OrderItem orderItem : order.getOrderItems()) {
+            InventoryDTO inventory = inventoryClient.getInventoryByProductIdAndSellerId(orderItem.getProductId(),
+                    orderItem.getSellerId());
+            if (inventory.getQuantity() < orderItem.getQuantity()) {
+                throw new CheckoutException(orderId,
+                        "Insufficient inventory for product ID " + orderItem.getProductId(), true);
             }
         }
-        for(OrderItem orderItem : order.getOrderItems()){
-            InventoryDTO inventory = inventoryClient.getInventoryByProductIdAndSellerId(orderItem.getProductId(), orderItem.getSellerId());
-            inventoryClient.updateInventory(inventory.getId(), inventory.getQuantity() - orderItem.getQuantity(), inventory.getPrice());
+        for (OrderItem orderItem : order.getOrderItems()) {
+            InventoryDTO inventory = inventoryClient.getInventoryByProductIdAndSellerId(orderItem.getProductId(),
+                    orderItem.getSellerId());
+            inventoryClient.updateInventory(inventory.getId(), inventory.getQuantity() - orderItem.getQuantity(),
+                    inventory.getPrice());
         }
         order.setStatus(OrderStatus.CONFIRMED);
         orderRepository.save(order);
-        return orderService.getOrderById(order.getId()).orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + order.getId()));
+        return orderService.getOrderById(order.getId())
+                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + order.getId()));
     }
 
     @Override
     public SaleResponse checkoutPending3D(CheckoutRequestDTO request, String clientIp, ClientType clientType) {
-        
 
-        SaleRequest saleRequest=saleRequest(request, clientIp, clientType);
+        SaleRequest saleRequest = saleRequest(request, clientIp, clientType);
         SaleResponse saleResponse3D = paymentClient.sale3DPay(saleRequest);
         return saleResponse3D;
     }
 
-    private SaleRequest saleRequest(CheckoutRequestDTO request, String clientIp, ClientType clientType){
-        Long cartId=cartRepository.findByCustomerId(userClient.getCustomerIdFromJWT()).get().getId();
-        Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new CartNotFoundException("Cart not found with ID: " + cartId));
+    private SaleRequest saleRequest(CheckoutRequestDTO request, String clientIp, ClientType clientType) {
+        Long cartId = cartRepository.findByCustomerId(userClient.getCustomerIdFromJWT()).get().getId();
+        Cart cart = cartRepository.findById(Objects.requireNonNull(cartId))
+                .orElseThrow(() -> new CartNotFoundException("Cart not found with ID: " + cartId));
         Order order = new Order();
         List<OrderItem> orderItems = new ArrayList<>();
-        for(CartItem cartItem : cart.getCartItems()){
-            if(!productClient.isProductAvailable(cartItem.getProductId())){
+        for (CartItem cartItem : cart.getCartItems()) {
+            if (!productClient.isProductAvailable(cartItem.getProductId())) {
                 throw new CheckoutException(cartId, "Product with ID " + cartItem.getProductId() + " is not available");
             }
-            InventoryDTO inventory = inventoryClient.getInventoryByProductIdAndSellerId(cartItem.getProductId(), cartItem.getSellerId());
-            if(inventory.getQuantity() < cartItem.getQuantity()){
+            InventoryDTO inventory = inventoryClient.getInventoryByProductIdAndSellerId(cartItem.getProductId(),
+                    cartItem.getSellerId());
+            if (inventory.getQuantity() < cartItem.getQuantity()) {
                 throw new CheckoutException(cartId, "Insufficient inventory for product ID " + cartItem.getProductId());
             }
 
@@ -118,15 +125,12 @@ public class CheckoutServiceImpl implements CheckoutService {
             orderItems.add(orderItem);
         }
 
-        
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(orderItems.stream().mapToDouble(OrderItem::getTotalPrice).sum());
         order.setCustomerId(cart.getCustomerId());
         order.setOrderItems(orderItems);
-        order=orderRepository.save(order);
+        order = orderRepository.save(order);
 
-
-        
         // Card info setters
         CardCheckDTO cardCheckDTO = new CardCheckDTO();
         cardCheckDTO.setCardNumber(request.getCardNumber());
@@ -134,7 +138,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         cardCheckDTO.setExpirationDateYear(request.getCardExpireDateYear());
         cardCheckDTO.setExpirationDateMonth(request.getCardExpiteDateMonth());
         cardCheckDTO.setCvv(request.getCardCVV());
-        
+
         // Order info setters
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setId(order.getId());
@@ -144,12 +148,12 @@ public class CheckoutServiceImpl implements CheckoutService {
         orderDTO.setTotalAmount(order.getTotalAmount());
         orderDTO.setCurrencyCode(949);
         orderDTO.setInstallCount(1);
-        
+
         // Customer info setters
         CustomerDTO customerDTO = customerClient.getCustomerById(order.getCustomerId());
         customerDTO.setIpAddress(clientIp);
 
-        SaleRequest saleRequest=new SaleRequest();
+        SaleRequest saleRequest = new SaleRequest();
         saleRequest.setCardCheckDTO(cardCheckDTO);
         saleRequest.setOrderDTO(orderDTO);
         saleRequest.setCustomerDTO(customerDTO);
@@ -158,7 +162,9 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     @Override
     public SaleResponse okCheckout(SaleResponse response) {
-        Order order=orderRepository.findByOrderNumber(response.getOrder().getOrderId()).orElseThrow(()-> new OrderNotFoundException("Order not found by this order number: "+response.getOrder().getOrderId()));
+        Order order = orderRepository.findByOrderNumber(response.getOrder().getOrderId())
+                .orElseThrow(() -> new OrderNotFoundException(
+                        "Order not found by this order number: " + response.getOrder().getOrderId()));
         order.setStatus(OrderStatus.CONFIRMED);
         orderRepository.save(order);
         return response;

@@ -8,6 +8,7 @@ import org.springframework.web.client.RestClient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import java.util.Objects;
 
 @Component
 @Slf4j
@@ -25,11 +26,11 @@ public class KuveytTurkPaymentGatewayClient implements PaymentGatewayClient {
         RestClient restClient = RestClient.create();
 
         ResponseEntity<String> response = restClient.post()
-            .uri(cardCheckUrl)
-            .contentType(MediaType.APPLICATION_XML)
-            .body(xmlString)
-            .retrieve()
-            .toEntity(String.class);
+                .uri(Objects.requireNonNull(cardCheckUrl))
+                .contentType(Objects.requireNonNull(MediaType.APPLICATION_XML))
+                .body(Objects.requireNonNull(xmlString))
+                .retrieve()
+                .toEntity(String.class);
 
         return response.getBody();
     }
@@ -39,11 +40,11 @@ public class KuveytTurkPaymentGatewayClient implements PaymentGatewayClient {
         RestClient restClient = RestClient.create();
 
         ResponseEntity<String> response = restClient.post()
-            .uri(payUrl)
-            .contentType(MediaType.APPLICATION_XML)
-            .body(xmlString)
-            .retrieve()
-            .toEntity(String.class);
+                .uri(Objects.requireNonNull(payUrl))
+                .contentType(Objects.requireNonNull(MediaType.APPLICATION_XML))
+                .body(Objects.requireNonNull(xmlString))
+                .retrieve()
+                .toEntity(String.class);
 
         return response.getBody();
     }
