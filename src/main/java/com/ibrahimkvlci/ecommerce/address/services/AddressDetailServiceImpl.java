@@ -1,6 +1,8 @@
 package com.ibrahimkvlci.ecommerce.address.services;
 
-import com.ibrahimkvlci.ecommerce.address.dto.AddressDetailDTO;
+import com.ibrahimkvlci.ecommerce.address.client.UserClient;
+import com.ibrahimkvlci.ecommerce.address.dto.AddressDetailRequestDTO;
+import com.ibrahimkvlci.ecommerce.address.dto.AddressDetailResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.models.AddressDetail;
 import com.ibrahimkvlci.ecommerce.address.models.Country;
 import com.ibrahimkvlci.ecommerce.address.models.City;
@@ -11,16 +13,20 @@ import com.ibrahimkvlci.ecommerce.address.repositories.CountryRepository;
 import com.ibrahimkvlci.ecommerce.address.repositories.CityRepository;
 import com.ibrahimkvlci.ecommerce.address.repositories.DistrictRepository;
 import com.ibrahimkvlci.ecommerce.address.repositories.NeighborhoodRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.Objects;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AddressDetailServiceImpl implements AddressDetailService {
 
     private final AddressDetailRepository addressDetailRepository;
@@ -28,59 +34,48 @@ public class AddressDetailServiceImpl implements AddressDetailService {
     private final CityRepository cityRepository;
     private final DistrictRepository districtRepository;
     private final NeighborhoodRepository neighborhoodRepository;
-
-    @Autowired
-    public AddressDetailServiceImpl(AddressDetailRepository addressDetailRepository,
-            CountryRepository countryRepository,
-            CityRepository cityRepository,
-            DistrictRepository districtRepository,
-            NeighborhoodRepository neighborhoodRepository) {
-        this.addressDetailRepository = addressDetailRepository;
-        this.countryRepository = countryRepository;
-        this.cityRepository = cityRepository;
-        this.districtRepository = districtRepository;
-        this.neighborhoodRepository = neighborhoodRepository;
-    }
+    private final UserClient userClient;
 
     @Override
-    public AddressDetail createAddressDetail(AddressDetailDTO addressDetailDTO) {
-        Country country = countryRepository.findById(Objects.requireNonNull(addressDetailDTO.getCountryId()))
-                .orElseThrow(() -> new RuntimeException("Country not found"));
-        City city = cityRepository.findById(Objects.requireNonNull(addressDetailDTO.getCityId()))
-                .orElseThrow(() -> new RuntimeException("City not found"));
-        District district = districtRepository.findById(Objects.requireNonNull(addressDetailDTO.getDistrictId()))
-                .orElseThrow(() -> new RuntimeException("District not found"));
-        Neighborhood neighborhood = neighborhoodRepository
-                .findById(Objects.requireNonNull(addressDetailDTO.getNeighborhoodId()))
-                .orElseThrow(() -> new RuntimeException("Neighborhood not found"));
-
+    @Transactional
+    public AddressDetailResponseDTO createAddressDetail(AddressDetailRequestDTO addressDetailDTO) {
         AddressDetail addressDetail = new AddressDetail();
-        addressDetail.setCountry(country);
-        addressDetail.setCity(city);
-        addressDetail.setDistrict(district);
-        addressDetail.setNeighborhood(neighborhood);
+
+        addressDetail.setCountry(countryRepository.getReferenceById(addressDetailDTO.getCountryId()));
+        addressDetail.setCity(cityRepository.getReferenceById(addressDetailDTO.getCityId()));
+        addressDetail.setDistrict(districtRepository.getReferenceById(addressDetailDTO.getDistrictId()));
+        addressDetail.setNeighborhood(neighborhoodRepository.getReferenceById(addressDetailDTO.getNeighborhoodId()));
+
         addressDetail.setAddress(addressDetailDTO.getAddress());
         addressDetail.setName(addressDetailDTO.getName());
         addressDetail.setSurname(addressDetailDTO.getSurname());
         addressDetail.setPhone(addressDetailDTO.getPhone());
+        addressDetail.setDefaultAddress(addressDetailDTO.isDefaultAddress());
+        addressDetail.setCustomerId(userClient.getCustomerIdFromJWT());
+        addressDetail.setAddressPostalCode(addressDetailDTO.getPostalCode());
 
-        return addressDetailRepository.save(addressDetail);
+        if (addressDetailDTO.isDefaultAddress()) {
+            addressDetailRepository.unsetDefaultAddress(addressDetail.getCustomerId());
+        }
+
+        return mapToDTO(addressDetailRepository.save(addressDetail));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<AddressDetail> getAddressDetailById(Long id) {
-        return addressDetailRepository.findById(Objects.requireNonNull(id));
+    public Optional<AddressDetailResponseDTO> getAddressDetailById(Long id) {
+        return addressDetailRepository.findById(Objects.requireNonNull(id)).map(this::mapToDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<AddressDetail> getAllAddressDetails() {
-        return addressDetailRepository.findAllWithFullHierarchy();
+    public List<AddressDetailResponseDTO> getAllAddressDetails() {
+        return addressDetailRepository.findAllWithFullHierarchy().stream().map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public AddressDetail updateAddressDetail(Long id, AddressDetailDTO addressDetailDTO) {
+    public AddressDetailResponseDTO updateAddressDetail(Long id, AddressDetailRequestDTO addressDetailDTO) {
         AddressDetail addressDetail = addressDetailRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Address detail not found with id: " + id));
 
@@ -103,7 +98,7 @@ public class AddressDetailServiceImpl implements AddressDetailService {
         addressDetail.setSurname(addressDetailDTO.getSurname());
         addressDetail.setPhone(addressDetailDTO.getPhone());
 
-        return addressDetailRepository.save(addressDetail);
+        return mapToDTO(addressDetailRepository.save(addressDetail));
     }
 
     @Override
@@ -112,11 +107,12 @@ public class AddressDetailServiceImpl implements AddressDetailService {
     }
 
     @Override
-    public AddressDetailDTO mapToDTO(AddressDetail addressDetail) {
+    public AddressDetailResponseDTO mapToDTO(AddressDetail addressDetail) {
         if (addressDetail == null)
             return null;
 
-        AddressDetailDTO dto = new AddressDetailDTO();
+        AddressDetailResponseDTO dto = new AddressDetailResponseDTO();
+        dto.setId(addressDetail.getId());
         dto.setCountryId(addressDetail.getCountry().getId());
         dto.setCountryName(addressDetail.getCountry().getName());
         dto.setCityId(addressDetail.getCity().getId());
@@ -126,6 +122,8 @@ public class AddressDetailServiceImpl implements AddressDetailService {
         dto.setNeighborhoodId(addressDetail.getNeighborhood().getId());
         dto.setNeighborhoodName(addressDetail.getNeighborhood().getName());
         dto.setAddress(addressDetail.getAddress());
+        dto.setPostalCode(addressDetail.getAddressPostalCode());
+        dto.setDefaultAddress(addressDetail.isDefaultAddress());
         dto.setName(addressDetail.getName());
         dto.setSurname(addressDetail.getSurname());
         dto.setPhone(addressDetail.getPhone());
@@ -134,7 +132,7 @@ public class AddressDetailServiceImpl implements AddressDetailService {
     }
 
     @Override
-    public AddressDetail mapToEntity(AddressDetailDTO addressDetailDTO) {
+    public AddressDetail mapToEntity(AddressDetailRequestDTO addressDetailDTO) {
         if (addressDetailDTO == null)
             return null;
 
@@ -149,7 +147,8 @@ public class AddressDetailServiceImpl implements AddressDetailService {
     }
 
     @Override
-    public Optional<AddressDetail> getAddressDetailByCustomerId(Long id) {
-        return addressDetailRepository.findByCustomerId(id);
+    public List<AddressDetailResponseDTO> getAddressDetailsByCustomerId(Long id) {
+        return addressDetailRepository.findAllByCustomerId(id).stream().map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }

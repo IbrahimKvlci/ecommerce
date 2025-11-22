@@ -24,7 +24,7 @@ public class AddressDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "customer_id",nullable = false)
+    @Column(name = "customer_id", nullable = false)
     private Long customerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,7 +46,7 @@ public class AddressDetail {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name="address_poastal_code",nullable=false)
+    @Column(name = "address_poastal_code", nullable = false)
     private String addressPostalCode;
 
     @Column(name = "name", nullable = false)
@@ -57,5 +57,8 @@ public class AddressDetail {
 
     @Column(name = "phone", nullable = false)
     private String phone;
+
+    @Column(name = "is_default_address", nullable = false)
+    private boolean isDefaultAddress;
 
 }
