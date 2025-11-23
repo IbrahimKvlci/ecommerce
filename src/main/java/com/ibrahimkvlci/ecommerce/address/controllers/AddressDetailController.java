@@ -45,9 +45,9 @@ public class AddressDetailController {
         return ResponseEntity.ok(res);
     }
 
-    @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<AddressDetailResponseDTO>> getAddressDetailsByCustomerId(@PathVariable Long customerId) {
-        return ResponseEntity.ok(addressDetailService.getAddressDetailsByCustomerId(customerId));
+    @GetMapping("/customer")
+    public ResponseEntity<List<AddressDetailResponseDTO>> getAddressDetailsOfCustomer() {
+        return ResponseEntity.ok(addressDetailService.getAddressDetailsOfCustomer());
     }
 
     @PutMapping("/{id}")

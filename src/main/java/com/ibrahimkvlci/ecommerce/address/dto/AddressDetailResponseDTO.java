@@ -10,18 +10,15 @@ import lombok.NoArgsConstructor;
 public class AddressDetailResponseDTO {
 
     private Long id;
+    private String addressTitle;
     private String name;
     private String surname;
     private String phone;
     private String address;
     private String postalCode;
-    private Long countryId;
-    private String countryName;
-    private Long cityId;
-    private String cityName;
-    private Long districtId;
-    private String districtName;
-    private Long neighborhoodId;
-    private String neighborhoodName;
+    private CountryResponseDTO country;
+    private CityResponseDTO city;
+    private DistrictResponseDTO district;
+    private NeighborhoodResponseDTO neighborhood;
     private boolean defaultAddress;
 }

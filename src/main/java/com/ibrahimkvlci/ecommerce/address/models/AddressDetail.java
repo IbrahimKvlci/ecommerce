@@ -24,6 +24,9 @@ public class AddressDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "address_title", nullable = false)
+    private String addressTitle;
+
     @Column(name = "customer_id", nullable = false)
     private Long customerId;
 

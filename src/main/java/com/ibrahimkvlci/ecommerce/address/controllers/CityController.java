@@ -1,7 +1,7 @@
 package com.ibrahimkvlci.ecommerce.address.controllers;
 
-import com.ibrahimkvlci.ecommerce.address.dto.CityDTO;
-import com.ibrahimkvlci.ecommerce.address.models.City;
+import com.ibrahimkvlci.ecommerce.address.dto.CityRequestDTO;
+import com.ibrahimkvlci.ecommerce.address.dto.CityResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.services.CityService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * REST Controller for City operations
@@ -19,74 +18,60 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/address/cities")
 @CrossOrigin(origins = "*")
 public class CityController {
-    
+
     private final CityService cityService;
-    
+
     @Autowired
     public CityController(CityService cityService) {
         this.cityService = cityService;
     }
-    
+
     @PostMapping
-    public ResponseEntity<CityDTO> createCity(@Valid @RequestBody CityDTO cityDTO) {
-        City city = cityService.createCity(cityDTO);
-        CityDTO createdDTO = cityService.mapToDTO(city);
+    public ResponseEntity<CityResponseDTO> createCity(@Valid @RequestBody CityRequestDTO cityRequestDTO) {
+        CityResponseDTO createdDTO = cityService.createCity(cityRequestDTO);
         return new ResponseEntity<>(createdDTO, HttpStatus.CREATED);
     }
-    
+
     @GetMapping
-    public ResponseEntity<List<CityDTO>> getAllCities() {
-        List<City> cities = cityService.getAllCities();
-        List<CityDTO> cityDTOs = cities.stream()
-                .map(cityService::mapToDTO)
-                .collect(Collectors.toList());
+    public ResponseEntity<List<CityResponseDTO>> getAllCities() {
+        List<CityResponseDTO> cityDTOs = cityService.getAllCities();
         return ResponseEntity.ok(cityDTOs);
     }
-    
+
     @GetMapping("/{id}")
-    public ResponseEntity<CityDTO> getCityById(@PathVariable Long id) {
+    public ResponseEntity<CityResponseDTO> getCityById(@PathVariable Long id) {
         return cityService.getCityById(id)
-                .map(city -> ResponseEntity.ok(cityService.mapToDTO(city)))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-    
+
     @GetMapping("/country/{countryId}")
-    public ResponseEntity<List<CityDTO>> getCitiesByCountryId(@PathVariable Long countryId) {
-        List<City> cities = cityService.getCitiesByCountryId(countryId);
-        List<CityDTO> cityDTOs = cities.stream()
-                .map(cityService::mapToDTO)
-                .collect(Collectors.toList());
+    public ResponseEntity<List<CityResponseDTO>> getCitiesByCountryId(@PathVariable Long countryId) {
+        List<CityResponseDTO> cityDTOs = cityService.getCitiesByCountryId(countryId);
         return ResponseEntity.ok(cityDTOs);
     }
-    
+
     @GetMapping("/search")
-    public ResponseEntity<List<CityDTO>> searchCitiesByName(@RequestParam String name) {
-        List<City> cities = cityService.searchCitiesByName(name);
-        List<CityDTO> cityDTOs = cities.stream()
-                .map(cityService::mapToDTO)
-                .collect(Collectors.toList());
+    public ResponseEntity<List<CityResponseDTO>> searchCitiesByName(@RequestParam String name) {
+        List<CityResponseDTO> cityDTOs = cityService.searchCitiesByName(name);
         return ResponseEntity.ok(cityDTOs);
     }
-    
+
     @GetMapping("/search/country")
-    public ResponseEntity<List<CityDTO>> searchCitiesByCountryAndName(
-            @RequestParam Long countryId, 
+    public ResponseEntity<List<CityResponseDTO>> searchCitiesByCountryAndName(
+            @RequestParam Long countryId,
             @RequestParam String name) {
-        List<City> cities = cityService.searchCitiesByCountryAndName(countryId, name);
-        List<CityDTO> cityDTOs = cities.stream()
-                .map(cityService::mapToDTO)
-                .collect(Collectors.toList());
+        List<CityResponseDTO> cityDTOs = cityService.searchCitiesByCountryAndName(countryId, name);
         return ResponseEntity.ok(cityDTOs);
     }
-    
+
     @PutMapping("/{id}")
-    public ResponseEntity<CityDTO> updateCity(@PathVariable Long id, 
-                                            @Valid @RequestBody CityDTO cityDTO) {
-        City updatedCity = cityService.updateCity(id, cityDTO);
-        CityDTO updatedDTO = cityService.mapToDTO(updatedCity);
+    public ResponseEntity<CityResponseDTO> updateCity(@PathVariable Long id,
+            @Valid @RequestBody CityRequestDTO cityRequestDTO) {
+        CityResponseDTO updatedDTO = cityService.updateCity(id, cityRequestDTO);
         return ResponseEntity.ok(updatedDTO);
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCity(@PathVariable Long id) {
         cityService.deleteCity(id);

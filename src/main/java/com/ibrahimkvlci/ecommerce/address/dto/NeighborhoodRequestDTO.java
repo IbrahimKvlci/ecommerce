@@ -7,22 +7,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Data Transfer Object for Neighborhood entity
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NeighborhoodDTO {
-    
+public class NeighborhoodRequestDTO {
+
     @NotBlank(message = "Neighborhood name is required")
     @Size(max = 100, message = "Neighborhood name must not exceed 100 characters")
     private String name;
-    
+
     @NotNull(message = "District is required")
     private Long districtId;
-    
-    private String districtName;
-    private String cityName;
-    private String countryName;
 }

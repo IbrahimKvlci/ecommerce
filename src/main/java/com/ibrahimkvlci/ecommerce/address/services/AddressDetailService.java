@@ -18,7 +18,7 @@ public interface AddressDetailService {
 
     List<AddressDetailResponseDTO> getAllAddressDetails();
 
-    List<AddressDetailResponseDTO> getAddressDetailsByCustomerId(Long id);
+    List<AddressDetailResponseDTO> getAddressDetailsOfCustomer();
 
     AddressDetailResponseDTO updateAddressDetail(Long id, AddressDetailRequestDTO addressDetailDTO);
 

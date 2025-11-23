@@ -15,6 +15,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AddressDetailRequestDTO {
 
+    @NotNull(message = "Address title is required")
+    private String addressTitle;
+
     @NotNull(message = "Country is required")
     private Long countryId;
 

@@ -15,7 +15,7 @@ import java.util.List;
 @Repository
 public interface AddressDetailRepository extends JpaRepository<AddressDetail, Long> {
 
-    List<AddressDetail> findAllByCustomerId(Long customerId);
+    List<AddressDetail> findAllByCustomerIdOrderByIdAsc(Long customerId);
 
     /**
      * Find all address details with full hierarchy information
@@ -24,6 +24,7 @@ public interface AddressDetailRepository extends JpaRepository<AddressDetail, Lo
     List<AddressDetail> findAllWithFullHierarchy();
 
     @Modifying
-    @Query("UPDATE AddressDetail a SET a.isDefaultAddress = false WHERE a.customerId = :customerId")
-    void unsetDefaultAddress(@Param("customerId") Long customerId);
+    @Query("UPDATE AddressDetail a SET a.isDefaultAddress = false WHERE a.customerId = :customerId AND a.id != :addressDetailId")
+    void unsetDefaultAddressExceptThis(@Param("customerId") Long customerId,
+            @Param("addressDetailId") Long addressDetailId);
 }

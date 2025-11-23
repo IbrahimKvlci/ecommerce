@@ -33,8 +33,8 @@ public class AddressApp {
         return addressDetailService.getAddressDetailById(id);
     }
 
-    public List<AddressDetailResponseDTO> getAddressDetailsByCustomerId(Long id) {
-        return addressDetailService.getAddressDetailsByCustomerId(id);
+    public List<AddressDetailResponseDTO> getAddressDetailsOfCustomer() {
+        return addressDetailService.getAddressDetailsOfCustomer();
     }
 
     public List<AddressDetailResponseDTO> getAllAddressDetails() {

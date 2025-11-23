@@ -3,6 +3,10 @@ package com.ibrahimkvlci.ecommerce.address.services;
 import com.ibrahimkvlci.ecommerce.address.client.UserClient;
 import com.ibrahimkvlci.ecommerce.address.dto.AddressDetailRequestDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.AddressDetailResponseDTO;
+import com.ibrahimkvlci.ecommerce.address.dto.CityResponseDTO;
+import com.ibrahimkvlci.ecommerce.address.dto.CountryResponseDTO;
+import com.ibrahimkvlci.ecommerce.address.dto.DistrictResponseDTO;
+import com.ibrahimkvlci.ecommerce.address.dto.NeighborhoodResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.models.AddressDetail;
 import com.ibrahimkvlci.ecommerce.address.models.Country;
 import com.ibrahimkvlci.ecommerce.address.models.City;
@@ -53,12 +57,13 @@ public class AddressDetailServiceImpl implements AddressDetailService {
         addressDetail.setDefaultAddress(addressDetailDTO.isDefaultAddress());
         addressDetail.setCustomerId(userClient.getCustomerIdFromJWT());
         addressDetail.setAddressPostalCode(addressDetailDTO.getPostalCode());
+        addressDetail.setAddressTitle(addressDetailDTO.getAddressTitle());
 
+        var res = addressDetailRepository.save(addressDetail);
         if (addressDetailDTO.isDefaultAddress()) {
-            addressDetailRepository.unsetDefaultAddress(addressDetail.getCustomerId());
+            addressDetailRepository.unsetDefaultAddressExceptThis(addressDetail.getCustomerId(), res.getId());
         }
-
-        return mapToDTO(addressDetailRepository.save(addressDetail));
+        return mapToDTO(res);
     }
 
     @Override
@@ -75,6 +80,7 @@ public class AddressDetailServiceImpl implements AddressDetailService {
     }
 
     @Override
+    @Transactional
     public AddressDetailResponseDTO updateAddressDetail(Long id, AddressDetailRequestDTO addressDetailDTO) {
         AddressDetail addressDetail = addressDetailRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Address detail not found with id: " + id));
@@ -93,10 +99,18 @@ public class AddressDetailServiceImpl implements AddressDetailService {
         addressDetail.setCity(city);
         addressDetail.setDistrict(district);
         addressDetail.setNeighborhood(neighborhood);
-        addressDetail.setAddress(addressDetailDTO.getAddress());
         addressDetail.setName(addressDetailDTO.getName());
         addressDetail.setSurname(addressDetailDTO.getSurname());
         addressDetail.setPhone(addressDetailDTO.getPhone());
+        addressDetail.setAddressTitle(addressDetailDTO.getAddressTitle());
+        addressDetail.setAddressPostalCode(addressDetailDTO.getPostalCode());
+        addressDetail.setAddress(addressDetailDTO.getAddress());
+
+        if (addressDetailDTO.isDefaultAddress()) {
+            addressDetailRepository.unsetDefaultAddressExceptThis(addressDetail.getCustomerId(), id);
+        }
+
+        addressDetail.setDefaultAddress(addressDetailDTO.isDefaultAddress());
 
         return mapToDTO(addressDetailRepository.save(addressDetail));
     }
@@ -113,20 +127,44 @@ public class AddressDetailServiceImpl implements AddressDetailService {
 
         AddressDetailResponseDTO dto = new AddressDetailResponseDTO();
         dto.setId(addressDetail.getId());
-        dto.setCountryId(addressDetail.getCountry().getId());
-        dto.setCountryName(addressDetail.getCountry().getName());
-        dto.setCityId(addressDetail.getCity().getId());
-        dto.setCityName(addressDetail.getCity().getName());
-        dto.setDistrictId(addressDetail.getDistrict().getId());
-        dto.setDistrictName(addressDetail.getDistrict().getName());
-        dto.setNeighborhoodId(addressDetail.getNeighborhood().getId());
-        dto.setNeighborhoodName(addressDetail.getNeighborhood().getName());
+
+        CountryResponseDTO countryDTO = new CountryResponseDTO();
+        countryDTO.setId(addressDetail.getCountry().getId());
+        countryDTO.setName(addressDetail.getCountry().getName());
+        countryDTO.setCode(addressDetail.getCountry().getCode());
+        dto.setCountry(countryDTO);
+
+        CityResponseDTO cityDTO = new CityResponseDTO();
+        cityDTO.setId(addressDetail.getCity().getId());
+        cityDTO.setName(addressDetail.getCity().getName());
+        cityDTO.setCountryId(addressDetail.getCity().getCountry().getId());
+        cityDTO.setCountryName(addressDetail.getCity().getCountry().getName());
+        dto.setCity(cityDTO);
+
+        DistrictResponseDTO districtDTO = new DistrictResponseDTO();
+        districtDTO.setId(addressDetail.getDistrict().getId());
+        districtDTO.setName(addressDetail.getDistrict().getName());
+        districtDTO.setCityId(addressDetail.getDistrict().getCity().getId());
+        districtDTO.setCityName(addressDetail.getDistrict().getCity().getName());
+        districtDTO.setCountryName(addressDetail.getDistrict().getCity().getCountry().getName());
+        dto.setDistrict(districtDTO);
+
+        NeighborhoodResponseDTO neighborhoodDTO = new NeighborhoodResponseDTO();
+        neighborhoodDTO.setId(addressDetail.getNeighborhood().getId());
+        neighborhoodDTO.setName(addressDetail.getNeighborhood().getName());
+        neighborhoodDTO.setDistrictId(addressDetail.getNeighborhood().getDistrict().getId());
+        neighborhoodDTO.setDistrictName(addressDetail.getNeighborhood().getDistrict().getName());
+        neighborhoodDTO.setCityName(addressDetail.getNeighborhood().getDistrict().getCity().getName());
+        neighborhoodDTO.setCountryName(addressDetail.getNeighborhood().getDistrict().getCity().getCountry().getName());
+        dto.setNeighborhood(neighborhoodDTO);
+
         dto.setAddress(addressDetail.getAddress());
         dto.setPostalCode(addressDetail.getAddressPostalCode());
         dto.setDefaultAddress(addressDetail.isDefaultAddress());
         dto.setName(addressDetail.getName());
         dto.setSurname(addressDetail.getSurname());
         dto.setPhone(addressDetail.getPhone());
+        dto.setAddressTitle(addressDetail.getAddressTitle());
 
         return dto;
     }
@@ -141,14 +179,18 @@ public class AddressDetailServiceImpl implements AddressDetailService {
         addressDetail.setName(addressDetailDTO.getName());
         addressDetail.setSurname(addressDetailDTO.getSurname());
         addressDetail.setPhone(addressDetailDTO.getPhone());
+        addressDetail.setAddressTitle(addressDetailDTO.getAddressTitle());
+        addressDetail.setAddressPostalCode(addressDetailDTO.getPostalCode());
+        addressDetail.setDefaultAddress(addressDetailDTO.isDefaultAddress());
         // Relations will be set in service methods
 
         return addressDetail;
     }
 
     @Override
-    public List<AddressDetailResponseDTO> getAddressDetailsByCustomerId(Long id) {
-        return addressDetailRepository.findAllByCustomerId(id).stream().map(this::mapToDTO)
+    public List<AddressDetailResponseDTO> getAddressDetailsOfCustomer() {
+        return addressDetailRepository.findAllByCustomerIdOrderByIdAsc(userClient.getCustomerIdFromJWT()).stream()
+                .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 }

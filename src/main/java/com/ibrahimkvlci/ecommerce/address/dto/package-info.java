@@ -2,7 +2,10 @@
  * Address DTOs Package
  * 
  * Contains data transfer objects for address operations including:
- * - CountryDTO, CityDTO, DistrictDTO, NeighborhoodDTO: Location hierarchy DTOs
+ * - CountryRequestDTO, CountryResponseDTO
+ * - CityRequestDTO, CityResponseDTO
+ * - DistrictRequestDTO, DistrictResponseDTO
+ * - NeighborhoodRequestDTO, NeighborhoodResponseDTO
  * - AddressDetailDTO: Main address detail DTO
  * - Request/Response DTOs for CRUD operations
  */
