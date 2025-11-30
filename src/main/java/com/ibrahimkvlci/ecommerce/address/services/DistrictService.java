@@ -4,8 +4,10 @@ import com.ibrahimkvlci.ecommerce.address.dto.DistrictRequestDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.DistrictResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.models.District;
 
+import com.ibrahimkvlci.ecommerce.address.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.Result;
+
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service interface for District operations
@@ -15,37 +17,37 @@ public interface DistrictService {
     /**
      * Create a new district
      */
-    DistrictResponseDTO createDistrict(DistrictRequestDTO districtRequestDTO);
+    DataResult<DistrictResponseDTO> createDistrict(DistrictRequestDTO districtRequestDTO);
 
     /**
      * Get district by ID
      */
-    Optional<DistrictResponseDTO> getDistrictById(Long id);
+    DataResult<DistrictResponseDTO> getDistrictById(Long id);
 
     /**
      * Get all districts
      */
-    List<DistrictResponseDTO> getAllDistricts();
+    DataResult<List<DistrictResponseDTO>> getAllDistricts();
 
     /**
      * Get districts by city ID
      */
-    List<DistrictResponseDTO> getDistrictsByCityId(Long cityId);
+    DataResult<List<DistrictResponseDTO>> getDistrictsByCityId(Long cityId);
 
     /**
      * Search districts by name
      */
-    List<DistrictResponseDTO> searchDistrictsByName(String name);
+    DataResult<List<DistrictResponseDTO>> searchDistrictsByName(String name);
 
     /**
      * Update district
      */
-    DistrictResponseDTO updateDistrict(Long id, DistrictRequestDTO districtRequestDTO);
+    DataResult<DistrictResponseDTO> updateDistrict(Long id, DistrictRequestDTO districtRequestDTO);
 
     /**
      * Delete district
      */
-    void deleteDistrict(Long id);
+    Result deleteDistrict(Long id);
 
     /**
      * Map District entity to DTO

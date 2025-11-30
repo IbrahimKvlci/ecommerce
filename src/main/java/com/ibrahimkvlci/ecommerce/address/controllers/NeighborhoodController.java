@@ -3,6 +3,8 @@ package com.ibrahimkvlci.ecommerce.address.controllers;
 import com.ibrahimkvlci.ecommerce.address.dto.NeighborhoodRequestDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.NeighborhoodResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.services.NeighborhoodService;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.Result;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,47 +29,41 @@ public class NeighborhoodController {
     }
 
     @PostMapping
-    public ResponseEntity<NeighborhoodResponseDTO> createNeighborhood(
+    public ResponseEntity<DataResult<NeighborhoodResponseDTO>> createNeighborhood(
             @Valid @RequestBody NeighborhoodRequestDTO neighborhoodRequestDTO) {
-        NeighborhoodResponseDTO createdDTO = neighborhoodService.createNeighborhood(neighborhoodRequestDTO);
-        return new ResponseEntity<>(createdDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(neighborhoodService.createNeighborhood(neighborhoodRequestDTO), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<NeighborhoodResponseDTO>> getAllNeighborhoods() {
-        List<NeighborhoodResponseDTO> neighborhoodDTOs = neighborhoodService.getAllNeighborhoods();
-        return ResponseEntity.ok(neighborhoodDTOs);
+    public ResponseEntity<DataResult<List<NeighborhoodResponseDTO>>> getAllNeighborhoods() {
+        return ResponseEntity.ok(neighborhoodService.getAllNeighborhoods());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NeighborhoodResponseDTO> getNeighborhoodById(@PathVariable Long id) {
-        return neighborhoodService.getNeighborhoodById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<DataResult<NeighborhoodResponseDTO>> getNeighborhoodById(@PathVariable Long id) {
+        return ResponseEntity.ok(neighborhoodService.getNeighborhoodById(id));
     }
 
     @GetMapping("/district/{districtId}")
-    public ResponseEntity<List<NeighborhoodResponseDTO>> getNeighborhoodsByDistrictId(@PathVariable Long districtId) {
-        List<NeighborhoodResponseDTO> neighborhoodDTOs = neighborhoodService.getNeighborhoodsByDistrictId(districtId);
-        return ResponseEntity.ok(neighborhoodDTOs);
+    public ResponseEntity<DataResult<List<NeighborhoodResponseDTO>>> getNeighborhoodsByDistrictId(
+            @PathVariable Long districtId) {
+        return ResponseEntity.ok(neighborhoodService.getNeighborhoodsByDistrictId(districtId));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<NeighborhoodResponseDTO>> searchNeighborhoodsByName(@RequestParam String name) {
-        List<NeighborhoodResponseDTO> neighborhoodDTOs = neighborhoodService.searchNeighborhoodsByName(name);
-        return ResponseEntity.ok(neighborhoodDTOs);
+    public ResponseEntity<DataResult<List<NeighborhoodResponseDTO>>> searchNeighborhoodsByName(
+            @RequestParam String name) {
+        return ResponseEntity.ok(neighborhoodService.searchNeighborhoodsByName(name));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<NeighborhoodResponseDTO> updateNeighborhood(@PathVariable Long id,
+    public ResponseEntity<DataResult<NeighborhoodResponseDTO>> updateNeighborhood(@PathVariable Long id,
             @Valid @RequestBody NeighborhoodRequestDTO neighborhoodRequestDTO) {
-        NeighborhoodResponseDTO updatedDTO = neighborhoodService.updateNeighborhood(id, neighborhoodRequestDTO);
-        return ResponseEntity.ok(updatedDTO);
+        return ResponseEntity.ok(neighborhoodService.updateNeighborhood(id, neighborhoodRequestDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNeighborhood(@PathVariable Long id) {
-        neighborhoodService.deleteNeighborhood(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Result> deleteNeighborhood(@PathVariable Long id) {
+        return ResponseEntity.ok(neighborhoodService.deleteNeighborhood(id));
     }
 }

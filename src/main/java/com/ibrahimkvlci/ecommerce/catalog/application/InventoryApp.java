@@ -13,11 +13,11 @@ public class InventoryApp {
 
     private final InventoryService inventoryService;
 
-    public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId){
-        return inventoryService.getInventoryByProductIdAndSellerId(productId, sellerId);
+    public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId) {
+        return inventoryService.getInventoryByProductIdAndSellerId(productId, sellerId).getData();
     }
 
-    public InventoryDTO updateInventory(Long id, int quantity, double price){
-        return inventoryService.updateInventory(id, quantity, price);
+    public InventoryDTO updateInventory(Long id, int quantity, double price) {
+        return inventoryService.updateInventory(id, quantity, price).getData();
     }
 }

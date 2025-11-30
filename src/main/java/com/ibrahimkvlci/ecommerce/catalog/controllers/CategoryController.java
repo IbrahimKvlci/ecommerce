@@ -4,6 +4,8 @@ import com.ibrahimkvlci.ecommerce.catalog.dto.AddCategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategorySubcategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.services.CategoryService;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,99 +24,92 @@ import java.util.List;
 @Slf4j
 @CrossOrigin(origins = "*")
 public class CategoryController {
-    
+
     private final CategoryService categoryService;
-    
+
+    /**
+     * Create a new category
+     */
     /**
      * Create a new category
      */
     @PostMapping
-    public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody AddCategoryDTO categoryDTO) {
+    public ResponseEntity<DataResult<CategoryDTO>> createCategory(@Valid @RequestBody AddCategoryDTO categoryDTO) {
         log.info("Creating new category: {}", categoryDTO.getName());
-        CategoryDTO createdCategory = categoryService.createCategory(categoryDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(categoryDTO));
     }
-    
+
     /**
      * Get all categories
      */
     @GetMapping
-    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
+    public ResponseEntity<DataResult<List<CategoryDTO>>> getAllCategories() {
         log.info("Retrieving all categories");
-        List<CategoryDTO> categories = categoryService.getAllCategories();
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
     @GetMapping("/parents")
-    public ResponseEntity<List<CategoryDTO>> getAllParentCategories(){
+    public ResponseEntity<DataResult<List<CategoryDTO>>> getAllParentCategories() {
         log.info("Retrieving all parent categories");
-        List<CategoryDTO> categories = categoryService.getParentCategories();
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(categoryService.getParentCategories());
     }
 
     @GetMapping("/parentsWithSubcategories")
-    public ResponseEntity<List<CategorySubcategoryDTO>> getAllPatentCategoriesWithSubcategories(){
+    public ResponseEntity<DataResult<List<CategorySubcategoryDTO>>> getAllPatentCategoriesWithSubcategories() {
         log.info("Retrieving all parent categories with subcategories");
-        List<CategorySubcategoryDTO> categories = categoryService.getParentCategoryWithSubcategories();
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(categoryService.getParentCategoryWithSubcategories());
     }
 
     @GetMapping("/subcategories/{parentId}")
-    public ResponseEntity<List<CategoryDTO>> getAllSubCategoriesByParentId(@PathVariable Long parentId){
+    public ResponseEntity<DataResult<List<CategoryDTO>>> getAllSubCategoriesByParentId(@PathVariable Long parentId) {
         log.info("Retrieving all  subcategories");
-        List<CategoryDTO> categories = categoryService.getSubCategoriesByParentId(parentId);
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(categoryService.getSubCategoriesByParentId(parentId));
     }
 
     /**
      * Get category by ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<DataResult<CategoryDTO>> getCategoryById(@PathVariable Long id) {
         log.info("Retrieving category by ID: {}", id);
-        CategoryDTO category = categoryService.getCategoryById(id);
-        return ResponseEntity.ok(category);
+        return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
-    
+
     /**
      * Get category by name
      */
     @GetMapping("/name/{name}")
-    public ResponseEntity<CategoryDTO> getCategoryByName(@PathVariable String name) {
+    public ResponseEntity<DataResult<CategoryDTO>> getCategoryByName(@PathVariable String name) {
         log.info("Retrieving category by name: {}", name);
-        CategoryDTO category = categoryService.getCategoryByName(name);
-        return ResponseEntity.ok(category);
+        return ResponseEntity.ok(categoryService.getCategoryByName(name));
     }
-    
+
     /**
      * Update an existing category
      */
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long id, 
-                                                     @Valid @RequestBody CategoryDTO categoryDTO) {
+    public ResponseEntity<DataResult<CategoryDTO>> updateCategory(@PathVariable Long id,
+            @Valid @RequestBody CategoryDTO categoryDTO) {
         log.info("Updating category with ID: {}", id);
-        CategoryDTO updatedCategory = categoryService.updateCategory(id, categoryService.mapToEntity(categoryDTO));
-        return ResponseEntity.ok(updatedCategory);
+        return ResponseEntity.ok(categoryService.updateCategory(id, categoryService.mapToEntity(categoryDTO)));
     }
-    
+
     /**
      * Delete a category by ID
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<Result> deleteCategory(@PathVariable Long id) {
         log.info("Deleting category with ID: {}", id);
-        categoryService.deleteCategory(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(categoryService.deleteCategory(id));
     }
-    
+
     /**
      * Search categories by name
      */
     @GetMapping("/search/name")
-    public ResponseEntity<List<CategoryDTO>> searchCategoriesByName(@RequestParam String name) {
+    public ResponseEntity<DataResult<List<CategoryDTO>>> searchCategoriesByName(@RequestParam String name) {
         log.info("Searching categories by name: {}", name);
-        List<CategoryDTO> categories = categoryService.searchCategoriesByName(name);
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(categoryService.searchCategoriesByName(name));
     }
 
     /**

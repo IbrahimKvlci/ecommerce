@@ -4,29 +4,31 @@ import com.ibrahimkvlci.ecommerce.address.dto.CityRequestDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.CityResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.models.City;
 
+import com.ibrahimkvlci.ecommerce.address.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.Result;
+
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service interface for City operations
  */
 public interface CityService {
 
-    CityResponseDTO createCity(CityRequestDTO cityRequestDTO);
+    DataResult<CityResponseDTO> createCity(CityRequestDTO cityRequestDTO);
 
-    Optional<CityResponseDTO> getCityById(Long id);
+    DataResult<CityResponseDTO> getCityById(Long id);
 
-    List<CityResponseDTO> getAllCities();
+    DataResult<List<CityResponseDTO>> getAllCities();
 
-    List<CityResponseDTO> getCitiesByCountryId(Long countryId);
+    DataResult<List<CityResponseDTO>> getCitiesByCountryId(Long countryId);
 
-    List<CityResponseDTO> searchCitiesByName(String name);
+    DataResult<List<CityResponseDTO>> searchCitiesByName(String name);
 
-    List<CityResponseDTO> searchCitiesByCountryAndName(Long countryId, String name);
+    DataResult<List<CityResponseDTO>> searchCitiesByCountryAndName(Long countryId, String name);
 
-    CityResponseDTO updateCity(Long id, CityRequestDTO cityRequestDTO);
+    DataResult<CityResponseDTO> updateCity(Long id, CityRequestDTO cityRequestDTO);
 
-    void deleteCity(Long id);
+    Result deleteCity(Long id);
 
     boolean existsByNameAndCountryId(String name, Long countryId);
 

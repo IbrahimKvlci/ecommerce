@@ -4,6 +4,8 @@ import com.ibrahimkvlci.ecommerce.catalog.dto.AddCategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategorySubcategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 
 import java.util.List;
 
@@ -11,48 +13,48 @@ import java.util.List;
  * Service interface for Category operations.
  */
 public interface CategoryService {
-    
+
     /**
      * Create a new category
      */
-    CategoryDTO createCategory(AddCategoryDTO category);
-    
+    DataResult<CategoryDTO> createCategory(AddCategoryDTO category);
+
     /**
      * Get all categories
      */
-    List<CategoryDTO> getAllCategories();
-    
+    DataResult<List<CategoryDTO>> getAllCategories();
+
     /**
      * Get category by ID
      */
-    CategoryDTO getCategoryById(Long id);
-    
-    List<CategoryDTO> getParentCategories();
+    DataResult<CategoryDTO> getCategoryById(Long id);
 
-    List<CategoryDTO> getSubCategoriesByParentId(Long id);
+    DataResult<List<CategoryDTO>> getParentCategories();
 
-    List<CategorySubcategoryDTO> getParentCategoryWithSubcategories();
+    DataResult<List<CategoryDTO>> getSubCategoriesByParentId(Long id);
+
+    DataResult<List<CategorySubcategoryDTO>> getParentCategoryWithSubcategories();
 
     /**
      * Get category by name
      */
-    CategoryDTO getCategoryByName(String name);
-    
+    DataResult<CategoryDTO> getCategoryByName(String name);
+
     /**
      * Update an existing category
      */
-    CategoryDTO updateCategory(Long id, Category category);
-    
+    DataResult<CategoryDTO> updateCategory(Long id, Category category);
+
     /**
      * Delete a category by ID
      */
-    void deleteCategory(Long id);
-    
+    Result deleteCategory(Long id);
+
     /**
      * Search categories by name
      */
-    List<CategoryDTO> searchCategoriesByName(String name);
-    
+    DataResult<List<CategoryDTO>> searchCategoriesByName(String name);
+
     /**
      * Check if category exists by name
      */
@@ -62,12 +64,12 @@ public interface CategoryService {
      * Check if category exists by ID
      */
     boolean existsById(Long id);
-    
+
     /**
      * Convert DTO to entity
      */
     Category mapToEntity(CategoryDTO categoryDTO);
-    
+
     /**
      * Create DTO from entity
      */

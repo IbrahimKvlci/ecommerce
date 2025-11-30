@@ -3,6 +3,8 @@ package com.ibrahimkvlci.ecommerce.address.controllers;
 import com.ibrahimkvlci.ecommerce.address.dto.DistrictRequestDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.DistrictResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.services.DistrictService;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.Result;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,47 +29,39 @@ public class DistrictController {
     }
 
     @PostMapping
-    public ResponseEntity<DistrictResponseDTO> createDistrict(
+    public ResponseEntity<DataResult<DistrictResponseDTO>> createDistrict(
             @Valid @RequestBody DistrictRequestDTO districtRequestDTO) {
-        DistrictResponseDTO createdDTO = districtService.createDistrict(districtRequestDTO);
-        return new ResponseEntity<>(createdDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(districtService.createDistrict(districtRequestDTO), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<DistrictResponseDTO>> getAllDistricts() {
-        List<DistrictResponseDTO> districtDTOs = districtService.getAllDistricts();
-        return ResponseEntity.ok(districtDTOs);
+    public ResponseEntity<DataResult<List<DistrictResponseDTO>>> getAllDistricts() {
+        return ResponseEntity.ok(districtService.getAllDistricts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DistrictResponseDTO> getDistrictById(@PathVariable Long id) {
-        return districtService.getDistrictById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<DataResult<DistrictResponseDTO>> getDistrictById(@PathVariable Long id) {
+        return ResponseEntity.ok(districtService.getDistrictById(id));
     }
 
     @GetMapping("/city/{cityId}")
-    public ResponseEntity<List<DistrictResponseDTO>> getDistrictsByCityId(@PathVariable Long cityId) {
-        List<DistrictResponseDTO> districtDTOs = districtService.getDistrictsByCityId(cityId);
-        return ResponseEntity.ok(districtDTOs);
+    public ResponseEntity<DataResult<List<DistrictResponseDTO>>> getDistrictsByCityId(@PathVariable Long cityId) {
+        return ResponseEntity.ok(districtService.getDistrictsByCityId(cityId));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<DistrictResponseDTO>> searchDistrictsByName(@RequestParam String name) {
-        List<DistrictResponseDTO> districtDTOs = districtService.searchDistrictsByName(name);
-        return ResponseEntity.ok(districtDTOs);
+    public ResponseEntity<DataResult<List<DistrictResponseDTO>>> searchDistrictsByName(@RequestParam String name) {
+        return ResponseEntity.ok(districtService.searchDistrictsByName(name));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DistrictResponseDTO> updateDistrict(@PathVariable Long id,
+    public ResponseEntity<DataResult<DistrictResponseDTO>> updateDistrict(@PathVariable Long id,
             @Valid @RequestBody DistrictRequestDTO districtRequestDTO) {
-        DistrictResponseDTO updatedDTO = districtService.updateDistrict(id, districtRequestDTO);
-        return ResponseEntity.ok(updatedDTO);
+        return ResponseEntity.ok(districtService.updateDistrict(id, districtRequestDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDistrict(@PathVariable Long id) {
-        districtService.deleteDistrict(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Result> deleteDistrict(@PathVariable Long id) {
+        return ResponseEntity.ok(districtService.deleteDistrict(id));
     }
 }

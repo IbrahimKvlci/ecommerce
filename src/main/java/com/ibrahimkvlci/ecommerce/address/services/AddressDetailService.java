@@ -3,26 +3,27 @@ package com.ibrahimkvlci.ecommerce.address.services;
 import com.ibrahimkvlci.ecommerce.address.dto.AddressDetailRequestDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.AddressDetailResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.models.AddressDetail;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.Result;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service interface for AddressDetail operations
  */
 public interface AddressDetailService {
 
-    AddressDetailResponseDTO createAddressDetail(AddressDetailRequestDTO addressDetailDTO);
+    DataResult<AddressDetailResponseDTO> createAddressDetail(AddressDetailRequestDTO addressDetailDTO);
 
-    Optional<AddressDetailResponseDTO> getAddressDetailById(Long id);
+    DataResult<AddressDetailResponseDTO> getAddressDetailById(Long id);
 
-    List<AddressDetailResponseDTO> getAllAddressDetails();
+    DataResult<List<AddressDetailResponseDTO>> getAllAddressDetails();
 
-    List<AddressDetailResponseDTO> getAddressDetailsOfCustomer();
+    DataResult<List<AddressDetailResponseDTO>> getAddressDetailsOfCustomer();
 
-    AddressDetailResponseDTO updateAddressDetail(Long id, AddressDetailRequestDTO addressDetailDTO);
+    DataResult<AddressDetailResponseDTO> updateAddressDetail(Long id, AddressDetailRequestDTO addressDetailDTO);
 
-    void deleteAddressDetail(Long id);
+    Result deleteAddressDetail(Long id);
 
     AddressDetailResponseDTO mapToDTO(AddressDetail addressDetail);
 

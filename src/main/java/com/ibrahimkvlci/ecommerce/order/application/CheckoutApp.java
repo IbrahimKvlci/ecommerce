@@ -13,12 +13,12 @@ public class CheckoutApp {
 
     private final CheckoutService checkoutService;
 
-    public SaleResponse okCheckout(SaleResponse response){
+    public SaleResponse okCheckout(SaleResponse response) {
 
-        return checkoutService.okCheckout(response);
+        return checkoutService.okCheckout(response).getData();
     }
 
-    public SaleResponse failCheckout(SaleResponse response){
-        return checkoutService.failCheckout(response);
+    public SaleResponse failCheckout(SaleResponse response) {
+        return checkoutService.failCheckout(response).getData();
     }
 }

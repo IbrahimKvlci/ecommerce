@@ -6,12 +6,17 @@ import com.ibrahimkvlci.ecommerce.address.models.City;
 import com.ibrahimkvlci.ecommerce.address.models.Country;
 import com.ibrahimkvlci.ecommerce.address.repositories.CityRepository;
 import com.ibrahimkvlci.ecommerce.address.repositories.CountryRepository;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.Result;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.SuccessDataResult;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.SuccessResult;
+import com.ibrahimkvlci.ecommerce.address.exceptions.CityNotFoundException;
+import com.ibrahimkvlci.ecommerce.address.exceptions.CountryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
@@ -29,69 +34,73 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
-
-    public CityResponseDTO createCity(CityRequestDTO cityRequestDTO) {
+    public DataResult<CityResponseDTO> createCity(CityRequestDTO cityRequestDTO) {
         Country country = countryRepository.findById(Objects.requireNonNull(cityRequestDTO.getCountryId()))
-                .orElseThrow(() -> new RuntimeException("Country not found with id: " + cityRequestDTO.getCountryId()));
+                .orElseThrow(() -> new CountryNotFoundException(cityRequestDTO.getCountryId()));
 
         City city = new City();
         city.setName(cityRequestDTO.getName());
         city.setCountry(country);
 
-        return mapToDTO(cityRepository.save(city));
+        return new SuccessDataResult<>("City created successfully", mapToDTO(cityRepository.save(city)));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CityResponseDTO> getCityById(Long id) {
-        return cityRepository.findById(Objects.requireNonNull(id)).map(this::mapToDTO);
+    public DataResult<CityResponseDTO> getCityById(Long id) {
+        return new SuccessDataResult<>(
+                cityRepository.findById(Objects.requireNonNull(id)).map(this::mapToDTO).orElse(null));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CityResponseDTO> getAllCities() {
-        return cityRepository.findAllWithCountry().stream().map(this::mapToDTO).collect(Collectors.toList());
+    public DataResult<List<CityResponseDTO>> getAllCities() {
+        return new SuccessDataResult<>(cityRepository.findAllWithCountry().stream()
+                .map(this::mapToDTO).collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CityResponseDTO> getCitiesByCountryId(Long countryId) {
-        return cityRepository.findByCountryIdOrderedByName(countryId).stream().map(this::mapToDTO)
-                .collect(Collectors.toList());
+    public DataResult<List<CityResponseDTO>> getCitiesByCountryId(Long countryId) {
+        return new SuccessDataResult<>(
+                cityRepository.findByCountryIdOrderedByName(countryId).stream().map(this::mapToDTO)
+                        .collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CityResponseDTO> searchCitiesByName(String name) {
-        return cityRepository.findByNameContainingIgnoreCase(name).stream().map(this::mapToDTO)
-                .collect(Collectors.toList());
+    public DataResult<List<CityResponseDTO>> searchCitiesByName(String name) {
+        return new SuccessDataResult<>(
+                cityRepository.findByNameContainingIgnoreCase(name).stream().map(this::mapToDTO)
+                        .collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CityResponseDTO> searchCitiesByCountryAndName(Long countryId, String name) {
-        return cityRepository.findByCountryIdAndNameContainingIgnoreCase(countryId, name).stream().map(this::mapToDTO)
-                .collect(Collectors.toList());
+    public DataResult<List<CityResponseDTO>> searchCitiesByCountryAndName(Long countryId, String name) {
+        return new SuccessDataResult<>(cityRepository.findByCountryIdAndNameContainingIgnoreCase(countryId, name)
+                .stream().map(this::mapToDTO)
+                .collect(Collectors.toList()));
     }
 
     @Override
-
-    public CityResponseDTO updateCity(Long id, CityRequestDTO cityRequestDTO) {
+    public DataResult<CityResponseDTO> updateCity(Long id, CityRequestDTO cityRequestDTO) {
         City city = cityRepository.findById(Objects.requireNonNull(id))
-                .orElseThrow(() -> new RuntimeException("City not found with id: " + id));
+                .orElseThrow(() -> new CityNotFoundException(id));
 
         Country country = countryRepository.findById(Objects.requireNonNull(cityRequestDTO.getCountryId()))
-                .orElseThrow(() -> new RuntimeException("Country not found with id: " + cityRequestDTO.getCountryId()));
+                .orElseThrow(() -> new CountryNotFoundException(cityRequestDTO.getCountryId()));
 
         city.setName(cityRequestDTO.getName());
         city.setCountry(country);
 
-        return mapToDTO(cityRepository.save(city));
+        return new SuccessDataResult<>("City updated successfully", mapToDTO(cityRepository.save(city)));
     }
 
     @Override
-    public void deleteCity(Long id) {
+    public Result deleteCity(Long id) {
         cityRepository.deleteById(Objects.requireNonNull(id));
+        return new SuccessResult("City deleted successfully");
     }
 
     @Override
@@ -101,7 +110,6 @@ public class CityServiceImpl implements CityService {
     }
 
     @Override
-
     public CityResponseDTO mapToDTO(City city) {
         if (city == null)
             return null;

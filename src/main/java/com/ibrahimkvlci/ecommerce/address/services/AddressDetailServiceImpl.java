@@ -17,6 +17,10 @@ import com.ibrahimkvlci.ecommerce.address.repositories.CountryRepository;
 import com.ibrahimkvlci.ecommerce.address.repositories.CityRepository;
 import com.ibrahimkvlci.ecommerce.address.repositories.DistrictRepository;
 import com.ibrahimkvlci.ecommerce.address.repositories.NeighborhoodRepository;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.Result;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.SuccessDataResult;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.SuccessResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
@@ -42,13 +45,16 @@ public class AddressDetailServiceImpl implements AddressDetailService {
 
     @Override
     @Transactional
-    public AddressDetailResponseDTO createAddressDetail(AddressDetailRequestDTO addressDetailDTO) {
+    public DataResult<AddressDetailResponseDTO> createAddressDetail(AddressDetailRequestDTO addressDetailDTO) {
         AddressDetail addressDetail = new AddressDetail();
 
-        addressDetail.setCountry(countryRepository.getReferenceById(addressDetailDTO.getCountryId()));
-        addressDetail.setCity(cityRepository.getReferenceById(addressDetailDTO.getCityId()));
-        addressDetail.setDistrict(districtRepository.getReferenceById(addressDetailDTO.getDistrictId()));
-        addressDetail.setNeighborhood(neighborhoodRepository.getReferenceById(addressDetailDTO.getNeighborhoodId()));
+        addressDetail.setCountry(
+                countryRepository.getReferenceById(Objects.requireNonNull(addressDetailDTO.getCountryId())));
+        addressDetail.setCity(cityRepository.getReferenceById(Objects.requireNonNull(addressDetailDTO.getCityId())));
+        addressDetail.setDistrict(
+                districtRepository.getReferenceById(Objects.requireNonNull(addressDetailDTO.getDistrictId())));
+        addressDetail.setNeighborhood(
+                neighborhoodRepository.getReferenceById(Objects.requireNonNull(addressDetailDTO.getNeighborhoodId())));
 
         addressDetail.setAddress(addressDetailDTO.getAddress());
         addressDetail.setName(addressDetailDTO.getName());
@@ -63,25 +69,27 @@ public class AddressDetailServiceImpl implements AddressDetailService {
         if (addressDetailDTO.isDefaultAddress()) {
             addressDetailRepository.unsetDefaultAddressExceptThis(addressDetail.getCustomerId(), res.getId());
         }
-        return mapToDTO(res);
+        return new SuccessDataResult<>("Address detail created successfully", mapToDTO(res));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<AddressDetailResponseDTO> getAddressDetailById(Long id) {
-        return addressDetailRepository.findById(Objects.requireNonNull(id)).map(this::mapToDTO);
+    public DataResult<AddressDetailResponseDTO> getAddressDetailById(Long id) {
+        return new SuccessDataResult<>(addressDetailRepository.findById(Objects.requireNonNull(id))
+                .map(this::mapToDTO).orElse(null));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<AddressDetailResponseDTO> getAllAddressDetails() {
-        return addressDetailRepository.findAllWithFullHierarchy().stream().map(this::mapToDTO)
-                .collect(Collectors.toList());
+    public DataResult<List<AddressDetailResponseDTO>> getAllAddressDetails() {
+        return new SuccessDataResult<>(
+                addressDetailRepository.findAllWithFullHierarchy().stream().map(this::mapToDTO)
+                        .collect(Collectors.toList()));
     }
 
     @Override
     @Transactional
-    public AddressDetailResponseDTO updateAddressDetail(Long id, AddressDetailRequestDTO addressDetailDTO) {
+    public DataResult<AddressDetailResponseDTO> updateAddressDetail(Long id, AddressDetailRequestDTO addressDetailDTO) {
         AddressDetail addressDetail = addressDetailRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Address detail not found with id: " + id));
 
@@ -112,12 +120,14 @@ public class AddressDetailServiceImpl implements AddressDetailService {
 
         addressDetail.setDefaultAddress(addressDetailDTO.isDefaultAddress());
 
-        return mapToDTO(addressDetailRepository.save(addressDetail));
+        return new SuccessDataResult<>("Address detail updated successfully",
+                mapToDTO(addressDetailRepository.save(addressDetail)));
     }
 
     @Override
-    public void deleteAddressDetail(Long id) {
+    public Result deleteAddressDetail(Long id) {
         addressDetailRepository.deleteById(Objects.requireNonNull(id));
+        return new SuccessResult("Address detail deleted successfully");
     }
 
     @Override
@@ -188,9 +198,10 @@ public class AddressDetailServiceImpl implements AddressDetailService {
     }
 
     @Override
-    public List<AddressDetailResponseDTO> getAddressDetailsOfCustomer() {
-        return addressDetailRepository.findAllByCustomerIdOrderByIdAsc(userClient.getCustomerIdFromJWT()).stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+    public DataResult<List<AddressDetailResponseDTO>> getAddressDetailsOfCustomer() {
+        return new SuccessDataResult<>(
+                addressDetailRepository.findAllByCustomerIdOrderByIdAsc(userClient.getCustomerIdFromJWT()).stream()
+                        .map(this::mapToDTO)
+                        .collect(Collectors.toList()));
     }
 }

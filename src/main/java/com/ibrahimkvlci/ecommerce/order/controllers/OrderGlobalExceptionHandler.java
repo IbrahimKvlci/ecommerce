@@ -8,6 +8,12 @@ import com.ibrahimkvlci.ecommerce.order.exceptions.InsufficientInventoryExceptio
 import com.ibrahimkvlci.ecommerce.order.exceptions.CartNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CartItemNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CheckoutException;
+import com.ibrahimkvlci.ecommerce.order.models.Order;
+import com.ibrahimkvlci.ecommerce.order.models.OrderItem;
+import com.ibrahimkvlci.ecommerce.order.models.Cart;
+import com.ibrahimkvlci.ecommerce.order.models.CartItem;
+import com.ibrahimkvlci.ecommerce.order.utils.results.ErrorResult;
+import com.ibrahimkvlci.ecommerce.order.utils.results.ErrorDataResult;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,178 +22,67 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Global exception handler for Order module.
  * Handles all order-related exceptions and returns appropriate HTTP responses.
  */
 @RestControllerAdvice
 public class OrderGlobalExceptionHandler {
-    
+
     @ExceptionHandler(OrderNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleOrderNotFoundException(OrderNotFoundException ex) {
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.NOT_FOUND.value(),
-            "Order Not Found",
-            ex.getMessage(),
-            LocalDateTime.now()
-        );
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    public ResponseEntity<ErrorDataResult<Order>> handleOrderNotFoundException(OrderNotFoundException ex) {
+        return new ResponseEntity<>(new ErrorDataResult<Order>(ex.getMessage(), null), HttpStatus.NOT_FOUND);
     }
-    
+
     @ExceptionHandler(OrderItemNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleOrderItemNotFoundException(OrderItemNotFoundException ex) {
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.NOT_FOUND.value(),
-            "Order Item Not Found",
-            ex.getMessage(),
-            LocalDateTime.now()
-        );
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    public ResponseEntity<ErrorDataResult<OrderItem>> handleOrderItemNotFoundException(OrderItemNotFoundException ex) {
+        return new ResponseEntity<>(new ErrorDataResult<OrderItem>(ex.getMessage(), null), HttpStatus.NOT_FOUND);
     }
-    
+
     @ExceptionHandler(OrderValidationException.class)
-    public ResponseEntity<ErrorResponse> handleOrderValidationException(OrderValidationException ex) {
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            "Order Validation Error",
-            ex.getMessage(),
-            LocalDateTime.now()
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResult> handleOrderValidationException(OrderValidationException ex) {
+        return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
-    
+
     @ExceptionHandler(OrderStatusException.class)
-    public ResponseEntity<ErrorResponse> handleOrderStatusException(OrderStatusException ex) {
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            "Order Status Error",
-            ex.getMessage(),
-            LocalDateTime.now()
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResult> handleOrderStatusException(OrderStatusException ex) {
+        return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
-    
+
     @ExceptionHandler(InsufficientInventoryException.class)
-    public ResponseEntity<ErrorResponse> handleInsufficientInventoryException(InsufficientInventoryException ex) {
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            "Insufficient Inventory",
-            ex.getMessage(),
-            LocalDateTime.now()
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResult> handleInsufficientInventoryException(InsufficientInventoryException ex) {
+        return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
-    
+
     @ExceptionHandler(CartNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleCartNotFoundException(CartNotFoundException ex) {
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.NOT_FOUND.value(),
-            "Cart Not Found",
-            ex.getMessage(),
-            LocalDateTime.now()
-        );
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    public ResponseEntity<ErrorDataResult<Cart>> handleCartNotFoundException(CartNotFoundException ex) {
+        return new ResponseEntity<>(new ErrorDataResult<Cart>(ex.getMessage(), null), HttpStatus.NOT_FOUND);
     }
-    
+
     @ExceptionHandler(CartItemNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleCartItemNotFoundException(CartItemNotFoundException ex) {
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.NOT_FOUND.value(),
-            "Cart Item Not Found",
-            ex.getMessage(),
-            LocalDateTime.now()
-        );
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    public ResponseEntity<ErrorDataResult<CartItem>> handleCartItemNotFoundException(CartItemNotFoundException ex) {
+        return new ResponseEntity<>(new ErrorDataResult<CartItem>(ex.getMessage(), null), HttpStatus.NOT_FOUND);
     }
-    
+
     @ExceptionHandler(CheckoutException.class)
-    public ResponseEntity<ErrorResponse> handleCheckoutException(CheckoutException ex) {
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            "Checkout Failed",
-            ex.getMessage(),
-            LocalDateTime.now()
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResult> handleCheckoutException(CheckoutException ex) {
+        return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
-    
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<ErrorResult> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        StringBuilder errors = new StringBuilder();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            errors.append(fieldName).append(": ").append(errorMessage).append("; ");
         });
-        
-        ValidationErrorResponse error = new ValidationErrorResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            "Validation Failed",
-            "One or more fields have validation errors",
-            LocalDateTime.now(),
-            errors
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorResult(errors.toString()), HttpStatus.BAD_REQUEST);
     }
-    
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
-        ErrorResponse error = new ErrorResponse(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            "Internal Server Error",
-            "An unexpected error occurred: " + ex.getMessage(),
-            LocalDateTime.now()
-        );
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    
-    /**
-     * Error response class
-     */
-    public static class ErrorResponse {
-        private int status;
-        private String error;
-        private String message;
-        private LocalDateTime timestamp;
-        
-        public ErrorResponse(int status, String error, String message, LocalDateTime timestamp) {
-            this.status = status;
-            this.error = error;
-            this.message = message;
-            this.timestamp = timestamp;
-        }
-        
-        // Getters and setters
-        public int getStatus() { return status; }
-        public void setStatus(int status) { this.status = status; }
-        
-        public String getError() { return error; }
-        public void setError(String error) { this.error = error; }
-        
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
-        
-        public LocalDateTime getTimestamp() { return timestamp; }
-        public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
-    }
-    
-    /**
-     * Validation error response class
-     */
-    public static class ValidationErrorResponse extends ErrorResponse {
-        private Map<String, String> fieldErrors;
-        
-        public ValidationErrorResponse(int status, String error, String message, 
-                                     LocalDateTime timestamp, Map<String, String> fieldErrors) {
-            super(status, error, message, timestamp);
-            this.fieldErrors = fieldErrors;
-        }
-        
-        public Map<String, String> getFieldErrors() { return fieldErrors; }
-        public void setFieldErrors(Map<String, String> fieldErrors) { this.fieldErrors = fieldErrors; }
+    public ResponseEntity<ErrorResult> handleGenericException(Exception ex) {
+        return new ResponseEntity<>(new ErrorResult("An unexpected error occurred: " + ex.getMessage()),
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

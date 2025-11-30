@@ -10,6 +10,10 @@ import com.ibrahimkvlci.ecommerce.order.models.Cart;
 import com.ibrahimkvlci.ecommerce.order.models.CartItem;
 import com.ibrahimkvlci.ecommerce.order.repositories.CartItemRepository;
 import com.ibrahimkvlci.ecommerce.order.repositories.CartRepository;
+import com.ibrahimkvlci.ecommerce.order.utils.results.DataResult;
+import com.ibrahimkvlci.ecommerce.order.utils.results.Result;
+import com.ibrahimkvlci.ecommerce.order.utils.results.SuccessDataResult;
+import com.ibrahimkvlci.ecommerce.order.utils.results.SuccessResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +36,7 @@ public class CartItemServiceImpl implements CartItemService {
     private final InventoryClient inventoryClient;
 
     @Override
-    public CartItemDTO addCartItem(AddCartItemRequest request) {
+    public DataResult<CartItemDTO> addCartItem(AddCartItemRequest request) {
         // Check if cart exists
         Cart cart = cartRepository.findById(Objects.requireNonNull(request.getCartId()))
                 .orElseThrow(() -> new CartNotFoundException("Cart not found with id: " + request.getCartId()));
@@ -56,84 +60,91 @@ public class CartItemServiceImpl implements CartItemService {
         }
 
         CartItem savedCartItem = cartItemRepository.save(cartItem);
-        return mapToDTO(savedCartItem);
+        return new SuccessDataResult<CartItemDTO>(mapToDTO(savedCartItem));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CartItemDTO> getAllCartItems() {
-        return cartItemRepository.findAll().stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+    public DataResult<List<CartItemDTO>> getAllCartItems() {
+        return new SuccessDataResult<List<CartItemDTO>>(cartItemRepository.findAll().stream()
+                .map(item -> mapToDTO(item))
+                .collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CartItemDTO> getCartItemById(Long id) {
-        return cartItemRepository.findById(Objects.requireNonNull(id))
-                .map(this::mapToDTO);
+    public DataResult<CartItemDTO> getCartItemById(Long id) {
+        return new SuccessDataResult<CartItemDTO>(cartItemRepository.findById(Objects.requireNonNull(id))
+                .map(item -> mapToDTO(item))
+                .orElseThrow(() -> new CartItemNotFoundException("Cart item not found with id: " + id)));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CartItemDTO> getCartItemsByCartId(Long cartId) {
-        return cartItemRepository.findByCartId(cartId).stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+    public DataResult<List<CartItemDTO>> getCartItemsByCartId(Long cartId) {
+        return new SuccessDataResult<List<CartItemDTO>>(cartItemRepository.findByCartId(cartId).stream()
+                .map(item -> mapToDTO(item))
+                .collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CartItemDTO> getCartItemByCartIdAndProductIdAndSellerId(Long cartId, Long productId,
+    public DataResult<CartItemDTO> getCartItemByCartIdAndProductIdAndSellerId(Long cartId, Long productId,
             Long sellerId) {
-        return cartItemRepository.findByCartIdAndProductIdAndSellerId(cartId, productId, sellerId)
-                .map(this::mapToDTO);
+        return new SuccessDataResult<CartItemDTO>(
+                cartItemRepository.findByCartIdAndProductIdAndSellerId(cartId, productId, sellerId)
+                        .map(item -> mapToDTO(item))
+                        .orElseThrow(() -> new CartItemNotFoundException("Cart item not found with cartId: " + cartId
+                                + " and productId: " + productId + " and sellerId: " + sellerId)));
     }
 
     @Override
-    public CartItemDTO updateCartItem(Long id, UpdateCartItemRequest request) {
+    public DataResult<CartItemDTO> updateCartItem(Long id, UpdateCartItemRequest request) {
         CartItem cartItem = cartItemRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new CartItemNotFoundException("Cart item not found with id: " + id));
 
         cartItem.setQuantity(request.getQuantity());
 
         CartItem savedCartItem = cartItemRepository.save(cartItem);
-        return mapToDTO(savedCartItem);
+        return new SuccessDataResult<CartItemDTO>(mapToDTO(savedCartItem));
     }
 
     @Override
-    public void deleteCartItem(Long id) {
+    public Result deleteCartItem(Long id) {
         if (!cartItemRepository.existsById(Objects.requireNonNull(id))) {
             throw new CartItemNotFoundException("Cart item not found with id: " + id);
         }
         cartItemRepository.deleteById(Objects.requireNonNull(id));
+        return new SuccessResult("Cart item deleted successfully");
     }
 
     @Override
-    public void deleteCartItemByCartIdAndProductId(Long cartId, Long productId) {
+    public Result deleteCartItemByCartIdAndProductId(Long cartId, Long productId) {
         if (!cartItemRepository.existsByCartIdAndProductId(cartId, productId)) {
             throw new CartItemNotFoundException(
                     "Cart item not found for cart: " + cartId + " and product: " + productId);
         }
         cartItemRepository.deleteByCartIdAndProductId(cartId, productId);
+        return new SuccessResult("Cart item deleted successfully");
     }
 
     @Override
-    public void deleteCartItemsByCartId(Long cartId) {
+    public Result deleteCartItemsByCartId(Long cartId) {
         cartItemRepository.deleteByCartId(cartId);
+        return new SuccessResult("Cart items deleted successfully");
     }
 
     @Override
     @Transactional(readOnly = true)
-    public boolean cartItemExistsForCartAndProduct(Long cartId, Long productId) {
-        return cartItemRepository.existsByCartIdAndProductId(cartId, productId);
+    public DataResult<Boolean> cartItemExistsForCartAndProduct(Long cartId, Long productId) {
+        return new SuccessDataResult<Boolean>(cartItemRepository.existsByCartIdAndProductId(cartId, productId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Long getTotalQuantityByCartId(Long cartId) {
+    public DataResult<Long> getTotalQuantityByCartId(Long cartId) {
         Long totalQuantity = cartItemRepository.getTotalQuantityByCartId(cartId);
-        return totalQuantity != null ? totalQuantity : 0L;
+        return new SuccessDataResult<Long>(totalQuantity != null ? totalQuantity : 0L);
     }
 
     @Override

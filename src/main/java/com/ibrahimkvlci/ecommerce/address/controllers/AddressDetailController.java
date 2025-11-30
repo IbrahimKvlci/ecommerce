@@ -3,6 +3,8 @@ package com.ibrahimkvlci.ecommerce.address.controllers;
 import com.ibrahimkvlci.ecommerce.address.dto.AddressDetailRequestDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.AddressDetailResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.services.AddressDetailService;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.Result;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,39 +29,34 @@ public class AddressDetailController {
     }
 
     @PostMapping
-    public ResponseEntity<AddressDetailResponseDTO> createAddressDetail(
+    public ResponseEntity<DataResult<AddressDetailResponseDTO>> createAddressDetail(
             @Valid @RequestBody AddressDetailRequestDTO addressDetailDTO) {
-        AddressDetailResponseDTO createdDTO = addressDetailService.createAddressDetail(addressDetailDTO);
-        return new ResponseEntity<>(createdDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(addressDetailService.createAddressDetail(addressDetailDTO), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<AddressDetailResponseDTO>> getAllAddressDetails() {
-        List<AddressDetailResponseDTO> addressDetailDTOs = addressDetailService.getAllAddressDetails();
-        return ResponseEntity.ok(addressDetailDTOs);
+    public ResponseEntity<DataResult<List<AddressDetailResponseDTO>>> getAllAddressDetails() {
+        return ResponseEntity.ok(addressDetailService.getAllAddressDetails());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AddressDetailResponseDTO> getAddressDetailById(@PathVariable Long id) {
-        var res = addressDetailService.getAddressDetailById(id).get();
-        return ResponseEntity.ok(res);
+    public ResponseEntity<DataResult<AddressDetailResponseDTO>> getAddressDetailById(@PathVariable Long id) {
+        return ResponseEntity.ok(addressDetailService.getAddressDetailById(id));
     }
 
     @GetMapping("/customer")
-    public ResponseEntity<List<AddressDetailResponseDTO>> getAddressDetailsOfCustomer() {
+    public ResponseEntity<DataResult<List<AddressDetailResponseDTO>>> getAddressDetailsOfCustomer() {
         return ResponseEntity.ok(addressDetailService.getAddressDetailsOfCustomer());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AddressDetailResponseDTO> updateAddressDetail(@PathVariable Long id,
+    public ResponseEntity<DataResult<AddressDetailResponseDTO>> updateAddressDetail(@PathVariable Long id,
             @Valid @RequestBody AddressDetailRequestDTO addressDetailDTO) {
-        var res = addressDetailService.updateAddressDetail(id, addressDetailDTO);
-        return ResponseEntity.ok(res);
+        return ResponseEntity.ok(addressDetailService.updateAddressDetail(id, addressDetailDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAddressDetail(@PathVariable Long id) {
-        addressDetailService.deleteAddressDetail(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Result> deleteAddressDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(addressDetailService.deleteAddressDetail(id));
     }
 }

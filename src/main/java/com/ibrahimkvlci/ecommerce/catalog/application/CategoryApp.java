@@ -13,11 +13,11 @@ public class CategoryApp {
 
     private final CategoryService categoryService;
 
-    public CategoryDTO getCategoryById(Long id){
-        return categoryService.getCategoryById(id);
+    public CategoryDTO getCategoryById(Long id) {
+        return categoryService.getCategoryById(id).getData();
     }
 
-    public boolean existsById(Long id){
+    public boolean existsById(Long id) {
         return categoryService.existsById(id);
     }
 }

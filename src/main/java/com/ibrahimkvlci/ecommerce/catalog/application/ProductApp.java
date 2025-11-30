@@ -13,11 +13,15 @@ public class ProductApp {
 
     private final ProductService productService;
 
-    public ProductDTO getProductById(Long productId){
-        return productService.getProductById(productId).map(productService::mapToDTO).orElse(null);
+    public ProductDTO getProductById(Long productId) {
+        var result = productService.getProductById(productId);
+        if (result.isSuccess() && result.getData() != null) {
+            return productService.mapToDTO(result.getData());
+        }
+        return null;
     }
 
-    public boolean isProductAvailable(Long productId){
+    public boolean isProductAvailable(Long productId) {
         return productService.isProductAvailable(productId);
     }
 }

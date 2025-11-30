@@ -33,6 +33,8 @@ import com.ibrahimkvlci.ecommerce.order.repositories.CartRepository;
 import com.ibrahimkvlci.ecommerce.order.repositories.OrderRepository;
 import com.ibrahimkvlci.ecommerce.order.utils.RequestUtils;
 import com.ibrahimkvlci.ecommerce.order.utils.RequestUtils.ClientType;
+import com.ibrahimkvlci.ecommerce.order.utils.results.DataResult;
+import com.ibrahimkvlci.ecommerce.order.utils.results.SuccessDataResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -51,7 +53,7 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final CustomerClient customerClient;
 
     @Override
-    public SaleResponse checkoutPending(CheckoutRequestDTO request, String clientIp,
+    public DataResult<SaleResponse> checkoutPending(CheckoutRequestDTO request, String clientIp,
             RequestUtils.ClientType clientType) {
 
         SaleRequest saleRequest = saleRequest(request, clientIp, clientType);
@@ -64,11 +66,11 @@ public class CheckoutServiceImpl implements CheckoutService {
         } catch (InvalidKeyException ex) {
             throw new CheckoutException("Invalid Secret Key");
         }
-        return saleResponse;
+        return new SuccessDataResult<SaleResponse>(saleResponse);
     }
 
     @Override
-    public OrderDTO completeCheckout(Long orderId) {
+    public DataResult<OrderDTO> completeCheckout(Long orderId) {
         Order order = orderRepository.findById(Objects.requireNonNull(orderId))
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
         for (OrderItem orderItem : order.getOrderItems()) {
@@ -87,16 +89,20 @@ public class CheckoutServiceImpl implements CheckoutService {
         }
         order.setStatus(OrderStatus.CONFIRMED);
         orderRepository.save(order);
-        return orderService.getOrderById(order.getId())
-                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + order.getId()));
+        DataResult<OrderDTO> result = orderService.getOrderById(order.getId());
+        if (!result.isSuccess()) {
+            throw new OrderNotFoundException("Order not found with ID: " + order.getId());
+        }
+        return new SuccessDataResult<OrderDTO>(result.getData());
     }
 
     @Override
-    public SaleResponse checkoutPending3D(CheckoutRequestDTO request, String clientIp, ClientType clientType) {
+    public DataResult<SaleResponse> checkoutPending3D(CheckoutRequestDTO request, String clientIp,
+            ClientType clientType) {
 
         SaleRequest saleRequest = saleRequest(request, clientIp, clientType);
         SaleResponse saleResponse3D = paymentClient.sale3DPay(saleRequest);
-        return saleResponse3D;
+        return new SuccessDataResult<SaleResponse>(saleResponse3D);
     }
 
     private SaleRequest saleRequest(CheckoutRequestDTO request, String clientIp, ClientType clientType) {
@@ -161,17 +167,17 @@ public class CheckoutServiceImpl implements CheckoutService {
     }
 
     @Override
-    public SaleResponse okCheckout(SaleResponse response) {
+    public DataResult<SaleResponse> okCheckout(SaleResponse response) {
         Order order = orderRepository.findByOrderNumber(response.getOrder().getOrderId())
                 .orElseThrow(() -> new OrderNotFoundException(
                         "Order not found by this order number: " + response.getOrder().getOrderId()));
         order.setStatus(OrderStatus.CONFIRMED);
         orderRepository.save(order);
-        return response;
+        return new SuccessDataResult<SaleResponse>(response);
     }
 
     @Override
-    public SaleResponse failCheckout(SaleResponse response) {
+    public DataResult<SaleResponse> failCheckout(SaleResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'failCheckout'");
     }

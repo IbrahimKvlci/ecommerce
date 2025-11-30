@@ -26,23 +26,23 @@ public class AddressApp {
     }
 
     public AddressDetailResponseDTO createAddressDetail(AddressDetailRequestDTO addressDetailDTO) {
-        return addressDetailService.createAddressDetail(addressDetailDTO);
+        return addressDetailService.createAddressDetail(addressDetailDTO).getData();
     }
 
     public Optional<AddressDetailResponseDTO> getAddressDetailById(Long id) {
-        return addressDetailService.getAddressDetailById(id);
+        return Optional.of(addressDetailService.getAddressDetailById(id).getData());
     }
 
     public List<AddressDetailResponseDTO> getAddressDetailsOfCustomer() {
-        return addressDetailService.getAddressDetailsOfCustomer();
+        return addressDetailService.getAddressDetailsOfCustomer().getData();
     }
 
     public List<AddressDetailResponseDTO> getAllAddressDetails() {
-        return addressDetailService.getAllAddressDetails();
+        return addressDetailService.getAllAddressDetails().getData();
     }
 
     public AddressDetailResponseDTO updateAddressDetail(Long id, AddressDetailRequestDTO addressDetailDTO) {
-        return addressDetailService.updateAddressDetail(id, addressDetailDTO);
+        return addressDetailService.updateAddressDetail(id, addressDetailDTO).getData();
     }
 
     public void deleteAddressDetail(Long id) {

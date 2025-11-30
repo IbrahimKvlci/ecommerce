@@ -3,36 +3,38 @@ package com.ibrahimkvlci.ecommerce.catalog.services;
 import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.models.Inventory;
 
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
+
 import java.util.List;
 
 public interface InventoryService {
 
-    InventoryDTO createInventory(Inventory inventory);
-    InventoryDTO createInventory(InventoryDTO inventoryDTO);
+    DataResult<InventoryDTO> createInventory(Inventory inventory);
 
-    List<InventoryDTO> getAllInventories();
+    DataResult<InventoryDTO> createInventory(InventoryDTO inventoryDTO);
 
-    InventoryDTO getInventoryById(Long id);
+    DataResult<List<InventoryDTO>> getAllInventories();
 
-    List<InventoryDTO> getInventoriesByProductId(Long productId);
+    DataResult<InventoryDTO> getInventoryById(Long id);
 
-    InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId);
+    DataResult<List<InventoryDTO>> getInventoriesByProductId(Long productId);
 
-    InventoryDTO updateInventory(Long id, Inventory inventory);
+    DataResult<InventoryDTO> getInventoryByProductIdAndSellerId(Long productId, Long sellerId);
 
-    InventoryDTO updateInventory(Long id, int quantity, double price);
+    DataResult<InventoryDTO> updateInventory(Long id, Inventory inventory);
 
-    void deleteInventory(Long id);
-    
+    DataResult<InventoryDTO> updateInventory(Long id, int quantity, double price);
+
+    Result deleteInventory(Long id);
+
     /**
      * Convert DTO to entity
      */
     Inventory mapToEntity(InventoryDTO inventoryDTO);
-    
+
     /**
      * Create DTO from entity
      */
     InventoryDTO mapToDTO(Inventory inventory);
 }
-
-

@@ -4,6 +4,8 @@ import com.ibrahimkvlci.ecommerce.order.dto.AddCartItemRequest;
 import com.ibrahimkvlci.ecommerce.order.dto.CartItemDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.UpdateCartItemRequest;
 import com.ibrahimkvlci.ecommerce.order.services.CartItemService;
+import com.ibrahimkvlci.ecommerce.order.utils.results.DataResult;
+import com.ibrahimkvlci.ecommerce.order.utils.results.Result;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,132 +23,108 @@ import java.util.List;
 @RequestMapping("/api/orders/cart-items")
 @CrossOrigin(origins = "*")
 public class CartItemController {
-    
+
     private final CartItemService cartItemService;
-    
+
     @Autowired
     public CartItemController(CartItemService cartItemService) {
         this.cartItemService = cartItemService;
     }
-    
+
     /**
      * Add item to cart
      */
     @PostMapping
-    public ResponseEntity<CartItemDTO> addCartItem(@Valid @RequestBody AddCartItemRequest request) {
-        CartItemDTO cartItem = cartItemService.addCartItem(request);
-        return new ResponseEntity<>(cartItem, HttpStatus.CREATED);
+    public ResponseEntity<DataResult<CartItemDTO>> addCartItem(@Valid @RequestBody AddCartItemRequest request) {
+        return new ResponseEntity<>(cartItemService.addCartItem(request), HttpStatus.CREATED);
     }
-    
+
     /**
      * Get all cart items
      */
     @GetMapping
-    public ResponseEntity<List<CartItemDTO>> getAllCartItems() {
-        List<CartItemDTO> cartItems = cartItemService.getAllCartItems();
-        return ResponseEntity.ok(cartItems);
+    public ResponseEntity<DataResult<List<CartItemDTO>>> getAllCartItems() {
+        return ResponseEntity.ok(cartItemService.getAllCartItems());
     }
-    
+
     /**
      * Get cart item by ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CartItemDTO> getCartItemById(@PathVariable Long id) {
-        return cartItemService.getCartItemById(id)
-                .map(cartItem -> ResponseEntity.ok(cartItem))
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<DataResult<CartItemDTO>> getCartItemById(@PathVariable Long id) {
+        return ResponseEntity.ok(cartItemService.getCartItemById(id));
     }
-    
+
     /**
      * Get cart items by cart ID
      */
     @GetMapping("/cart/{cartId}")
-    public ResponseEntity<List<CartItemDTO>> getCartItemsByCartId(@PathVariable Long cartId) {
-        List<CartItemDTO> cartItems = cartItemService.getCartItemsByCartId(cartId);
-        return ResponseEntity.ok(cartItems);
+    public ResponseEntity<DataResult<List<CartItemDTO>>> getCartItemsByCartId(@PathVariable Long cartId) {
+        return ResponseEntity.ok(cartItemService.getCartItemsByCartId(cartId));
     }
-    
+
     /**
      * Get cart item by cart ID and product ID
      */
     @GetMapping("/cart/{cartId}/product/{productId}")
-    public ResponseEntity<CartItemDTO> getCartItemByCartIdAndProductId(
-            @PathVariable Long cartId, 
+    public ResponseEntity<DataResult<CartItemDTO>> getCartItemByCartIdAndProductId(
+            @PathVariable Long cartId,
             @PathVariable Long productId,
             @PathVariable Long sellerId) {
-        return cartItemService.getCartItemByCartIdAndProductIdAndSellerId(cartId, productId, sellerId)
-                .map(cartItem -> ResponseEntity.ok(cartItem))
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity
+                .ok(cartItemService.getCartItemByCartIdAndProductIdAndSellerId(cartId, productId, sellerId));
     }
-    
+
     /**
      * Update cart item
      */
     @PutMapping("/{id}")
-    public ResponseEntity<CartItemDTO> updateCartItem(@PathVariable Long id, 
-                                                     @Valid @RequestBody UpdateCartItemRequest request) {
-        try {
-            CartItemDTO cartItem = cartItemService.updateCartItem(id, request);
-            return ResponseEntity.ok(cartItem);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<DataResult<CartItemDTO>> updateCartItem(@PathVariable Long id,
+            @Valid @RequestBody UpdateCartItemRequest request) {
+        return ResponseEntity.ok(cartItemService.updateCartItem(id, request));
     }
-    
+
     /**
      * Delete cart item
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCartItem(@PathVariable Long id) {
-        try {
-            cartItemService.deleteCartItem(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Result> deleteCartItem(@PathVariable Long id) {
+        return ResponseEntity.ok(cartItemService.deleteCartItem(id));
     }
-    
+
     /**
      * Delete cart item by cart ID and product ID
      */
     @DeleteMapping("/cart/{cartId}/product/{productId}")
-    public ResponseEntity<Void> deleteCartItemByCartIdAndProductId(
-            @PathVariable Long cartId, 
+    public ResponseEntity<Result> deleteCartItemByCartIdAndProductId(
+            @PathVariable Long cartId,
             @PathVariable Long productId) {
-        try {
-            cartItemService.deleteCartItemByCartIdAndProductId(cartId, productId);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(cartItemService.deleteCartItemByCartIdAndProductId(cartId, productId));
     }
-    
+
     /**
      * Delete all cart items by cart ID
      */
     @DeleteMapping("/cart/{cartId}")
-    public ResponseEntity<Void> deleteCartItemsByCartId(@PathVariable Long cartId) {
-        cartItemService.deleteCartItemsByCartId(cartId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Result> deleteCartItemsByCartId(@PathVariable Long cartId) {
+        return ResponseEntity.ok(cartItemService.deleteCartItemsByCartId(cartId));
     }
 
     /**
      * Check if cart item exists for cart and product
      */
     @GetMapping("/cart/{cartId}/product/{productId}/exists")
-    public ResponseEntity<Boolean> cartItemExistsForCartAndProduct(
-            @PathVariable Long cartId, 
+    public ResponseEntity<DataResult<Boolean>> cartItemExistsForCartAndProduct(
+            @PathVariable Long cartId,
             @PathVariable Long productId) {
-        boolean exists = cartItemService.cartItemExistsForCartAndProduct(cartId, productId);
-        return ResponseEntity.ok(exists);
+        return ResponseEntity.ok(cartItemService.cartItemExistsForCartAndProduct(cartId, productId));
     }
-    
+
     /**
      * Get total quantity of items in cart
      */
     @GetMapping("/cart/{cartId}/total-quantity")
-    public ResponseEntity<Long> getTotalQuantityByCartId(@PathVariable Long cartId) {
-        Long totalQuantity = cartItemService.getTotalQuantityByCartId(cartId);
-        return ResponseEntity.ok(totalQuantity);
+    public ResponseEntity<DataResult<Long>> getTotalQuantityByCartId(@PathVariable Long cartId) {
+        return ResponseEntity.ok(cartItemService.getTotalQuantityByCartId(cartId));
     }
 }

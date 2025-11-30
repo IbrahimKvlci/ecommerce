@@ -3,6 +3,8 @@ package com.ibrahimkvlci.ecommerce.order.controllers;
 import com.ibrahimkvlci.ecommerce.order.dto.CartDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.CreateCartRequest;
 import com.ibrahimkvlci.ecommerce.order.services.CartService;
+import com.ibrahimkvlci.ecommerce.order.utils.results.DataResult;
+import com.ibrahimkvlci.ecommerce.order.utils.results.Result;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,96 +34,71 @@ public class CartController {
      * Create a new cart
      */
     @PostMapping
-    public ResponseEntity<CartDTO> createCart(@Valid @RequestBody CreateCartRequest request) {
-        CartDTO cart = cartService.createCart(request);
-        return new ResponseEntity<>(cart, HttpStatus.CREATED);
+    public ResponseEntity<DataResult<CartDTO>> createCart(@Valid @RequestBody CreateCartRequest request) {
+        return new ResponseEntity<>(cartService.createCart(request), HttpStatus.CREATED);
     }
 
     /**
      * Get all carts
      */
     @GetMapping
-    public ResponseEntity<List<CartDTO>> getAllCarts() {
-        List<CartDTO> carts = cartService.getAllCarts();
-        return ResponseEntity.ok(carts);
+    public ResponseEntity<DataResult<List<CartDTO>>> getAllCarts() {
+        return ResponseEntity.ok(cartService.getAllCarts());
     }
 
     /**
      * Get cart by ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CartDTO> getCartById(@PathVariable Long id) {
-        return cartService.getCartById(id)
-                .map(cart -> ResponseEntity.ok(cart))
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<DataResult<CartDTO>> getCartById(@PathVariable Long id) {
+        return ResponseEntity.ok(cartService.getCartById(id));
     }
 
     /**
      * Get cart by customer ID
      */
     @GetMapping("/customer/{customerId}")
-    public ResponseEntity<CartDTO> getCartByCustomerId(@PathVariable Long customerId) {
-        return cartService.getCartByCustomerId(customerId)
-                .map(cart -> ResponseEntity.ok(cart))
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<DataResult<CartDTO>> getCartByCustomerId(@PathVariable Long customerId) {
+        return ResponseEntity.ok(cartService.getCartByCustomerId(customerId));
     }
 
     /**
      * Get cart with items by ID
      */
     @GetMapping("/{id}/with-items")
-    public ResponseEntity<CartDTO> getCartWithItems(@PathVariable Long id) {
-        return cartService.getCartWithItems(id)
-                .map(cart -> ResponseEntity.ok(cart))
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<DataResult<CartDTO>> getCartWithItems(@PathVariable Long id) {
+        return ResponseEntity.ok(cartService.getCartWithItems(id));
     }
 
     /**
      * Get cart with items by customer ID
      */
     @GetMapping("/customer/{customerId}/with-items")
-    public ResponseEntity<CartDTO> getCartWithItemsByCustomerId(@PathVariable Long customerId) {
-        return cartService.getCartWithItemsByCustomerId(customerId)
-                .map(cart -> ResponseEntity.ok(cart))
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<DataResult<CartDTO>> getCartWithItemsByCustomerId(@PathVariable Long customerId) {
+        return ResponseEntity.ok(cartService.getCartWithItemsByCustomerId(customerId));
     }
 
     /**
      * Delete a cart
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCart(@PathVariable Long id) {
-        try {
-            cartService.deleteCart(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Result> deleteCart(@PathVariable Long id) {
+        return ResponseEntity.ok(cartService.deleteCart(id));
     }
 
     /**
      * Clear cart items
      */
     @DeleteMapping("/{id}/items")
-    public ResponseEntity<CartDTO> clearCart(@PathVariable Long id) {
-        try {
-            CartDTO cart = cartService.clearCart(id);
-            return ResponseEntity.ok(cart);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<DataResult<CartDTO>> clearCart(@PathVariable Long id) {
+        return ResponseEntity.ok(cartService.clearCart(id));
     }
 
     /**
      * Calculate cart total price
      */
     @GetMapping("/{id}/total")
-    public ResponseEntity<Double> calculateCartTotal(@PathVariable Long id) {
-        try {
-            Double total = cartService.calculateCartTotal(id);
-            return ResponseEntity.ok(total);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<DataResult<Double>> calculateCartTotal(@PathVariable Long id) {
+        return ResponseEntity.ok(cartService.calculateCartTotal(id));
     }
 }

@@ -5,6 +5,10 @@ import com.ibrahimkvlci.ecommerce.catalog.exceptions.BrandNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.BrandValidationException;
 import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.BrandRepository;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.SuccessDataResult;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.SuccessResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +27,7 @@ public class BrandServiceImpl implements BrandService {
     private final BrandRepository brandRepository;
 
     @Override
-    public BrandDTO createBrand(Brand brand) {
+    public DataResult<BrandDTO> createBrand(Brand brand) {
         log.info("Creating new brand: {}", brand.getName());
 
         if (brandRepository.existsByNameIgnoreCase(brand.getName())) {
@@ -31,33 +35,34 @@ public class BrandServiceImpl implements BrandService {
         }
 
         Brand saved = brandRepository.save(brand);
-        return this.mapToDTO(saved);
+        return new SuccessDataResult<>("Brand created successfully", this.mapToDTO(saved));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BrandDTO> getAllBrands() {
-        return brandRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
+    public DataResult<List<BrandDTO>> getAllBrands() {
+        return new SuccessDataResult<>("Brands listed successfully",
+                brandRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public BrandDTO getBrandById(Long id) {
+    public DataResult<BrandDTO> getBrandById(Long id) {
         Brand brand = brandRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new BrandNotFoundException("Brand not found with ID: " + id));
-        return this.mapToDTO(brand);
+        return new SuccessDataResult<>("Brand found successfully", this.mapToDTO(brand));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public BrandDTO getBrandByName(String name) {
+    public DataResult<BrandDTO> getBrandByName(String name) {
         Brand brand = brandRepository.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new BrandNotFoundException("Brand not found with name: " + name));
-        return this.mapToDTO(brand);
+        return new SuccessDataResult<>("Brand found successfully", this.mapToDTO(brand));
     }
 
     @Override
-    public BrandDTO updateBrand(Long id, Brand brand) {
+    public DataResult<BrandDTO> updateBrand(Long id, Brand brand) {
         Brand existing = brandRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new BrandNotFoundException("Brand not found with ID: " + id));
 
@@ -68,22 +73,24 @@ public class BrandServiceImpl implements BrandService {
 
         existing.setName(brand.getName());
         Brand updated = brandRepository.save(existing);
-        return this.mapToDTO(updated);
+        return new SuccessDataResult<>("Brand updated successfully", this.mapToDTO(updated));
     }
 
     @Override
-    public void deleteBrand(Long id) {
+    public Result deleteBrand(Long id) {
         if (!brandRepository.existsById(Objects.requireNonNull(id))) {
             throw new BrandNotFoundException("Brand not found with ID: " + id);
         }
         brandRepository.deleteById(Objects.requireNonNull(id));
+        return new SuccessResult("Brand deleted successfully");
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BrandDTO> searchBrandsByName(String name) {
-        return brandRepository.findByNameContainingIgnoreCase(name).stream().map(this::mapToDTO)
-                .collect(Collectors.toList());
+    public DataResult<List<BrandDTO>> searchBrandsByName(String name) {
+        return new SuccessDataResult<>("Brands found successfully",
+                brandRepository.findByNameContainingIgnoreCase(name).stream().map(this::mapToDTO)
+                        .collect(Collectors.toList()));
     }
 
     @Override

@@ -2,6 +2,8 @@ package com.ibrahimkvlci.ecommerce.catalog.controllers;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.BrandDTO;
 import com.ibrahimkvlci.ecommerce.catalog.services.BrandService;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,46 +23,41 @@ public class BrandController {
     private final BrandService brandService;
 
     @PostMapping
-    public ResponseEntity<BrandDTO> createBrand(@Valid @RequestBody BrandDTO brandDTO) {
+    public ResponseEntity<DataResult<BrandDTO>> createBrand(@Valid @RequestBody BrandDTO brandDTO) {
         log.info("Creating new brand: {}", brandDTO.getName());
-        BrandDTO created = brandService.createBrand(brandService.mapToEntity(brandDTO));
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(brandService.createBrand(brandService.mapToEntity(brandDTO)));
     }
 
     @GetMapping
-    public ResponseEntity<List<BrandDTO>> getAllBrands() {
-        List<BrandDTO> brands = brandService.getAllBrands();
-        return ResponseEntity.ok(brands);
+    public ResponseEntity<DataResult<List<BrandDTO>>> getAllBrands() {
+        return ResponseEntity.ok(brandService.getAllBrands());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BrandDTO> getBrandById(@PathVariable Long id) {
-        BrandDTO brand = brandService.getBrandById(id);
-        return ResponseEntity.ok(brand);
+    public ResponseEntity<DataResult<BrandDTO>> getBrandById(@PathVariable Long id) {
+        return ResponseEntity.ok(brandService.getBrandById(id));
     }
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<BrandDTO> getBrandByName(@PathVariable String name) {
-        BrandDTO brand = brandService.getBrandByName(name);
-        return ResponseEntity.ok(brand);
+    public ResponseEntity<DataResult<BrandDTO>> getBrandByName(@PathVariable String name) {
+        return ResponseEntity.ok(brandService.getBrandByName(name));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BrandDTO> updateBrand(@PathVariable Long id, @Valid @RequestBody BrandDTO brandDTO) {
-        BrandDTO updated = brandService.updateBrand(id, brandService.mapToEntity(brandDTO));
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<DataResult<BrandDTO>> updateBrand(@PathVariable Long id,
+            @Valid @RequestBody BrandDTO brandDTO) {
+        return ResponseEntity.ok(brandService.updateBrand(id, brandService.mapToEntity(brandDTO)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBrand(@PathVariable Long id) {
-        brandService.deleteBrand(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Result> deleteBrand(@PathVariable Long id) {
+        return ResponseEntity.ok(brandService.deleteBrand(id));
     }
 
     @GetMapping("/search/name")
-    public ResponseEntity<List<BrandDTO>> searchBrandsByName(@RequestParam String name) {
-        List<BrandDTO> brands = brandService.searchBrandsByName(name);
-        return ResponseEntity.ok(brands);
+    public ResponseEntity<DataResult<List<BrandDTO>>> searchBrandsByName(@RequestParam String name) {
+        return ResponseEntity.ok(brandService.searchBrandsByName(name));
     }
 
     @GetMapping("/exists")
@@ -69,5 +66,3 @@ public class BrandController {
         return ResponseEntity.ok(exists);
     }
 }
-
-

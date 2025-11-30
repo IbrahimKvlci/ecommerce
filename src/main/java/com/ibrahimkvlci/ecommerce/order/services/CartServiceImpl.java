@@ -6,6 +6,10 @@ import com.ibrahimkvlci.ecommerce.order.dto.CreateCartRequest;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CartNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.models.Cart;
 import com.ibrahimkvlci.ecommerce.order.repositories.CartRepository;
+import com.ibrahimkvlci.ecommerce.order.utils.results.DataResult;
+import com.ibrahimkvlci.ecommerce.order.utils.results.Result;
+import com.ibrahimkvlci.ecommerce.order.utils.results.SuccessDataResult;
+import com.ibrahimkvlci.ecommerce.order.utils.results.SuccessResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
@@ -28,7 +31,7 @@ public class CartServiceImpl implements CartService {
     private final CartItemService cartItemService;
 
     @Override
-    public CartDTO createCart(CreateCartRequest request) {
+    public DataResult<CartDTO> createCart(CreateCartRequest request) {
         // Check if cart already exists for customer
         if (cartRepository.existsByCustomerId(request.getCustomerId())) {
             throw new RuntimeException("Cart already exists for customer: " + request.getCustomerId());
@@ -38,75 +41,80 @@ public class CartServiceImpl implements CartService {
         cart.setCustomerId(request.getCustomerId());
 
         Cart savedCart = cartRepository.save(cart);
-        return mapToDTO(savedCart);
+        return new SuccessDataResult<CartDTO>(mapToDTO(savedCart));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CartDTO> getAllCarts() {
-        return cartRepository.findAll().stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+    public DataResult<List<CartDTO>> getAllCarts() {
+        return new SuccessDataResult<List<CartDTO>>(cartRepository.findAll().stream()
+                .map(cart -> mapToDTO(cart))
+                .collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CartDTO> getCartById(Long id) {
-        return cartRepository.findById(Objects.requireNonNull(id))
-                .map(this::mapToDTO);
+    public DataResult<CartDTO> getCartById(Long id) {
+        return new SuccessDataResult<CartDTO>(cartRepository.findById(Objects.requireNonNull(id))
+                .map(cart -> mapToDTO(cart))
+                .orElseThrow(() -> new CartNotFoundException("Cart not found with id: " + id)));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CartDTO> getCartByCustomerId(Long customerId) {
-        return cartRepository.findByCustomerId(customerId)
-                .map(this::mapToDTO);
+    public DataResult<CartDTO> getCartByCustomerId(Long customerId) {
+        return new SuccessDataResult<CartDTO>(cartRepository.findByCustomerId(customerId)
+                .map(cart -> mapToDTO(cart))
+                .orElseThrow(() -> new CartNotFoundException("Cart not found with customerId: " + customerId)));
     }
 
     @Override
-    public void deleteCart(Long id) {
+    public Result deleteCart(Long id) {
         if (!cartRepository.existsById(Objects.requireNonNull(id))) {
             throw new CartNotFoundException("Cart not found with id: " + id);
         }
         cartRepository.deleteById(Objects.requireNonNull(id));
+        return new SuccessResult("Cart deleted successfully");
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Double calculateCartTotal(Long cartId) {
+    public DataResult<Double> calculateCartTotal(Long cartId) {
         Cart cart = cartRepository.findById(Objects.requireNonNull(cartId))
                 .orElseThrow(() -> new CartNotFoundException("Cart not found with id: " + cartId));
 
-        return cart.getCartItems().stream()
+        return new SuccessDataResult<Double>(cart.getCartItems().stream()
                 .mapToDouble(item -> inventoryClient
                         .getInventoryByProductIdAndSellerId(item.getProductId(), item.getSellerId()).getPrice()
                         * item.getQuantity())
-                .sum();
+                .sum());
     }
 
     @Override
-    public CartDTO clearCart(Long cartId) {
+    public DataResult<CartDTO> clearCart(Long cartId) {
         Cart cart = cartRepository.findById(Objects.requireNonNull(cartId))
                 .orElseThrow(() -> new CartNotFoundException("Cart not found with id: " + cartId));
 
         cart.getCartItems().clear();
 
         Cart savedCart = cartRepository.save(cart);
-        return mapToDTO(savedCart);
+        return new SuccessDataResult<CartDTO>(mapToDTO(savedCart));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CartDTO> getCartWithItems(Long cartId) {
-        return cartRepository.findById(Objects.requireNonNull(cartId))
-                .map(this::mapToDTO);
+    public DataResult<CartDTO> getCartWithItems(Long cartId) {
+        return new SuccessDataResult<CartDTO>(cartRepository.findById(Objects.requireNonNull(cartId))
+                .map(cart -> mapToDTO(cart))
+                .orElseThrow(() -> new CartNotFoundException("Cart not found with id: " + cartId)));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CartDTO> getCartWithItemsByCustomerId(Long customerId) {
-        return cartRepository.findByCustomerId(customerId)
-                .map(this::mapToDTO);
+    public DataResult<CartDTO> getCartWithItemsByCustomerId(Long customerId) {
+        return new SuccessDataResult<CartDTO>(cartRepository.findByCustomerId(customerId)
+                .map(cart -> mapToDTO(cart))
+                .orElseThrow(() -> new CartNotFoundException("Cart not found with customerId: " + customerId)));
     }
 
     @Override

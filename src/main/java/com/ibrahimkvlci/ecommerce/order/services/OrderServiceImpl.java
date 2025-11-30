@@ -12,6 +12,7 @@ import com.ibrahimkvlci.ecommerce.order.models.Order;
 import com.ibrahimkvlci.ecommerce.order.models.OrderItem;
 import com.ibrahimkvlci.ecommerce.order.models.OrderStatus;
 import com.ibrahimkvlci.ecommerce.order.repositories.OrderRepository;
+import com.ibrahimkvlci.ecommerce.order.utils.results.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,10 +39,10 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemService orderItemService;
 
     @Override
-    public OrderDTO createOrder(CreateOrderRequest request) {
+    public DataResult<OrderDTO> createOrder(CreateOrderRequest request) {
 
         // Calculate total amount
-        Double totalAmount = calculateOrderTotal(request.getOrderItems());
+        Double totalAmount = calculateOrderTotal(request.getOrderItems()).getData();
 
         // Create order
         Order order = new Order();
@@ -79,37 +80,39 @@ public class OrderServiceImpl implements OrderService {
         orderItemRepository.saveAll(Objects.requireNonNull(orderItems));
         savedOrder.setOrderItems(orderItems);
 
-        return mapToDTO(savedOrder);
+        return new SuccessDataResult<>("Order created successfully", mapToDTO(savedOrder));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderDTO> getAllOrders() {
-        return orderRepository.findAll().stream()
-                .map(order -> mapToDTO(order))
-                .collect(Collectors.toList());
+    public DataResult<List<OrderDTO>> getAllOrders() {
+        return new SuccessDataResult<>("Orders listed successfully", orderRepository.findAll().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<OrderDTO> getOrderById(Long id) {
+    public DataResult<OrderDTO> getOrderById(Long id) {
         return orderRepository.findById(Objects.requireNonNull(id))
-                .map(order -> mapToDTO(order));
+                .map(order -> (DataResult<OrderDTO>) new SuccessDataResult<>("Order found", mapToDTO(order)))
+                .orElse(new ErrorDataResult<>("Order not found", null));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<OrderDTO> getOrderByOrderNumber(String orderNumber) {
+    public DataResult<OrderDTO> getOrderByOrderNumber(String orderNumber) {
         return orderRepository.findByOrderNumber(orderNumber)
-                .map(order -> mapToDTO(order));
+                .map(order -> (DataResult<OrderDTO>) new SuccessDataResult<>("Order found", mapToDTO(order)))
+                .orElse(new ErrorDataResult<>("Order not found", null));
     }
 
     @Override
-    public OrderDTO updateOrder(Long id, UpdateOrderRequest request) {
+    public DataResult<OrderDTO> updateOrder(Long id, UpdateOrderRequest request) {
         Order order = orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new OrderNotFoundException(id));
 
-        if (!canUpdateOrder(id)) {
+        if (!canUpdateOrder(id).getData()) {
             throw new OrderStatusException(order.getStatus(), "update");
         }
 
@@ -121,15 +124,15 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order updatedOrder = orderRepository.save(Objects.requireNonNull(order));
-        return mapToDTO(updatedOrder);
+        return new SuccessDataResult<>("Order updated successfully", mapToDTO(updatedOrder));
     }
 
     @Override
-    public void deleteOrder(Long id) {
+    public Result deleteOrder(Long id) {
         Order order = orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new OrderNotFoundException(id));
 
-        if (!canUpdateOrder(id)) {
+        if (!canUpdateOrder(id).getData()) {
             throw new OrderStatusException(order.getStatus(), "delete");
         }
 
@@ -137,26 +140,28 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItems = orderItemRepository.findByOrderId(id);
         orderItemRepository.deleteAll(Objects.requireNonNull(orderItems));
         orderRepository.deleteById(Objects.requireNonNull(id));
+        return new SuccessResult("Order deleted successfully");
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderDTO> getOrdersByCustomerId(Long customerId) {
-        return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId).stream()
-                .map(order -> mapToDTO(order))
-                .collect(Collectors.toList());
+    public DataResult<List<OrderDTO>> getOrdersByCustomerId(Long customerId) {
+        return new SuccessDataResult<>("Orders listed successfully",
+                orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId).stream()
+                        .map(this::mapToDTO)
+                        .collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderDTO> getOrdersByStatus(OrderStatus status) {
-        return orderRepository.findByStatus(status).stream()
-                .map(order -> mapToDTO(order))
-                .collect(Collectors.toList());
+    public DataResult<List<OrderDTO>> getOrdersByStatus(OrderStatus status) {
+        return new SuccessDataResult<>("Orders listed successfully", orderRepository.findByStatus(status).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList()));
     }
 
     @Override
-    public OrderDTO updateOrderStatus(Long id, OrderStatus status) {
+    public DataResult<OrderDTO> updateOrderStatus(Long id, OrderStatus status) {
         Order order = orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new OrderNotFoundException(id));
 
@@ -169,70 +174,72 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(status);
         Order updatedOrder = orderRepository.save(order);
-        return mapToDTO(updatedOrder);
+        return new SuccessDataResult<>("Order status updated successfully", mapToDTO(updatedOrder));
     }
 
     @Override
-    public OrderDTO cancelOrder(Long id) {
+    public DataResult<OrderDTO> cancelOrder(Long id) {
         Order order = orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new OrderNotFoundException(id));
 
-        if (!canCancelOrder(id)) {
+        if (!canCancelOrder(id).getData()) {
             throw new OrderStatusException(order.getStatus(), "cancel");
         }
 
         order.setStatus(OrderStatus.CANCELLED);
         Order updatedOrder = orderRepository.save(order);
-        return mapToDTO(updatedOrder);
+        return new SuccessDataResult<>("Order cancelled successfully", mapToDTO(updatedOrder));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderDTO> getOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-        return orderRepository.findByCreatedAtBetween(startDate, endDate).stream()
-                .map(order -> mapToDTO(order))
-                .collect(Collectors.toList());
+    public DataResult<List<OrderDTO>> getOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        return new SuccessDataResult<>("Orders listed successfully",
+                orderRepository.findByCreatedAtBetween(startDate, endDate).stream()
+                        .map(this::mapToDTO)
+                        .collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderDTO> getOrdersByAmountRange(Double minAmount, Double maxAmount) {
-        return orderRepository.findByTotalAmountBetween(minAmount, maxAmount).stream()
-                .map(order -> mapToDTO(order))
-                .collect(Collectors.toList());
+    public DataResult<List<OrderDTO>> getOrdersByAmountRange(Double minAmount, Double maxAmount) {
+        return new SuccessDataResult<>("Orders listed successfully",
+                orderRepository.findByTotalAmountBetween(minAmount, maxAmount).stream()
+                        .map(this::mapToDTO)
+                        .collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<OrderDTO> getCustomerOrderHistory(Long customerId) {
+    public DataResult<List<OrderDTO>> getCustomerOrderHistory(Long customerId) {
         return getOrdersByCustomerId(customerId);
     }
 
     @Override
-    public Double calculateOrderTotal(List<CreateOrderRequest.CreateOrderItemRequest> orderItems) {
-        return orderItems.stream()
+    public DataResult<Double> calculateOrderTotal(List<CreateOrderRequest.CreateOrderItemRequest> orderItems) {
+        return new SuccessDataResult<>("Total calculated successfully", orderItems.stream()
                 .mapToDouble(item -> item.getQuantity() * item.getUnitPrice())
-                .sum();
+                .sum());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canCancelOrder(Long id) {
+    public DataResult<Boolean> canCancelOrder(Long id) {
         Order order = orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new OrderNotFoundException(id));
 
-        return order.getStatus() == OrderStatus.PENDING ||
-                order.getStatus() == OrderStatus.CONFIRMED;
+        return new SuccessDataResult<>("Check successful", order.getStatus() == OrderStatus.PENDING ||
+                order.getStatus() == OrderStatus.CONFIRMED);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canUpdateOrder(Long id) {
+    public DataResult<Boolean> canUpdateOrder(Long id) {
         Order order = orderRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new OrderNotFoundException(id));
 
-        return order.getStatus() == OrderStatus.PENDING ||
-                order.getStatus() == OrderStatus.CONFIRMED;
+        return new SuccessDataResult<>("Check successful", order.getStatus() == OrderStatus.PENDING ||
+                order.getStatus() == OrderStatus.CONFIRMED);
     }
 
     private boolean isValidStatusTransition(OrderStatus current, OrderStatus target) {

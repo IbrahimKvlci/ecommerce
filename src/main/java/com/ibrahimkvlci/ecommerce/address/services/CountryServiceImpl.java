@@ -4,12 +4,16 @@ import com.ibrahimkvlci.ecommerce.address.dto.CountryRequestDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.CountryResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.models.Country;
 import com.ibrahimkvlci.ecommerce.address.repositories.CountryRepository;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.Result;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.SuccessDataResult;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.SuccessResult;
+import com.ibrahimkvlci.ecommerce.address.exceptions.CountryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
@@ -28,56 +32,64 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public CountryResponseDTO createCountry(CountryRequestDTO countryRequestDTO) {
+    public DataResult<CountryResponseDTO> createCountry(CountryRequestDTO countryRequestDTO) {
         Country country = mapToEntity(countryRequestDTO);
-        return mapToDTO(countryRepository.save(Objects.requireNonNull(country)));
+        return new SuccessDataResult<>("Country created successfully",
+                mapToDTO(countryRepository.save(Objects.requireNonNull(country))));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CountryResponseDTO> getCountryById(Long id) {
-        return countryRepository.findById(Objects.requireNonNull(id)).map(this::mapToDTO);
+    public DataResult<CountryResponseDTO> getCountryById(Long id) {
+        return new SuccessDataResult<>(countryRepository.findById(Objects.requireNonNull(id))
+                .map(this::mapToDTO).orElse(null));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CountryResponseDTO> getCountryByName(String name) {
-        return countryRepository.findByNameIgnoreCase(name).map(this::mapToDTO);
+    public DataResult<CountryResponseDTO> getCountryByName(String name) {
+        return new SuccessDataResult<>(
+                countryRepository.findByNameIgnoreCase(name).map(this::mapToDTO).orElse(null));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CountryResponseDTO> getCountryByCode(String code) {
-        return countryRepository.findByCodeIgnoreCase(code).map(this::mapToDTO);
+    public DataResult<CountryResponseDTO> getCountryByCode(String code) {
+        return new SuccessDataResult<>(
+                countryRepository.findByCodeIgnoreCase(code).map(this::mapToDTO).orElse(null));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CountryResponseDTO> getAllCountries() {
-        return countryRepository.findAllOrderedByName().stream().map(this::mapToDTO).collect(Collectors.toList());
+    public DataResult<List<CountryResponseDTO>> getAllCountries() {
+        return new SuccessDataResult<>(countryRepository.findAllOrderedByName().stream()
+                .map(this::mapToDTO).collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CountryResponseDTO> searchCountriesByName(String name) {
-        return countryRepository.findByNameContainingIgnoreCase(name).stream().map(this::mapToDTO)
-                .collect(Collectors.toList());
+    public DataResult<List<CountryResponseDTO>> searchCountriesByName(String name) {
+        return new SuccessDataResult<>(countryRepository.findByNameContainingIgnoreCase(name).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList()));
     }
 
     @Override
-    public CountryResponseDTO updateCountry(Long id, CountryRequestDTO countryRequestDTO) {
+    public DataResult<CountryResponseDTO> updateCountry(Long id, CountryRequestDTO countryRequestDTO) {
         Country country = countryRepository.findById(Objects.requireNonNull(id))
-                .orElseThrow(() -> new RuntimeException("Country not found with id: " + id));
+                .orElseThrow(() -> new CountryNotFoundException(id));
 
         country.setName(countryRequestDTO.getName());
         country.setCode(countryRequestDTO.getCode());
 
-        return mapToDTO(countryRepository.save(country));
+        return new SuccessDataResult<>("Country updated successfully",
+                mapToDTO(countryRepository.save(country)));
     }
 
     @Override
-    public void deleteCountry(Long id) {
+    public Result deleteCountry(Long id) {
         countryRepository.deleteById(Objects.requireNonNull(id));
+        return new SuccessResult("Country deleted successfully");
     }
 
     @Override

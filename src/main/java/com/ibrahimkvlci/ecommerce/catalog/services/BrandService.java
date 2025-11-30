@@ -2,36 +2,36 @@ package com.ibrahimkvlci.ecommerce.catalog.services;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.BrandDTO;
 import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 
 import java.util.List;
 
 public interface BrandService {
 
-    BrandDTO createBrand(Brand brand);
+    DataResult<BrandDTO> createBrand(Brand brand);
 
-    List<BrandDTO> getAllBrands();
+    DataResult<List<BrandDTO>> getAllBrands();
 
-    BrandDTO getBrandById(Long id);
+    DataResult<BrandDTO> getBrandById(Long id);
 
-    BrandDTO getBrandByName(String name);
+    DataResult<BrandDTO> getBrandByName(String name);
 
-    BrandDTO updateBrand(Long id, Brand brand);
+    DataResult<BrandDTO> updateBrand(Long id, Brand brand);
 
-    void deleteBrand(Long id);
+    Result deleteBrand(Long id);
 
-    List<BrandDTO> searchBrandsByName(String name);
+    DataResult<List<BrandDTO>> searchBrandsByName(String name);
 
     boolean existsByName(String name);
-    
+
     /**
      * Convert DTO to entity
      */
     Brand mapToEntity(BrandDTO brandDTO);
-    
+
     /**
      * Create DTO from entity
      */
     BrandDTO mapToDTO(Brand brand);
 }
-
-

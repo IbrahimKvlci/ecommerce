@@ -9,6 +9,10 @@ import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.mappers.ProductMapper;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.SuccessDataResult;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.SuccessResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +35,8 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public Product createProduct(Product product) {
+
+    public DataResult<Product> createProduct(Product product) {
         // Validate product data
         if (product.getTitle() == null || product.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Product title cannot be null or empty");
@@ -48,27 +53,33 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Category with ID " + product.getCategory().getId() + " not found");
         }
 
-        return productRepository.save(product);
+        return new SuccessDataResult<>("Product created successfully", productRepository.save(product));
 
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductDTO> getAllProducts() {
-        return productRepository.findAll().stream().map(productMapper::toDTO).collect(Collectors.toList());
+    public DataResult<List<ProductDTO>> getAllProducts() {
+        return new SuccessDataResult<>("Products listed successfully",
+                productRepository.findAll().stream().map(productMapper::toDTO).collect(Collectors.toList()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Product> getProductById(Long id) {
+    public DataResult<Product> getProductById(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Product ID must be a positive number");
         }
-        return productRepository.findById(id);
+        Product product = productRepository.findById(id).orElse(null);
+        if (product == null) {
+            return new com.ibrahimkvlci.ecommerce.catalog.utilities.results.ErrorDataResult<>("Product not found",
+                    null);
+        }
+        return new SuccessDataResult<>("Product found successfully", product);
     }
 
     @Override
-    public Product updateProduct(Long id, Product product) {
+    public DataResult<Product> updateProduct(Long id, Product product) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Product ID must be a positive number");
         }
@@ -98,11 +109,11 @@ public class ProductServiceImpl implements ProductService {
         existing.setTitle(product.getTitle());
         existing.setDescription(product.getDescription());
 
-        return productRepository.save(existing);
+        return new SuccessDataResult<>("Product updated successfully", productRepository.save(existing));
     }
 
     @Override
-    public void deleteProduct(Long id) {
+    public Result deleteProduct(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Product ID must be a positive number");
         }
@@ -112,24 +123,27 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productRepository.deleteById(id);
+        return new SuccessResult("Product deleted successfully");
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Product> searchProductsByTitle(String title) {
+    public DataResult<List<Product>> searchProductsByTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Search title cannot be null or empty");
         }
-        return productRepository.findByTitleContainingIgnoreCase(title.trim());
+        return new SuccessDataResult<>("Products found successfully",
+                productRepository.findByTitleContainingIgnoreCase(title.trim()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Product> searchProductsByDescription(String keyword) {
+    public DataResult<List<Product>> searchProductsByDescription(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             throw new IllegalArgumentException("Search keyword cannot be null or empty");
         }
-        return productRepository.findByDescriptionContaining(keyword.trim());
+        return new SuccessDataResult<>("Products found successfully",
+                productRepository.findByDescriptionContaining(keyword.trim()));
     }
 
     @Override
@@ -143,38 +157,38 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Product> getProductsByCategory(Category category) {
+    public DataResult<List<Product>> getProductsByCategory(Category category) {
         if (category == null) {
             throw new IllegalArgumentException("Category cannot be null");
         }
-        return productRepository.findByCategory(category);
+        return new SuccessDataResult<>("Products found successfully", productRepository.findByCategory(category));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Product> getProductsByCategoryId(Long categoryId) {
+    public DataResult<List<Product>> getProductsByCategoryId(Long categoryId) {
         if (categoryId == null || categoryId <= 0) {
             throw new IllegalArgumentException("Category ID must be a positive number");
         }
-        return productRepository.findByCategoryId(categoryId);
+        return new SuccessDataResult<>("Products found successfully", productRepository.findByCategoryId(categoryId));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Product> getProductsByBrand(Brand brand) {
+    public DataResult<List<Product>> getProductsByBrand(Brand brand) {
         if (brand == null) {
             throw new IllegalArgumentException("Brand cannot be null");
         }
-        return productRepository.findByBrand(brand);
+        return new SuccessDataResult<>("Products found successfully", productRepository.findByBrand(brand));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Product> getProductsByBrandId(Long brandId) {
+    public DataResult<List<Product>> getProductsByBrandId(Long brandId) {
         if (brandId == null || brandId <= 0) {
             throw new IllegalArgumentException("Brand ID must be a positive number");
         }
-        return productRepository.findByBrandId(brandId);
+        return new SuccessDataResult<>("Products found successfully", productRepository.findByBrandId(brandId));
     }
 
     @Override
@@ -197,21 +211,22 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDTO> getProductsByCategoryIdAndFeaturedTrue(Long categoryId) {
+    public DataResult<List<ProductDTO>> getProductsByCategoryIdAndFeaturedTrue(Long categoryId) {
         if (categoryId == null || categoryId <= 0) {
             throw new IllegalArgumentException("Category ID must be a positive number");
         }
         List<Product> featuredProducts = productRepository.findByCategoryIdAndFeaturedTrue(categoryId);
-        return featuredProducts.stream()
+        return new SuccessDataResult<>("Featured products found successfully", featuredProducts.stream()
                 .map(productMapper::toDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     @Override
-    public List<ProductDisplayDTO> getDisplayProductsByCategoryId(Long categoryId) {
+    public DataResult<List<ProductDisplayDTO>> getDisplayProductsByCategoryId(Long categoryId) {
         if (categoryId == null || categoryId <= 0) {
             throw new IllegalArgumentException("Category ID must be a positive number");
         }
-        return productRepository.findByCategoryIdAndFeaturedTrueWithLowestPriceInventory(categoryId);
+        return new SuccessDataResult<>("Display products found successfully",
+                productRepository.findByCategoryIdAndFeaturedTrueWithLowestPriceInventory(categoryId));
     }
 }

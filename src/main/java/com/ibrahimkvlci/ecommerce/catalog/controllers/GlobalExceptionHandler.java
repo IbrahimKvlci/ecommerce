@@ -2,12 +2,19 @@ package com.ibrahimkvlci.ecommerce.catalog.controllers;
 
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.ProductNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.ProductValidationException;
+import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
+import com.ibrahimkvlci.ecommerce.catalog.models.Inventory;
+import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.CategoryNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.CategoryValidationException;
+import com.ibrahimkvlci.ecommerce.address.utilities.results.ErrorDataResult;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.BrandNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.BrandValidationException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.InventoryNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.InventoryValidationException;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.ErrorResult;
+
+import java.util.Locale.Category;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +22,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Global exception handler for catalog controllers.
@@ -28,258 +30,75 @@ import java.util.Map;
 @ControllerAdvice(basePackages = "com.ibrahimkvlci.ecommerce.catalog")
 public class GlobalExceptionHandler {
 
-    /**
-     * Handle ProductNotFoundException
-     */
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleProductNotFoundException(
-            ProductNotFoundException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                "Product Not Found",
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-    }
-
-    /**
-     * Handle ProductValidationException
-     */
-    @ExceptionHandler(ProductValidationException.class)
-    public ResponseEntity<ErrorResponse> handleProductValidationException(
-            ProductValidationException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Error",
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-
-
-    /**
-     * Handle CategoryNotFoundException
-     */
-    @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleCategoryNotFoundException(
-            CategoryNotFoundException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                "Category Not Found",
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-    }
-
-    /**
-     * Handle CategoryValidationException
-     */
-    @ExceptionHandler(CategoryValidationException.class)
-    public ResponseEntity<ErrorResponse> handleCategoryValidationException(
-            CategoryValidationException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Error",
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * Handle BrandNotFoundException
-     */
-    @ExceptionHandler(BrandNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleBrandNotFoundException(
-            BrandNotFoundException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                "Brand Not Found",
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-    }
-
-    /**
-     * Handle BrandValidationException
-     */
-    @ExceptionHandler(BrandValidationException.class)
-    public ResponseEntity<ErrorResponse> handleBrandValidationException(
-            BrandValidationException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Error",
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * Handle InventoryNotFoundException
-     */
-    @ExceptionHandler(InventoryNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleInventoryNotFoundException(
-            InventoryNotFoundException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                "Inventory Not Found",
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-    }
-
-    /**
-     * Handle InventoryValidationException
-     */
-    @ExceptionHandler(InventoryValidationException.class)
-    public ResponseEntity<ErrorResponse> handleInventoryValidationException(
-            InventoryValidationException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Error",
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * Handle IllegalArgumentException
-     */
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
-            IllegalArgumentException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Invalid Argument",
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * Handle validation errors from @Valid annotations
-     */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(
-            MethodArgumentNotValidException ex, WebRequest request) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-
-        ValidationErrorResponse errorResponse = new ValidationErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Failed",
-                "One or more fields have validation errors",
-                request.getDescription(false),
-                errors
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * Handle generic RuntimeException
-     */
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleRuntimeException(
-            RuntimeException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                "An unexpected error occurred",
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-
-    /**
-     * Handle generic Exception
-     */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(
-            Exception ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                "An unexpected error occurred",
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    /**
-     * Error response model for general errors
-     */
-    public static class ErrorResponse {
-        private LocalDateTime timestamp;
-        private int status;
-        private String error;
-        private String message;
-        private String path;
-
-        public ErrorResponse(LocalDateTime timestamp, int status, String error, 
-                           String message, String path) {
-            this.timestamp = timestamp;
-            this.status = status;
-            this.error = error;
-            this.message = message;
-            this.path = path;
+        @ExceptionHandler(ProductNotFoundException.class)
+        public ResponseEntity<ErrorDataResult<Product>> handleProductNotFoundException(ProductNotFoundException ex) {
+                return new ResponseEntity<>(new ErrorDataResult<Product>(ex.getMessage(), null), HttpStatus.NOT_FOUND);
         }
 
-        // Getters and setters
-        public LocalDateTime getTimestamp() { return timestamp; }
-        public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
-        
-        public int getStatus() { return status; }
-        public void setStatus(int status) { this.status = status; }
-        
-        public String getError() { return error; }
-        public void setError(String error) { this.error = error; }
-        
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
-        
-        public String getPath() { return path; }
-        public void setPath(String path) { this.path = path; }
-    }
-
-    /**
-     * Error response model for validation errors
-     */
-    public static class ValidationErrorResponse extends ErrorResponse {
-        private Map<String, String> fieldErrors;
-
-        public ValidationErrorResponse(LocalDateTime timestamp, int status, String error,
-                                    String message, String path, Map<String, String> fieldErrors) {
-            super(timestamp, status, error, message, path);
-            this.fieldErrors = fieldErrors;
+        @ExceptionHandler(ProductValidationException.class)
+        public ResponseEntity<ErrorResult> handleProductValidationException(ProductValidationException ex) {
+                return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
-        public Map<String, String> getFieldErrors() { return fieldErrors; }
-        public void setFieldErrors(Map<String, String> fieldErrors) { this.fieldErrors = fieldErrors; }
-    }
+        @ExceptionHandler(CategoryNotFoundException.class)
+        public ResponseEntity<ErrorDataResult<Category>> handleCategoryNotFoundException(CategoryNotFoundException ex) {
+                return new ResponseEntity<>(new ErrorDataResult<Category>(ex.getMessage(), null), HttpStatus.NOT_FOUND);
+        }
+
+        @ExceptionHandler(CategoryValidationException.class)
+        public ResponseEntity<ErrorResult> handleCategoryValidationException(CategoryValidationException ex) {
+                return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        @ExceptionHandler(BrandNotFoundException.class)
+        public ResponseEntity<ErrorDataResult<Brand>> handleBrandNotFoundException(BrandNotFoundException ex) {
+                return new ResponseEntity<>(new ErrorDataResult<Brand>(ex.getMessage() + "test", null),
+                                HttpStatus.NOT_FOUND);
+        }
+
+        @ExceptionHandler(BrandValidationException.class)
+        public ResponseEntity<ErrorResult> handleBrandValidationException(BrandValidationException ex) {
+                return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        @ExceptionHandler(InventoryNotFoundException.class)
+        public ResponseEntity<ErrorDataResult<Inventory>> handleInventoryNotFoundException(
+                        InventoryNotFoundException ex) {
+                return new ResponseEntity<>(new ErrorDataResult<Inventory>(ex.getMessage(), null),
+                                HttpStatus.NOT_FOUND);
+        }
+
+        @ExceptionHandler(InventoryValidationException.class)
+        public ResponseEntity<ErrorResult> handleInventoryValidationException(InventoryValidationException ex) {
+                return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        @ExceptionHandler(IllegalArgumentException.class)
+        public ResponseEntity<ErrorResult> handleIllegalArgumentException(IllegalArgumentException ex) {
+                return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<ErrorResult> handleValidationExceptions(MethodArgumentNotValidException ex) {
+                StringBuilder errors = new StringBuilder();
+                ex.getBindingResult().getAllErrors().forEach((error) -> {
+                        String fieldName = ((FieldError) error).getField();
+                        String errorMessage = error.getDefaultMessage();
+                        errors.append(fieldName).append(": ").append(errorMessage).append("; ");
+                });
+                return new ResponseEntity<>(new ErrorResult(errors.toString()), HttpStatus.BAD_REQUEST);
+        }
+
+        @ExceptionHandler(RuntimeException.class)
+        public ResponseEntity<ErrorResult> handleRuntimeException(RuntimeException ex) {
+                return new ResponseEntity<>(new ErrorResult("An unexpected error occurred: " + ex.getMessage()),
+                                HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ErrorResult> handleGenericException(Exception ex) {
+                return new ResponseEntity<>(new ErrorResult("An unexpected error occurred: " + ex.getMessage()),
+                                HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
 }
