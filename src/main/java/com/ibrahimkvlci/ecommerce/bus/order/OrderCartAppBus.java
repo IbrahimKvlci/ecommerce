@@ -20,7 +20,7 @@ public class OrderCartAppBus {
         return cartApp.createCart(request);
     }
 
-    public CartDTO getCartByCustomerId(Long id){
-        return cartApp.getCartByCustomerId(id);
+    public CartDTO getCartOfCustomer() {
+        return cartApp.getCartOfCustomer();
     }
 }

@@ -1,8 +1,9 @@
 package com.ibrahimkvlci.ecommerce.auth.services;
 
 import com.ibrahimkvlci.ecommerce.auth.exceptions.AuthException;
+import com.ibrahimkvlci.ecommerce.auth.utilities.results.DataResult;
 
 public interface UserInfoService {
 
-    Long getUserIdFromJWT() throws AuthException;
+    DataResult<Long> getUserIdFromJWT() throws AuthException;
 }

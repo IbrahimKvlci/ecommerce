@@ -6,6 +6,7 @@ import com.ibrahimkvlci.ecommerce.order.exceptions.OrderItemNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.OrderStatusException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.InsufficientInventoryException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CartNotFoundException;
+import com.ibrahimkvlci.ecommerce.order.exceptions.AuthException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CartItemNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CheckoutException;
 import com.ibrahimkvlci.ecommerce.order.models.Order;
@@ -67,6 +68,11 @@ public class OrderGlobalExceptionHandler {
     @ExceptionHandler(CheckoutException.class)
     public ResponseEntity<ErrorResult> handleCheckoutException(CheckoutException ex) {
         return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ErrorResult> handleAuthException(AuthException ex) {
+        return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

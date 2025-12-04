@@ -2,6 +2,7 @@ package com.ibrahimkvlci.ecommerce.auth.controllers;
 
 import com.ibrahimkvlci.ecommerce.auth.dto.AuthRequest;
 import com.ibrahimkvlci.ecommerce.auth.dto.AuthResponse;
+import com.ibrahimkvlci.ecommerce.auth.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.auth.services.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -27,13 +28,13 @@ public class AuthController {
     private long jwtExpirationTime;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request,
+    public ResponseEntity<DataResult<AuthResponse>> login(@Valid @RequestBody AuthRequest request,
             HttpServletResponse httpResponse) {
         log.info("Login attempt for {}", request.getEmail());
-        AuthResponse response = authService.login(request);
+        DataResult<AuthResponse> result = authService.login(request);
 
         // Set JWT in HttpOnly cookie
-        ResponseCookie jwtCookie = ResponseCookie.from("jwt", Objects.requireNonNull(response.getAccessToken()))
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt", Objects.requireNonNull(result.getData().getAccessToken()))
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -42,7 +43,7 @@ public class AuthController {
                 .build();
         httpResponse.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(result);
     }
 
 }

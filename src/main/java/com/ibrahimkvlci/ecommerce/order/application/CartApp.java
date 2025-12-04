@@ -18,8 +18,8 @@ public class CartApp {
         return cartService.createCart(request).getData();
     }
 
-    public CartDTO getCartByCustomerId(Long id) {
-        return cartService.getCartByCustomerId(id).getData();
+    public CartDTO getCartOfCustomer() {
+        return cartService.getCartOfCustomer().getData();
     }
 
 }

@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.ibrahimkvlci.ecommerce.auth.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.auth.utilities.results.SuccessDataResult;
 import com.ibrahimkvlci.ecommerce.auth.dto.UserMyDetails;
 import com.ibrahimkvlci.ecommerce.auth.models.UserInfo;
 import com.ibrahimkvlci.ecommerce.auth.repositories.UserInfoRepository;
@@ -37,11 +39,11 @@ public class UserInfoServiceImpl implements UserDetailsService, UserInfoService 
     }
 
     @Override
-    public Long getUserIdFromJWT() throws AuthException {
+    public DataResult<Long> getUserIdFromJWT() throws AuthException {
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal != null) {
             UserInfo user = userRepository.findByEmail(principal.getUsername()).get();
-            return user.getId();
+            return new SuccessDataResult<>(user.getId());
         }
         throw new AuthException("User not authenticated!");
     }

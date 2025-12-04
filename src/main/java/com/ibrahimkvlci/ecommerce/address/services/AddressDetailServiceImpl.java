@@ -61,7 +61,7 @@ public class AddressDetailServiceImpl implements AddressDetailService {
         addressDetail.setSurname(addressDetailDTO.getSurname());
         addressDetail.setPhone(addressDetailDTO.getPhone());
         addressDetail.setDefaultAddress(addressDetailDTO.isDefaultAddress());
-        addressDetail.setCustomerId(userClient.getCustomerIdFromJWT());
+        addressDetail.setCustomerId(userClient.getCustomerIdFromJWT().getData());
         addressDetail.setAddressPostalCode(addressDetailDTO.getPostalCode());
         addressDetail.setAddressTitle(addressDetailDTO.getAddressTitle());
 
@@ -200,7 +200,8 @@ public class AddressDetailServiceImpl implements AddressDetailService {
     @Override
     public DataResult<List<AddressDetailResponseDTO>> getAddressDetailsOfCustomer() {
         return new SuccessDataResult<>(
-                addressDetailRepository.findAllByCustomerIdOrderByIdAsc(userClient.getCustomerIdFromJWT()).stream()
+                addressDetailRepository.findAllByCustomerIdOrderByIdAsc(userClient.getCustomerIdFromJWT().getData())
+                        .stream()
                         .map(this::mapToDTO)
                         .collect(Collectors.toList()));
     }

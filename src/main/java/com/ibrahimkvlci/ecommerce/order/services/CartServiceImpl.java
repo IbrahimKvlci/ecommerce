@@ -1,8 +1,10 @@
 package com.ibrahimkvlci.ecommerce.order.services;
 
+import com.ibrahimkvlci.ecommerce.order.client.UserClient;
 import com.ibrahimkvlci.ecommerce.order.client.InventoryClient;
 import com.ibrahimkvlci.ecommerce.order.dto.CartDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.CreateCartRequest;
+import com.ibrahimkvlci.ecommerce.order.exceptions.AuthException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CartNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.models.Cart;
 import com.ibrahimkvlci.ecommerce.order.repositories.CartRepository;
@@ -29,6 +31,8 @@ public class CartServiceImpl implements CartService {
 
     private final InventoryClient inventoryClient;
     private final CartItemService cartItemService;
+
+    private final UserClient userClient;
 
     @Override
     public DataResult<CartDTO> createCart(CreateCartRequest request) {
@@ -62,7 +66,12 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional(readOnly = true)
-    public DataResult<CartDTO> getCartByCustomerId(Long customerId) {
+    public DataResult<CartDTO> getCartOfCustomer() {
+        DataResult<Long> userIdRes = userClient.getCustomerIdFromJWT();
+        if (!userIdRes.isSuccess()) {
+            throw new AuthException("User not authenticated!");
+        }
+        Long customerId = userIdRes.getData();
         return new SuccessDataResult<CartDTO>(cartRepository.findByCustomerId(customerId)
                 .map(cart -> mapToDTO(cart))
                 .orElseThrow(() -> new CartNotFoundException("Cart not found with customerId: " + customerId)));

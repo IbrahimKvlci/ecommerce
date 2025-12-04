@@ -7,12 +7,13 @@ import com.ibrahimkvlci.ecommerce.catalog.models.Inventory;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.CategoryNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.CategoryValidationException;
-import com.ibrahimkvlci.ecommerce.address.utilities.results.ErrorDataResult;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.ErrorDataResult;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.BrandNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.BrandValidationException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.InventoryNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.InventoryValidationException;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.ErrorResult;
+import com.ibrahimkvlci.ecommerce.catalog.exceptions.AuthException;
 
 import java.util.Locale.Category;
 
@@ -76,6 +77,11 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(IllegalArgumentException.class)
         public ResponseEntity<ErrorResult> handleIllegalArgumentException(IllegalArgumentException ex) {
                 return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+
+        @ExceptionHandler(AuthException.class)
+        public ResponseEntity<ErrorResult> handleAuthException(AuthException ex) {
+                return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.UNAUTHORIZED);
         }
 
         @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -21,6 +21,7 @@ import com.ibrahimkvlci.ecommerce.order.dto.OrderDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.SaleRequest;
 import com.ibrahimkvlci.ecommerce.order.dto.SaleResponse;
 import com.ibrahimkvlci.ecommerce.order.dto.CustomerDTO;
+import com.ibrahimkvlci.ecommerce.order.exceptions.AuthException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CartNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.OrderNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CheckoutException;
@@ -106,7 +107,12 @@ public class CheckoutServiceImpl implements CheckoutService {
     }
 
     private SaleRequest saleRequest(CheckoutRequestDTO request, String clientIp, ClientType clientType) {
-        Long cartId = cartRepository.findByCustomerId(userClient.getCustomerIdFromJWT()).get().getId();
+        DataResult<Long> userIdRes = userClient.getCustomerIdFromJWT();
+        if (!userIdRes.isSuccess()) {
+            throw new AuthException("User not authenticated!");
+        }
+        Long customerId = userIdRes.getData();
+        Long cartId = cartRepository.findByCustomerId(customerId).get().getId();
         Cart cart = cartRepository.findById(Objects.requireNonNull(cartId))
                 .orElseThrow(() -> new CartNotFoundException("Cart not found with ID: " + cartId));
         Order order = new Order();

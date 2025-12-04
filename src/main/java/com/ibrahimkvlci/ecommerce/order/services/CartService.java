@@ -29,7 +29,7 @@ public interface CartService {
     /**
      * Get cart by customer ID
      */
-    DataResult<CartDTO> getCartByCustomerId(Long customerId);
+    DataResult<CartDTO> getCartOfCustomer();
 
     /**
      * Delete a cart
