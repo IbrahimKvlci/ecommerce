@@ -16,7 +16,7 @@ import jakarta.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CheckoutRequestDTO {
-    
+
     @NotNull
     private String cardNumber;
 
@@ -34,6 +34,9 @@ public class CheckoutRequestDTO {
 
     @NotNull
     private Long billAddressId;
+
+    @NotNull
+    private Long shipAddressId;
 
     @NotNull
     @JsonProperty

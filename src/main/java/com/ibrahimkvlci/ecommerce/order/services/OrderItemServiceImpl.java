@@ -2,6 +2,7 @@ package com.ibrahimkvlci.ecommerce.order.services;
 
 import org.springframework.stereotype.Service;
 
+import com.ibrahimkvlci.ecommerce.order.client.InventoryClient;
 import com.ibrahimkvlci.ecommerce.order.client.ProductClient;
 import com.ibrahimkvlci.ecommerce.order.dto.OrderItemDTO;
 import com.ibrahimkvlci.ecommerce.order.models.OrderItem;
@@ -14,9 +15,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderItemServiceImpl implements OrderItemService {
 
+    private final InventoryClient inventoryClient;
 
-    private final ProductClient productClient;
-    
     @Override
     public OrderItemDTO mapToDTO(OrderItem orderItem) {
         OrderItemDTO dto = new OrderItemDTO();
@@ -24,8 +24,9 @@ public class OrderItemServiceImpl implements OrderItemService {
         dto.setQuantity(orderItem.getQuantity());
         dto.setUnitPrice(orderItem.getUnitPrice());
         dto.setTotalPrice(orderItem.getTotalPrice());
-        dto.setProduct(productClient.getProductById(orderItem.getProductId()));
-        
+        dto.setProductInventory(
+                inventoryClient.getInventoryByProductIdAndSellerId(orderItem.getProductId(), orderItem.getSellerId()));
+
         return dto;
     }
 
@@ -36,8 +37,9 @@ public class OrderItemServiceImpl implements OrderItemService {
         orderItem.setQuantity(orderItemDTO.getQuantity());
         orderItem.setUnitPrice(orderItemDTO.getUnitPrice());
         orderItem.setTotalPrice(orderItemDTO.getTotalPrice());
-        orderItem.setProductId(orderItemDTO.getProduct().getId());
-        
+        orderItem.setProductId(orderItemDTO.getProductInventory().getProduct().getId());
+        orderItem.setSellerId(orderItemDTO.getProductInventory().getSellerId());
+
         return orderItem;
     }
 

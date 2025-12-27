@@ -141,6 +141,9 @@ public class CheckoutServiceImpl implements CheckoutService {
         order.setTotalAmount(orderItems.stream().mapToDouble(OrderItem::getTotalPrice).sum());
         order.setCustomerId(cart.getCustomerId());
         order.setOrderItems(orderItems);
+        order.setBillingAddressId(request.getBillAddressId());
+        order.setShippingAddressId(request.getShipAddressId());
+        order.setNotes(request.getNotes());
         order = orderRepository.save(order);
 
         // Card info setters

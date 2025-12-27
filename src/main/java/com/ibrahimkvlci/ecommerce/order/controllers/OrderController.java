@@ -82,6 +82,11 @@ public class OrderController {
         return ResponseEntity.ok(orderService.deleteOrder(id));
     }
 
+    @GetMapping("/customer")
+    public ResponseEntity<DataResult<List<OrderDTO>>> getOrdersOfCustomer() {
+        return ResponseEntity.ok(orderService.getOrdersOfCustomer());
+    }
+
     /**
      * Get orders by customer ID
      */

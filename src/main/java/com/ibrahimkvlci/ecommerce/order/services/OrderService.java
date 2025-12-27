@@ -45,6 +45,11 @@ public interface OrderService {
     Result deleteOrder(Long id);
 
     /**
+     * Get orders of customer
+     */
+    DataResult<List<OrderDTO>> getOrdersOfCustomer();
+
+    /**
      * Get orders by customer ID
      */
     DataResult<List<OrderDTO>> getOrdersByCustomerId(Long customerId);

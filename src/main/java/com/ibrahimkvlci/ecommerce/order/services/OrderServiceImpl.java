@@ -2,9 +2,11 @@ package com.ibrahimkvlci.ecommerce.order.services;
 
 import com.ibrahimkvlci.ecommerce.order.client.CustomerClient;
 import com.ibrahimkvlci.ecommerce.order.client.ProductClient;
+import com.ibrahimkvlci.ecommerce.order.client.UserClient;
 import com.ibrahimkvlci.ecommerce.order.dto.CreateOrderRequest;
 import com.ibrahimkvlci.ecommerce.order.dto.OrderDTO;
 import com.ibrahimkvlci.ecommerce.order.dto.UpdateOrderRequest;
+import com.ibrahimkvlci.ecommerce.order.exceptions.AuthException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.OrderNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.OrderStatusException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.OrderValidationException;
@@ -37,6 +39,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductClient productClient;
     private final CustomerClient customerClient;
     private final OrderItemService orderItemService;
+    private final UserClient userClient;
 
     @Override
     public DataResult<OrderDTO> createOrder(CreateOrderRequest request) {
@@ -304,5 +307,17 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return order;
+    }
+
+    @Override
+    public DataResult<List<OrderDTO>> getOrdersOfCustomer() {
+        DataResult<Long> res = userClient.getCustomerIdFromJWT();
+        if (!res.isSuccess()) {
+            throw new AuthException("User not authenticated!");
+        }
+        return new SuccessDataResult<>("Orders listed successfully", orderRepository.findByCustomerId(res.getData())
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList()));
     }
 }

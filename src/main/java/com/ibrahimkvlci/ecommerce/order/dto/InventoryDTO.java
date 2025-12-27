@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class InventoryDTO {
 
     private Long id;
-    private ProductDTO productDTO;
+    private ProductDTO product;
     private Integer quantity;
     private Long sellerId;
     private Double price;

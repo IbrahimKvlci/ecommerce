@@ -13,11 +13,11 @@ public class ProductBus {
 
     private final ProductApp productApp;
 
-    public ProductDTO getProductById(Long productId){
+    public ProductDTO getProductById(Long productId) {
         return productApp.getProductById(productId);
     }
-    
-    public boolean isProductAvailable(Long productId){
+
+    public boolean isProductAvailable(Long productId) {
         return productApp.isProductAvailable(productId);
     }
 }

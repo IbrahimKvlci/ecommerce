@@ -2,6 +2,7 @@ package com.ibrahimkvlci.ecommerce.address.controllers;
 
 import com.ibrahimkvlci.ecommerce.address.exceptions.AddressNotFoundException;
 import com.ibrahimkvlci.ecommerce.address.exceptions.AddressValidationException;
+import com.ibrahimkvlci.ecommerce.address.exceptions.AuthException;
 import com.ibrahimkvlci.ecommerce.address.exceptions.LocationNotFoundException;
 import com.ibrahimkvlci.ecommerce.address.utilities.results.ErrorResult;
 
@@ -59,6 +60,11 @@ public class AddressGlobalExceptionHandler {
     public ResponseEntity<ErrorResult> handleGenericException(Exception ex) {
         ErrorResult error = new ErrorResult("An unexpected error occurred: " + ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ErrorResult> handleAuthException(AuthException ex) {
+        return new ResponseEntity<>(new ErrorResult(ex.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 
     /**

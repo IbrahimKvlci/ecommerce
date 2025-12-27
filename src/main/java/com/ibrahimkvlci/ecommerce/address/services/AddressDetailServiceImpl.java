@@ -7,6 +7,7 @@ import com.ibrahimkvlci.ecommerce.address.dto.CityResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.CountryResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.DistrictResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.NeighborhoodResponseDTO;
+import com.ibrahimkvlci.ecommerce.address.exceptions.AuthException;
 import com.ibrahimkvlci.ecommerce.address.models.AddressDetail;
 import com.ibrahimkvlci.ecommerce.address.models.Country;
 import com.ibrahimkvlci.ecommerce.address.models.City;
@@ -61,7 +62,12 @@ public class AddressDetailServiceImpl implements AddressDetailService {
         addressDetail.setSurname(addressDetailDTO.getSurname());
         addressDetail.setPhone(addressDetailDTO.getPhone());
         addressDetail.setDefaultAddress(addressDetailDTO.isDefaultAddress());
-        addressDetail.setCustomerId(userClient.getCustomerIdFromJWT().getData());
+        DataResult<Long> userIdRes = userClient.getCustomerIdFromJWT();
+        if (!userIdRes.isSuccess()) {
+            throw new AuthException("User not authenticated!");
+        }
+        Long customerId = userIdRes.getData();
+        addressDetail.setCustomerId(customerId);
         addressDetail.setAddressPostalCode(addressDetailDTO.getPostalCode());
         addressDetail.setAddressTitle(addressDetailDTO.getAddressTitle());
 
@@ -199,8 +205,13 @@ public class AddressDetailServiceImpl implements AddressDetailService {
 
     @Override
     public DataResult<List<AddressDetailResponseDTO>> getAddressDetailsOfCustomer() {
+        DataResult<Long> userIdRes = userClient.getCustomerIdFromJWT();
+        if (!userIdRes.isSuccess()) {
+            throw new AuthException("User not authenticated!");
+        }
+        Long customerId = userIdRes.getData();
         return new SuccessDataResult<>(
-                addressDetailRepository.findAllByCustomerIdOrderByIdAsc(userClient.getCustomerIdFromJWT().getData())
+                addressDetailRepository.findAllByCustomerIdOrderByIdAsc(customerId)
                         .stream()
                         .map(this::mapToDTO)
                         .collect(Collectors.toList()));
