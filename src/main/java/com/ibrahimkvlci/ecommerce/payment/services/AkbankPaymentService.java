@@ -242,6 +242,40 @@ public class AkbankPaymentService implements PaymentService {
 
     @Override
     public void okCheckout(AkbankPaymentResultRequest akbankPaymentResultRequest) {
+        if (!checkHash(akbankPaymentResultRequest)) {
+            throw new PaymentIncorrectValuesError("The payment values are incorrect!");
+        }
+
+        // SEND SUCCESS RESTULT TO ORDER MODULE
+        SaleResponse saleResponse = new SaleResponse();
+        saleResponse.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Success);
+        saleResponse.setHostMessage(akbankPaymentResultRequest.getHostMessage());
+        saleResponse.setHostResponseCode(akbankPaymentResultRequest.getHostResponseCode());
+        saleResponse.setResponseMessage(akbankPaymentResultRequest.getResponseMessage());
+        saleResponse.setOrder(new SaleResponse.Order(akbankPaymentResultRequest.getOrderId()));
+
+        checkoutClient.okCheckout(saleResponse);
+
+    }
+
+    @Override
+    public void failCheckout(AkbankPaymentResultRequest akbankPaymentResultRequest) {
+        if (!checkHash(akbankPaymentResultRequest)) {
+            throw new PaymentIncorrectValuesError("The payment values are incorrect!");
+        }
+
+        // SEND FAIL RESTULT TO ORDER MODULE
+        SaleResponse saleResponse = new SaleResponse();
+        saleResponse.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Error);
+        saleResponse.setHostMessage(akbankPaymentResultRequest.getHostMessage());
+        saleResponse.setHostResponseCode(akbankPaymentResultRequest.getHostResponseCode());
+        saleResponse.setResponseMessage(akbankPaymentResultRequest.getResponseMessage());
+        saleResponse.setOrder(new SaleResponse.Order(akbankPaymentResultRequest.getOrderId()));
+
+        checkoutClient.failCheckout(saleResponse);
+    }
+
+    private boolean checkHash(AkbankPaymentResultRequest akbankPaymentResultRequest) {
         String[] paramNames = akbankPaymentResultRequest.getHashParams().split("\\+");
         String hashValues = "";
         Class<?> cls = akbankPaymentResultRequest.getClass();
@@ -264,24 +298,6 @@ public class AkbankPaymentService implements PaymentService {
             throw new RuntimeException("Hash generation failed", e);
         }
 
-        if (!hashedValues.equals(akbankPaymentResultRequest.getHash())) {
-            throw new PaymentIncorrectValuesError("The payment values are incorrect!");
-        }
-
-        // SEND SUCCESS RESTULT TO ORDER MODULE
-        SaleResponse saleResponse = new SaleResponse();
-        saleResponse.setSaleStatusEnum(SaleResponse.SaleStatusEnum.Success);
-        saleResponse.setHostMessage(akbankPaymentResultRequest.getHostMessage());
-        saleResponse.setHostResponseCode(akbankPaymentResultRequest.getHostResponseCode());
-        saleResponse.setResponseMessage(akbankPaymentResultRequest.getResponseMessage());
-        saleResponse.setOrder(new SaleResponse.Order(akbankPaymentResultRequest.getOrderId()));
-
-        checkoutClient.okCheckout(saleResponse);
-
-    }
-
-    @Override
-    public void failCheckout(AkbankPaymentResultRequest akbankPaymentResultRequest) {
-
+        return hashedValues.equals(akbankPaymentResultRequest.getHash());
     }
 }

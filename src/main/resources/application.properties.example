@@ -27,11 +27,14 @@ kuveyt.turk.card.check.url=https://boatest.kuveytturk.com.tr/boa.virtualpos.serv
 kuveyt.turk.pay.url=https://boatest.kuveytturk.com.tr/boa.virtualpos.services/Home/ThreeDModelProvisionGate
 
 # Akbank Payment Configuration
-akbank.merchantUser=
-akbank.merchantPassword=
-akbank.secretKey=
-akbank.sale.url=
+akbank.merchantUser={YOUR_MERCHANT_USER}
+akbank.merchantPassword={YOUR_MERCHANT_PASSWORD}
+akbank.secretKey={YOUR_SECRET_KEY}
+akbank.sale.url={YOUR_SALE_URL}
 akbank.securepay.url=https://virtualpospaymentgatewaypre.akbank.com/securepay
-akbank.okUrl=https://test.com/okUrl
-akbank.failUrl=https://test.com/failUrl
+akbank.okUrl={YOUR_OK_URL}
+akbank.failUrl={YOUR_FAIL_URL}
 akbank.lang=TR
+
+# Frontend Configuration
+frontend.url={YOUR_FRONTEND_URL}
