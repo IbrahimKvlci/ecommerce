@@ -22,7 +22,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -30,7 +29,7 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter,UserDetailsService userDetailsService) {
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, UserDetailsService userDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
     }
@@ -38,22 +37,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/admin/**").access((authentication, context) -> {
-                    String remoteAddr = context.getRequest().getRemoteAddr();
-                    return "127.0.0.1".equals(remoteAddr) || "0:0:0:0:0:0:0:1".equals(remoteAddr) ?
-                            new AuthorizationDecision(true) :
-                            new AuthorizationDecision(false);
-                })
-                .requestMatchers("/api/auth/login").permitAll()
-                .requestMatchers("/api/auth/customer/**").permitAll()
-                .requestMatchers("/api/catalog/products/**").authenticated()
-                .anyRequest().permitAll()
-                )
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/admin/**").access((authentication, context) -> {
+                            String remoteAddr = context.getRequest().getRemoteAddr();
+                            return "127.0.0.1".equals(remoteAddr) || "0:0:0:0:0:0:0:1".equals(remoteAddr)
+                                    ? new AuthorizationDecision(true)
+                                    : new AuthorizationDecision(false);
+                        })
+                        .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/customer/**").permitAll()
+                        .requestMatchers("/api/catalog/products/**").authenticated()
+                        .anyRequest().permitAll())
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -79,19 +77,29 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Explicitly list your frontend origins. Avoid "*" when allowCredentials is true.
+        // Explicitly list your frontend origins. Avoid "*" when allowCredentials is
+        // true.
         config.setAllowedOrigins(java.util.List.of(
-            "http://localhost:3000",
-            "http://127.0.0.1:3000"
+                "http://localhost:3000",
+                "http://127.0.0.1:3000"
+
         ));
         config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "Cookie"));
+        config.setAllowedHeaders(
+                java.util.List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "Cookie"));
         config.setAllowCredentials(true);
 
+        CorsConfiguration paymentCallbackConfig = new CorsConfiguration();
+        paymentCallbackConfig.setAllowedOriginPatterns(java.util.List.of("*"));
+        paymentCallbackConfig.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        paymentCallbackConfig.setAllowedHeaders(
+                java.util.List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With", "Cookie"));
+        paymentCallbackConfig.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/payment/**", paymentCallbackConfig);
         source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 }
-
-
