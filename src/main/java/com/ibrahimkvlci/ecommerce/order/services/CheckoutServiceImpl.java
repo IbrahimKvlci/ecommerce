@@ -35,6 +35,7 @@ import com.ibrahimkvlci.ecommerce.order.repositories.OrderRepository;
 import com.ibrahimkvlci.ecommerce.order.utils.RequestUtils;
 import com.ibrahimkvlci.ecommerce.order.utils.RequestUtils.ClientType;
 import com.ibrahimkvlci.ecommerce.order.utils.results.DataResult;
+import com.ibrahimkvlci.ecommerce.order.utils.results.ErrorDataResult;
 import com.ibrahimkvlci.ecommerce.order.utils.results.SuccessDataResult;
 
 import lombok.RequiredArgsConstructor;
@@ -187,8 +188,12 @@ public class CheckoutServiceImpl implements CheckoutService {
 
     @Override
     public DataResult<SaleResponse> failCheckout(SaleResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'failCheckout'");
+        Order order = orderRepository.findByOrderNumber(response.getOrder().getOrderId())
+                .orElseThrow(() -> new OrderNotFoundException(
+                        "Order not found by this order number: " + response.getOrder().getOrderId()));
+        order.setStatus(OrderStatus.FAILED);
+        orderRepository.save(order);
+        return new ErrorDataResult<SaleResponse>(response);
     }
 
 }

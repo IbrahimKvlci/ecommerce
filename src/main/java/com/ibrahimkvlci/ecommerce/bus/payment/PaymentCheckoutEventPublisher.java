@@ -11,15 +11,21 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class PaymentCheckoutEventPublisher implements CheckoutClient{
+public class PaymentCheckoutEventPublisher implements CheckoutClient {
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public void okCheckout(SaleResponse saleResponse) {
-        PaymentCheckoutSuccessEvent paymentCheckoutSuccessEvent=new PaymentCheckoutSuccessEvent(this,saleResponse);
+        PaymentCheckoutSuccessEvent paymentCheckoutSuccessEvent = new PaymentCheckoutSuccessEvent(this, saleResponse);
         applicationEventPublisher.publishEvent(paymentCheckoutSuccessEvent);
+    }
+
+    @Override
+    public void failCheckout(SaleResponse saleResponse) {
+        PaymentCheckoutFailEvent paymentCheckoutFailEvent = new PaymentCheckoutFailEvent(this, saleResponse);
+        applicationEventPublisher.publishEvent(paymentCheckoutFailEvent);
     }
 
 }
