@@ -1,11 +1,17 @@
 package com.ibrahimkvlci.ecommerce.payment.controllers;
 
 import com.ibrahimkvlci.ecommerce.payment.dto.AkbankPaymentResultRequest;
+import com.ibrahimkvlci.ecommerce.payment.exceptions.PaymentIncorrectValuesError;
 import com.ibrahimkvlci.ecommerce.payment.services.AkbankPaymentService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.ResponseEntity;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,15 +22,32 @@ public class AkbankPaymentController {
 
     private final AkbankPaymentService akbankPaymentService;
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     @PostMapping("/okCheckout")
-    public ResponseEntity<String> okCheckout(@ModelAttribute AkbankPaymentResultRequest paymentResult) {
-        akbankPaymentService.okCheckout(paymentResult);
-        return ResponseEntity.ok("Payment result received successfully");
+    public void okCheckout(@ModelAttribute AkbankPaymentResultRequest paymentResult, HttpServletResponse response)
+            throws IOException {
+        try {
+            akbankPaymentService.okCheckout(paymentResult);
+        } catch (PaymentIncorrectValuesError e) {
+            response.sendRedirect(frontendUrl + "/checkout/fail?error=" + paymentResult.getHostMessage());
+        } catch (Exception e) {
+            response.sendRedirect(frontendUrl + "/checkout/success");
+        }
+        response.sendRedirect(frontendUrl + "/checkout/success");
     }
 
     @PostMapping("/failCheckout")
-    public ResponseEntity<String> failCheckout(@ModelAttribute AkbankPaymentResultRequest paymentResult) {
-        akbankPaymentService.failCheckout(paymentResult);
-        return ResponseEntity.ok(paymentResult.getHostMessage());
+    public void failCheckout(@ModelAttribute AkbankPaymentResultRequest paymentResult, HttpServletResponse response)
+            throws IOException {
+        String encodedMsg = "";
+        try {
+            encodedMsg = URLEncoder.encode(paymentResult.getHostMessage(), StandardCharsets.UTF_8);
+            akbankPaymentService.failCheckout(paymentResult);
+        } catch (Exception e) {
+            response.sendRedirect(frontendUrl + "/checkout/fail?error=" + encodedMsg);
+        }
+        response.sendRedirect(frontendUrl + "/checkout/fail?error=" + encodedMsg);
     }
 }
