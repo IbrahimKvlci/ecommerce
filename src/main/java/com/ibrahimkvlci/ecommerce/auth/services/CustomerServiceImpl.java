@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerRequest;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerResponse;
+import com.ibrahimkvlci.ecommerce.auth.utilities.results.SuccessDataResult;
 import com.ibrahimkvlci.ecommerce.auth.client.CartClient;
 import com.ibrahimkvlci.ecommerce.auth.dto.CustomerDTO;
 import com.ibrahimkvlci.ecommerce.auth.exceptions.RegistrationException;
@@ -16,6 +17,7 @@ import com.ibrahimkvlci.ecommerce.auth.models.Role;
 import com.ibrahimkvlci.ecommerce.auth.repositories.CustomerRepository;
 import com.ibrahimkvlci.ecommerce.auth.repositories.RoleRepository;
 import com.ibrahimkvlci.ecommerce.auth.repositories.UserInfoRepository;
+import com.ibrahimkvlci.ecommerce.auth.utilities.results.DataResult;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +40,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CartClient cartClient;
 
     @Override
-    public RegisterCustomerResponse registerAsCustomer(RegisterCustomerRequest request) {
+    public DataResult<RegisterCustomerResponse> registerAsCustomer(RegisterCustomerRequest request) {
         if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
             throw new RegistrationException("Email already in use");
         }
@@ -58,7 +60,8 @@ public class CustomerServiceImpl implements CustomerService {
 
         cartClient.createCart(saved.getId());
 
-        return new RegisterCustomerResponse(saved.getEmail(), saved.getName(), saved.getSurname());
+        return new SuccessDataResult<>(
+                new RegisterCustomerResponse(saved.getEmail(), saved.getName(), saved.getSurname()));
     }
 
     @Override

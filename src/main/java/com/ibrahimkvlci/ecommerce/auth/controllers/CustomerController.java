@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerRequest;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerResponse;
 import com.ibrahimkvlci.ecommerce.auth.services.CustomerService;
+import com.ibrahimkvlci.ecommerce.auth.utilities.results.DataResult;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +28,10 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterCustomerResponse> registerCustomer(@Valid @RequestBody RegisterCustomerRequest request) {
+    public ResponseEntity<DataResult<RegisterCustomerResponse>> registerCustomer(
+            @Valid @RequestBody RegisterCustomerRequest request) {
         log.info("Customer registration attempt for {}", request.getEmail());
-        RegisterCustomerResponse response = customerService.registerAsCustomer(request);
+        DataResult<RegisterCustomerResponse> response = customerService.registerAsCustomer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
