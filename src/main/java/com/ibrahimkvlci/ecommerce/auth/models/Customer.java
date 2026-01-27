@@ -23,7 +23,4 @@ public class Customer extends UserInfo {
 
     @Column(name = "surname", nullable = false, length = 50)
     private String surname;
-
-    @Column(name = "phone_number", length = 20)
-    private String phoneNumber;
 }

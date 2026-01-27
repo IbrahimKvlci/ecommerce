@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomerDTO {
-    
+
     private Long id;
     private String email;
     private String name;
@@ -24,7 +24,7 @@ public class CustomerDTO {
     private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
+
     /**
      * Create DTO from entity
      */
@@ -34,7 +34,6 @@ public class CustomerDTO {
         dto.setEmail(customer.getEmail());
         dto.setName(customer.getName());
         dto.setSurname(customer.getSurname());
-        dto.setPhoneNumber(customer.getPhoneNumber());
         dto.setActive(customer.isActive());
         dto.setCreatedAt(customer.getCreatedAt());
         dto.setUpdatedAt(customer.getUpdatedAt());

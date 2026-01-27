@@ -48,7 +48,6 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         customer.setName(request.getName());
         customer.setSurname(request.getSurname());
-        customer.setPhoneNumber(request.getPhoneNumber());
         Role customerRole = roleRepository.findByName("ROLE_CUSTOMER")
                 .orElseThrow(() -> new RegistrationException("Role CUSTOMER not configured"));
         Set<Role> roles = new HashSet<>();
@@ -59,8 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         cartClient.createCart(saved.getId());
 
-        return new RegisterCustomerResponse(saved.getEmail(), saved.getName(), saved.getSurname(),
-                saved.getPhoneNumber());
+        return new RegisterCustomerResponse(saved.getEmail(), saved.getName(), saved.getSurname());
     }
 
     @Override
