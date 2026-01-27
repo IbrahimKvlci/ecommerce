@@ -10,6 +10,10 @@ import com.ibrahimkvlci.ecommerce.order.utils.results.Result;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -85,6 +89,12 @@ public class OrderController {
     @GetMapping("/customer")
     public ResponseEntity<DataResult<List<OrderDTO>>> getOrdersOfCustomer() {
         return ResponseEntity.ok(orderService.getOrdersOfCustomer());
+    }
+
+    @GetMapping("/active-orders")
+    public ResponseEntity<DataResult<Page<OrderDTO>>> getActiveOrdersOfCustomer(
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(orderService.getNonFailedOrdersOfCustomer(pageable));
     }
 
     /**

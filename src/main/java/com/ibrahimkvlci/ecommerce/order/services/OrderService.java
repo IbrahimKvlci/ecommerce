@@ -12,6 +12,9 @@ import com.ibrahimkvlci.ecommerce.order.utils.results.Result;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface OrderService {
 
     /**
@@ -48,6 +51,8 @@ public interface OrderService {
      * Get orders of customer
      */
     DataResult<List<OrderDTO>> getOrdersOfCustomer();
+
+    DataResult<Page<OrderDTO>> getNonFailedOrdersOfCustomer(Pageable pageable);
 
     /**
      * Get orders by customer ID

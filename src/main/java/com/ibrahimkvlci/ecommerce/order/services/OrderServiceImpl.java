@@ -20,12 +20,13 @@ import lombok.RequiredArgsConstructor;
 
 import com.ibrahimkvlci.ecommerce.order.repositories.OrderItemRepository;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
@@ -319,5 +320,17 @@ public class OrderServiceImpl implements OrderService {
                 .stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList()));
+    }
+
+    @Override
+    public DataResult<Page<OrderDTO>> getNonFailedOrdersOfCustomer(Pageable pageable) {
+        DataResult<Long> customerId = userClient.getCustomerIdFromJWT();
+        if (!customerId.isSuccess()) {
+            throw new AuthException("User not authenticated!");
+        }
+        return new SuccessDataResult<>("Orders listed successfully",
+                orderRepository.findByCustomerIdAndStatusNot(customerId.getData(), OrderStatus.FAILED,
+                        pageable)
+                        .map(this::mapToDTO));
     }
 }
