@@ -11,15 +11,13 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class RegisterCustomerResponse extends RegisterResponseBase {
 
-    public RegisterCustomerResponse(String email, String name, String surname, String phoneNumber) {
+    public RegisterCustomerResponse(String email, String name, String surname) {
         super(email);
         this.name = name;
         this.surname = surname;
-        this.phoneNumber = phoneNumber;
     }
-    
+
     private String name;
     private String surname;
-    private String phoneNumber;
 
 }
