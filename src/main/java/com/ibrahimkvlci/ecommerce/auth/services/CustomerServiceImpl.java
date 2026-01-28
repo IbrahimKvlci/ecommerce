@@ -41,6 +41,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final RoleRepository roleRepository;
     private final CustomerCodeRepository customerCodeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     private final CartClient cartClient;
 
@@ -58,10 +59,12 @@ public class CustomerServiceImpl implements CustomerService {
         customerCode.setFirstName(request.getName());
         customerCode.setLastName(request.getSurname());
         customerCode.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        customerCode.setCode(generateCode());
-        System.out.println(customerCode + "1");
+        String code = generateCode();
+        customerCode.setCode(code);
+
         CustomerCode saved = customerCodeRepository.save(customerCode);
-        System.out.println(saved + "2");
+
+        emailService.sendVerificationEmail(request.getEmail(), code);
 
         return new SuccessDataResult<>(
                 "Code sent to email", new RegisterCustomerResponse(saved.getEmail(), saved.getFirstName(),

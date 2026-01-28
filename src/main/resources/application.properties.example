@@ -42,3 +42,12 @@ akbank.lang=TR
 
 # Frontend Configuration
 frontend.url={YOUR_FRONTEND_URL}
+
+# Mail Configuration
+spring.mail.host={YOUR_MAIL_HOST}
+spring.mail.port={YOUR_MAIL_PORT}
+spring.mail.username={YOUR_MAIL_USERNAME}
+spring.mail.password={YOUR_MAIL_PASSWORD}
+spring.mail.from={YOUR_MAIL}
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
