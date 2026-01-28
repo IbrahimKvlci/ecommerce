@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerRequest;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerResponse;
+import com.ibrahimkvlci.ecommerce.auth.dto.RegisterVerifyRequest;
 import com.ibrahimkvlci.ecommerce.auth.services.CustomerService;
 import com.ibrahimkvlci.ecommerce.auth.utilities.results.DataResult;
 
@@ -28,10 +29,18 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping("/register")
-    public ResponseEntity<DataResult<RegisterCustomerResponse>> registerCustomer(
+    public ResponseEntity<DataResult<RegisterCustomerResponse>> registerInitiate(
             @Valid @RequestBody RegisterCustomerRequest request) {
         log.info("Customer registration attempt for {}", request.getEmail());
-        DataResult<RegisterCustomerResponse> response = customerService.registerAsCustomer(request);
+        DataResult<RegisterCustomerResponse> response = customerService.registerInitiate(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<DataResult<RegisterCustomerResponse>> registerVerify(
+            @Valid @RequestBody RegisterVerifyRequest request) {
+        log.info("Customer verification attempt for {}", request.getEmail());
+        DataResult<RegisterCustomerResponse> response = customerService.registerComplete(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
