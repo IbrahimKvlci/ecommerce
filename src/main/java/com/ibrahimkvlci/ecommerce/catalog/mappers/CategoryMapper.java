@@ -17,6 +17,7 @@ public class CategoryMapper {
         Category category = new Category();
         category.setId(categoryDTO.getId());
         category.setName(categoryDTO.getName());
+        category.setParent(toEntity(categoryDTO.getParentCategory()));
         return category;
     }
 
@@ -27,31 +28,30 @@ public class CategoryMapper {
         CategoryDTO dto = new CategoryDTO();
         dto.setId(category.getId());
         dto.setName(category.getName());
+        dto.setParentCategory(toDTO(category.getParent()));
         return dto;
     }
 
-    public CategorySubcategoryDTO toParentCategorySubcategoryDTO(Category category){
+    public CategorySubcategoryDTO toParentCategorySubcategoryDTO(Category category) {
         if (category == null) {
             return null;
         }
-        CategorySubcategoryDTO dto =new CategorySubcategoryDTO();
+        CategorySubcategoryDTO dto = new CategorySubcategoryDTO();
         dto.setId(category.getId());
         dto.setName(category.getName());
         dto.setSubcategories(category.getSubCategories().stream().map(this::toDTO).toList());
         return dto;
     }
 
-    public Category fromAddCategoryDTOTOEntity(AddCategoryDTO categoryDTO){
+    public Category fromAddCategoryDTOTOEntity(AddCategoryDTO categoryDTO) {
         if (categoryDTO == null) {
             return null;
         }
         Category category = new Category();
-        Category parent=new Category();
+        Category parent = new Category();
         parent.setId(categoryDTO.getParentCategoryId());
         category.setName(categoryDTO.getName());
         category.setParent(parent);
         return category;
     }
 }
-
-
