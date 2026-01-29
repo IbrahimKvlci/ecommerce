@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.controllers;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.models.Inventory;
 import com.ibrahimkvlci.ecommerce.catalog.services.InventoryService;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
@@ -44,6 +45,12 @@ public class InventoryController {
     @GetMapping("/{id}")
     public ResponseEntity<DataResult<InventoryDTO>> getInventoryById(@PathVariable Long id) {
         return ResponseEntity.ok(inventoryService.getInventoryById(id));
+    }
+
+    @GetMapping("/display/{productId}/{sellerId}")
+    public ResponseEntity<DataResult<InventoryDisplayDTO>> getInventoryDisplayByProductIdAndSellerId(
+            @PathVariable Long productId, @PathVariable Long sellerId) {
+        return ResponseEntity.ok(inventoryService.getInventoryDisplayByProductIdAndSellerId(productId, sellerId));
     }
 
     @GetMapping("/product/{productId}")

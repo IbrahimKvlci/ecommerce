@@ -26,13 +26,13 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(name = "title")
     private String title;
-    
+
     @Column(name = "description")
     private String description;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     @NotNull(message = "Category is required")
@@ -43,15 +43,16 @@ public class Product {
     @NotNull(message = "Brand is required")
     private Brand brand;
 
-    @Column(name="featured")
+    @Column(name = "featured")
     private boolean featured;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<Inventory> inventories;
 
-    public Product(Long id, String title,String description, Category category, Brand brand,List<Inventory> inventories){
-        this.id=id;
-        this.title=title;
+    public Product(Long id, String title, String description, Category category, Brand brand,
+            List<Inventory> inventories) {
+        this.id = id;
+        this.title = title;
         this.description = description;
         this.category = category;
         this.brand = brand;

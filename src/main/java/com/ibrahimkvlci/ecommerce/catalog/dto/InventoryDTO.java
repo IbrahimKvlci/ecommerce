@@ -25,6 +25,5 @@ public class InventoryDTO {
 
     @NotNull(message = "Price is required")
     private Double price;
+
 }
-
-

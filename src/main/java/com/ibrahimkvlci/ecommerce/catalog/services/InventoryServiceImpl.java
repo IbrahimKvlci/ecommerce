@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.services;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.InventoryNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.InventoryValidationException;
 import com.ibrahimkvlci.ecommerce.catalog.models.Inventory;
@@ -131,6 +132,28 @@ public class InventoryServiceImpl implements InventoryService {
     public DataResult<InventoryDTO> createInventory(InventoryDTO inventoryDTO) {
         Inventory inventory = this.mapToEntity(inventoryDTO);
         return this.createInventory(inventory);
+    }
+
+    @Override
+    public DataResult<InventoryDisplayDTO> getInventoryDisplayByProductIdAndSellerId(Long productId, Long sellerId) {
+
+        InventoryDTO inventoryDTO = this
+                .mapToDTO(this.inventoryRepository.findByProductIdAndSellerId(productId, sellerId)
+                        .orElseThrow(() -> new InventoryNotFoundException(
+                                "Inventory not found for product ID: " + productId + " and seller ID: " + sellerId)));
+        List<Inventory> otherInventories = this.inventoryRepository
+                .findAllByProductIdAndSellerIdNot(productId, sellerId);
+
+        List<InventoryDisplayDTO.OtherInventoryDTO> otherInventoriesDTO = otherInventories.stream()
+                .map(this::mapToOtherInventoryDTO).collect(Collectors.toList());
+
+        return new SuccessDataResult<>("Inventory display found successfully",
+                new InventoryDisplayDTO(inventoryDTO, otherInventoriesDTO));
+    }
+
+    private InventoryDisplayDTO.OtherInventoryDTO mapToOtherInventoryDTO(Inventory inventory) {
+        return new InventoryDisplayDTO.OtherInventoryDTO(inventory.getId(), inventory.getSellerId(),
+                inventory.getPrice(), inventory.getQuantity());
     }
 
 }
