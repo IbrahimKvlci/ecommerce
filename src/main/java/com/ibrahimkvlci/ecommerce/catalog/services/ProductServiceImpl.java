@@ -6,6 +6,7 @@ import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.BrandRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.CategoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductAddDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.mappers.ProductMapper;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,10 +35,10 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductImageService productImageService;
 
     @Override
-
-    public DataResult<Product> createProduct(Product product) {
+    public DataResult<ProductDTO> createProduct(ProductAddDTO product, List<MultipartFile> images) {
         // Validate product data
         if (product.getTitle() == null || product.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Product title cannot be null or empty");
@@ -46,14 +48,19 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Product with title '" + product.getTitle() + "' already exists");
         }
 
-        if (brandRepository.findById(Objects.requireNonNull(product.getBrand().getId())).isEmpty()) {
-            throw new IllegalArgumentException("Brand with ID " + product.getBrand().getId() + " not found");
+        if (brandRepository.findById(Objects.requireNonNull(product.getBrandId())).isEmpty()) {
+            throw new IllegalArgumentException("Brand with ID " + product.getBrandId() + " not found");
         }
-        if (categoryRepository.findById(Objects.requireNonNull(product.getCategory().getId())).isEmpty()) {
-            throw new IllegalArgumentException("Category with ID " + product.getCategory().getId() + " not found");
+        if (categoryRepository.findById(Objects.requireNonNull(product.getCategoryId())).isEmpty()) {
+            throw new IllegalArgumentException("Category with ID " + product.getCategoryId() + " not found");
         }
 
-        return new SuccessDataResult<>("Product created successfully", productRepository.save(product));
+        Product savedProduct = productRepository.save(productMapper.toEntity(product));
+        for (MultipartFile image : images) {
+            productImageService.uploadProductImage(image, savedProduct);
+        }
+
+        return new SuccessDataResult<>("Product created successfully", productMapper.toDTO(savedProduct));
 
     }
 

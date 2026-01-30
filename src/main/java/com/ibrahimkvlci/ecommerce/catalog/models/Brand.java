@@ -31,6 +31,8 @@ public class Brand {
 
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Product> products;
+
+    public Brand(Long id) {
+        this.id = id;
+    }
 }
-
-

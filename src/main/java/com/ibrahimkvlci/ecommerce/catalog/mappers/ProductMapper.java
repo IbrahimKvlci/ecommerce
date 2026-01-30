@@ -2,7 +2,10 @@ package com.ibrahimkvlci.ecommerce.catalog.mappers;
 
 import org.springframework.stereotype.Component;
 
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductAddDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
+import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
+import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,19 @@ public class ProductMapper {
         return product;
     }
 
+    public Product toEntity(ProductAddDTO productAddDTO) {
+        if (productAddDTO == null) {
+            return null;
+        }
+        Product product = new Product();
+        product.setTitle(productAddDTO.getTitle());
+        product.setDescription(productAddDTO.getDescription());
+        product.setCategory(new Category(productAddDTO.getCategoryId()));
+        product.setBrand(new Brand(productAddDTO.getBrandId()));
+        product.setFeatured(productAddDTO.isFeatured());
+        return product;
+    }
+
     public ProductDTO toDTO(Product product) {
         if (product == null) {
             return null;
@@ -41,5 +57,3 @@ public class ProductMapper {
     }
 
 }
-
-

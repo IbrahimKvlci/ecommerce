@@ -3,12 +3,15 @@ package com.ibrahimkvlci.ecommerce.catalog.services;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductAddDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 
 import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ProductService {
 
@@ -18,7 +21,7 @@ public interface ProductService {
     /**
      * Create a new product
      */
-    DataResult<Product> createProduct(Product product);
+    DataResult<ProductDTO> createProduct(ProductAddDTO product, List<MultipartFile> images);
 
     /**
      * Get all products
