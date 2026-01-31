@@ -53,8 +53,11 @@ spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 
 # Cloudflare R2 Configurations
-cloudflare.r2.access-key=YOUR_ACCESS_KEY_ID
-cloudflare.r2.secret-key=YOUR_SECRET_ACCESS_KEY
+cloudflare.r2.access-key={YOUR_ACCESS_KEY_ID}
+cloudflare.r2.secret-key={YOUR_SECRET_ACCESS_KEY}
 cloudflare.r2.endpoint=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
-cloudflare.r2.bucket=my-bucket-name
+cloudflare.r2.bucket={YOUR_BUCKET_NAME}
 cloudflare.r2.region=auto
+
+# Bucket Configurations
+bucket.image.base-url={YOUR_IMAGE_BASE_URL}

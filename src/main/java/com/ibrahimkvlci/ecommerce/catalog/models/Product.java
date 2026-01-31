@@ -49,6 +49,9 @@ public class Product {
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<Inventory> inventories;
 
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<ProductImage> images;
+
     public Product(Long id, String title, String description, Category category, Brand brand,
             List<Inventory> inventories) {
         this.id = id;

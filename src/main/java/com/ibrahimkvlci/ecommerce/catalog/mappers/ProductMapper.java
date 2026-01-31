@@ -1,5 +1,8 @@
 package com.ibrahimkvlci.ecommerce.catalog.mappers;
 
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductAddDTO;
@@ -16,6 +19,9 @@ public class ProductMapper {
 
     private final CategoryMapper categoryMapper;
     private final BrandMapper brandMapper;
+
+    @Value("${bucket.image.base-url}")
+    private String imageBaseUrl;
 
     public Product toEntity(ProductDTO productDTO) {
         if (productDTO == null) {
@@ -53,6 +59,8 @@ public class ProductMapper {
         dto.setDescription(product.getDescription());
         dto.setCategoryDTO(categoryMapper.toDTO(product.getCategory()));
         dto.setBrandDTO(brandMapper.toDTO(product.getBrand()));
+        dto.setImagesUrl(product.getImages().stream().map(i -> imageBaseUrl + "/" + i.getImageUrl())
+                .collect(Collectors.toList()));
         return dto;
     }
 
