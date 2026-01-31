@@ -1,14 +1,17 @@
 package com.ibrahimkvlci.ecommerce.catalog.mappers;
 
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.ibrahimkvlci.ecommerce.catalog.dto.ProductAddDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductRequestDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
+import com.ibrahimkvlci.ecommerce.catalog.models.Inventory;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 
 import lombok.RequiredArgsConstructor;
@@ -33,10 +36,11 @@ public class ProductMapper {
         product.setDescription(productDTO.getDescription());
         product.setCategory(categoryMapper.toEntity(productDTO.getCategoryDTO()));
         product.setBrand(brandMapper.toEntity(productDTO.getBrandDTO()));
+        product.setFeatured(productDTO.isFeatured());
         return product;
     }
 
-    public Product toEntity(ProductAddDTO productAddDTO) {
+    public Product toEntity(ProductRequestDTO productAddDTO) {
         if (productAddDTO == null) {
             return null;
         }
@@ -59,6 +63,24 @@ public class ProductMapper {
         dto.setDescription(product.getDescription());
         dto.setCategoryDTO(categoryMapper.toDTO(product.getCategory()));
         dto.setBrandDTO(brandMapper.toDTO(product.getBrand()));
+        dto.setFeatured(product.isFeatured());
+        dto.setImagesUrl(product.getImages().stream().map(i -> imageBaseUrl + "/" + i.getImageUrl())
+                .collect(Collectors.toList()));
+        return dto;
+    }
+
+    public ProductDisplayDTO toProductDisplayDTO(Product product) {
+        if (product == null) {
+            return null;
+        }
+        ProductDisplayDTO dto = new ProductDisplayDTO();
+        dto.setProductId(product.getId());
+        dto.setTitle(product.getTitle());
+        dto.setDescription(product.getDescription());
+        dto.setBrandName(product.getBrand().getName());
+        Inventory inventory = product.getInventories().stream().min(Comparator.comparing(Inventory::getPrice)).get();
+        dto.setPrice(inventory.getPrice());
+        dto.setSellerId(inventory.getSellerId());
         dto.setImagesUrl(product.getImages().stream().map(i -> imageBaseUrl + "/" + i.getImageUrl())
                 .collect(Collectors.toList()));
         return dto;
