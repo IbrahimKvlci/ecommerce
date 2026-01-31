@@ -1,9 +1,5 @@
 package com.ibrahimkvlci.ecommerce.catalog.dto;
 
-import java.util.List;
-
-import org.springframework.web.multipart.MultipartFile;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,7 +10,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductAddDTO {
+public class ProductRequestDTO {
+
+    @NotNull(message = "Product ID is required", groups = OnUpdate.class)
+    private Long id;
 
     @NotBlank(message = "Product title is required")
     @Size(min = 1, max = 255, message = "Product title must be between 1 and 255 characters")
@@ -30,4 +29,10 @@ public class ProductAddDTO {
     private Long brandId;
 
     private boolean featured;
+
+    public interface OnCreate {
+    }
+
+    public interface OnUpdate {
+    }
 }

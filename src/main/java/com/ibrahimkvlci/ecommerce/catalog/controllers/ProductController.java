@@ -1,6 +1,6 @@
 package com.ibrahimkvlci.ecommerce.catalog.controllers;
 
-import com.ibrahimkvlci.ecommerce.catalog.dto.ProductAddDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductRequestDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
@@ -10,10 +10,10 @@ import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,7 +37,7 @@ public class ProductController {
 
         @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
         public ResponseEntity<DataResult<ProductDTO>> createProduct(
-                        @Parameter(description = "Ürün bilgilerini içeren JSON objesi", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) @RequestPart @Valid ProductAddDTO productDTO,
+                        @Parameter(description = "Ürün bilgilerini içeren JSON objesi", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) @RequestPart @Validated(ProductRequestDTO.OnCreate.class) ProductRequestDTO productDTO,
                         @RequestPart("images") List<MultipartFile> images) {
                 DataResult<ProductDTO> productResult = productService.createProduct(productDTO, images);
 
@@ -74,18 +74,9 @@ public class ProductController {
          */
         @PutMapping("/{id}")
         public ResponseEntity<DataResult<ProductDTO>> updateProduct(@PathVariable Long id,
-                        @Valid @RequestBody ProductDTO productDTO) {
-                DataResult<Product> updatedProductResult = productService.updateProduct(id,
-                                productService.mapToEntity(productDTO));
-                if (updatedProductResult.isSuccess()) {
-                        ProductDTO updatedDTO = productService.mapToDTO(updatedProductResult.getData());
-                        return ResponseEntity.ok(
-                                        new com.ibrahimkvlci.ecommerce.catalog.utilities.results.SuccessDataResult<>(
-                                                        "Product updated successfully", updatedDTO));
-                }
-                return ResponseEntity.badRequest()
-                                .body(new com.ibrahimkvlci.ecommerce.catalog.utilities.results.ErrorDataResult<>(
-                                                updatedProductResult.getMessage(), null));
+                        @RequestBody @Validated(ProductRequestDTO.OnUpdate.class) ProductRequestDTO productDTO) {
+                DataResult<ProductDTO> updatedProductResult = productService.updateProduct(productDTO);
+                return ResponseEntity.ok(updatedProductResult);
         }
 
         /**

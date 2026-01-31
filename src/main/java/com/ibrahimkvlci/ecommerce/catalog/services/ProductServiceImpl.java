@@ -6,7 +6,7 @@ import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.BrandRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.CategoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
-import com.ibrahimkvlci.ecommerce.catalog.dto.ProductAddDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductRequestDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.mappers.ProductMapper;
@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
@@ -38,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductImageService productImageService;
 
     @Override
-    public DataResult<ProductDTO> createProduct(ProductAddDTO product, List<MultipartFile> images) {
+    public DataResult<ProductDTO> createProduct(ProductRequestDTO product, List<MultipartFile> images) {
         // Validate product data
         if (product.getTitle() == null || product.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Product title cannot be null or empty");
@@ -86,37 +85,32 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public DataResult<Product> updateProduct(Long id, Product product) {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("Product ID must be a positive number");
-        }
-
-        if (product == null) {
-            throw new IllegalArgumentException("Product cannot be null");
-        }
-
-        // Check if product exists
-        Optional<Product> existingProduct = productRepository.findById(id);
-        if (existingProduct.isEmpty()) {
-            throw new IllegalArgumentException("Product with ID " + id + " not found");
-        }
+    public DataResult<ProductDTO> updateProduct(ProductRequestDTO product) {
 
         // Validate product data
         if (product.getTitle() == null || product.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Product title cannot be null or empty");
         }
-
-        // Check if another product with same title exists (excluding current product)
-        Product existing = existingProduct.get();
-        if (!existing.getTitle().equals(product.getTitle()) && productExistsByTitle(product.getTitle())) {
-            throw new IllegalArgumentException("Product with title '" + product.getTitle() + "' already exists");
+        Product existingProduct = productRepository.findById(product.getId()).orElse(null);
+        if (existingProduct == null) {
+            throw new IllegalArgumentException("Product with ID " + product.getId() + " not found");
         }
 
-        // Update fields
-        existing.setTitle(product.getTitle());
-        existing.setDescription(product.getDescription());
+        convertProductRequestToProduct(product, existingProduct);
 
-        return new SuccessDataResult<>("Product updated successfully", productRepository.save(existing));
+        Product updatedProduct = productRepository.save(existingProduct);
+
+        return new SuccessDataResult<>("Product updated successfully", productMapper.toDTO(updatedProduct));
+    }
+
+    private void convertProductRequestToProduct(ProductRequestDTO productRequestDTO, Product product) {
+        Product productEntity = productMapper.toEntity(productRequestDTO);
+
+        product.setDescription(productEntity.getDescription());
+        product.setBrand(productEntity.getBrand());
+        product.setCategory(productEntity.getCategory());
+        product.setTitle(productEntity.getTitle());
+        product.setFeatured(productEntity.isFeatured());
     }
 
     @Override
@@ -233,7 +227,10 @@ public class ProductServiceImpl implements ProductService {
         if (categoryId == null || categoryId <= 0) {
             throw new IllegalArgumentException("Category ID must be a positive number");
         }
-        return new SuccessDataResult<>("Display products found successfully",
-                productRepository.findByCategoryIdAndFeaturedTrueWithLowestPriceInventory(categoryId));
+        List<Product> featuredProducts = productRepository.findByCategoryIdAndFeaturedTrue(categoryId);
+        List<ProductDisplayDTO> productDisplayDTOList = featuredProducts.stream()
+                .map(productMapper::toProductDisplayDTO)
+                .collect(Collectors.toList());
+        return new SuccessDataResult<>("Display products found successfully", productDisplayDTOList);
     }
 }

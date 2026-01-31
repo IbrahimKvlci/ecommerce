@@ -3,7 +3,7 @@ package com.ibrahimkvlci.ecommerce.catalog.services;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
-import com.ibrahimkvlci.ecommerce.catalog.dto.ProductAddDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductRequestDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
@@ -21,7 +21,7 @@ public interface ProductService {
     /**
      * Create a new product
      */
-    DataResult<ProductDTO> createProduct(ProductAddDTO product, List<MultipartFile> images);
+    DataResult<ProductDTO> createProduct(ProductRequestDTO product, List<MultipartFile> images);
 
     /**
      * Get all products
@@ -36,7 +36,7 @@ public interface ProductService {
     /**
      * Update an existing product
      */
-    DataResult<Product> updateProduct(Long id, Product product);
+    DataResult<ProductDTO> updateProduct(ProductRequestDTO product);
 
     /**
      * Delete a product by ID
