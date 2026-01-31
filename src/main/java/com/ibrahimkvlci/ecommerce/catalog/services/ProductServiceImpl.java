@@ -227,7 +227,8 @@ public class ProductServiceImpl implements ProductService {
         if (categoryId == null || categoryId <= 0) {
             throw new IllegalArgumentException("Category ID must be a positive number");
         }
-        List<Product> featuredProducts = productRepository.findByCategoryIdAndFeaturedTrue(categoryId);
+        List<Product> featuredProducts = productRepository
+                .findByCategoryIdAndFeaturedTrueAndInventoriesIsNotEmpty(categoryId);
         List<ProductDisplayDTO> productDisplayDTOList = featuredProducts.stream()
                 .map(productMapper::toProductDisplayDTO)
                 .collect(Collectors.toList());
