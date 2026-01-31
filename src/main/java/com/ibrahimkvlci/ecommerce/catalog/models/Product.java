@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -50,7 +51,7 @@ public class Product {
     private List<Inventory> inventories;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-    private List<ProductImage> images;
+    private List<ProductImage> images = new ArrayList<ProductImage>();
 
     public Product(Long id, String title, String description, Category category, Brand brand,
             List<Inventory> inventories) {

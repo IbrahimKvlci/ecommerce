@@ -1,5 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.dto;
 
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,14 +16,16 @@ import lombok.NoArgsConstructor;
 public class ProductDisplayDTO {
 
     private Long productId;
-    
+
     private String title;
-    
+
     private String description;
-    
+
     private String brandName;
 
     private Double price;
 
     private Long sellerId;
+
+    private List<String> imagesUrl = new ArrayList<String>();
 }
