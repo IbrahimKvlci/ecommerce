@@ -17,7 +17,8 @@ public class OrderProductClientBus implements ProductClient {
     @Override
     public ProductDTO getProductById(Long productId) {
         return new ProductDTO(productBus.getProductById(productId).getId(),
-                productBus.getProductById(productId).getTitle(), productBus.getProductById(productId).getDescription());
+                productBus.getProductById(productId).getTitle(), productBus.getProductById(productId).getDescription(),
+                productBus.getProductById(productId).getImagesUrl());
     }
 
     @Override

@@ -22,7 +22,8 @@ public class OrderInventoryClientBus implements InventoryClient {
                                 inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getId(),
                                 new ProductDTO(inventory.getProductDTO().getId(),
                                                 inventory.getProductDTO().getTitle(),
-                                                inventory.getProductDTO().getDescription()),
+                                                inventory.getProductDTO().getDescription(),
+                                                inventory.getProductDTO().getImagesUrl()),
                                 inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getQuantity(),
                                 sellerId,
                                 inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getPrice());
@@ -38,7 +39,8 @@ public class OrderInventoryClientBus implements InventoryClient {
                                 inventory.getId(),
                                 new ProductDTO(inventory.getProductDTO().getId(),
                                                 inventory.getProductDTO().getTitle(),
-                                                inventory.getProductDTO().getDescription()),
+                                                inventory.getProductDTO().getDescription(),
+                                                inventory.getProductDTO().getImagesUrl()),
                                 inventory.getQuantity(),
                                 inventory.getSellerId(),
                                 inventory.getPrice());
