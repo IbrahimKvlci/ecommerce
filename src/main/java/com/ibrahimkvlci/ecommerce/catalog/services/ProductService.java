@@ -87,7 +87,7 @@ public interface ProductService {
 
     DataResult<List<ProductDisplayDTO>> getDisplayProductsByCategoryId(Long categoryId);
 
-    DataResult<List<ProductDTO>> searchProductsWithRanking(String searchTerm);
+    DataResult<List<ProductDisplayDTO>> searchProductsWithRanking(String searchTerm);
 
     DataResult<List<String>> findKeywordSuggestions(String prefix);
 

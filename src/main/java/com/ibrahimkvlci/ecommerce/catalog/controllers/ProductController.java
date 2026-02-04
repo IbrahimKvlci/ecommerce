@@ -158,13 +158,14 @@ public class ProductController {
         }
 
         @GetMapping("/search/ranking")
-        public ResponseEntity<DataResult<List<ProductDTO>>> searchProductsWithRanking(
+        public ResponseEntity<DataResult<List<ProductDisplayDTO>>> searchProductsWithRanking(
                         @RequestParam String searchTerm) {
                 return ResponseEntity.ok(productService.searchProductsWithRanking(searchTerm));
         }
 
         @GetMapping("/search/suggestions")
         public ResponseEntity<DataResult<List<String>>> findKeywordSuggestions(@RequestParam String prefix) {
+                System.out.println("Prefix: " + prefix);
                 return ResponseEntity.ok(productService.findKeywordSuggestions(prefix));
         }
 }

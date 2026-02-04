@@ -236,11 +236,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public DataResult<List<ProductDTO>> searchProductsWithRanking(String searchTerm) {
-        return new SuccessDataResult<>("Products found successfully",
-                productRepository.searchWithRanking(searchTerm).stream()
-                        .map(productMapper::toDTO)
-                        .collect(Collectors.toList()));
+    public DataResult<List<ProductDisplayDTO>> searchProductsWithRanking(String searchTerm) {
+        List<Product> products = productRepository.searchWithRanking(searchTerm);
+        List<ProductDisplayDTO> productDisplayDTOList = products.stream()
+                .map(productMapper::toProductDisplayDTO)
+                .collect(Collectors.toList());
+        return new SuccessDataResult<>("Products found successfully", productDisplayDTOList);
     }
 
     @Override

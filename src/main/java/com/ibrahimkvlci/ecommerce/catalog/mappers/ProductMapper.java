@@ -78,9 +78,12 @@ public class ProductMapper {
         dto.setTitle(product.getTitle());
         dto.setDescription(product.getDescription());
         dto.setBrandName(product.getBrand().getName());
-        Inventory inventory = product.getInventories().stream().min(Comparator.comparing(Inventory::getPrice)).get();
-        dto.setPrice(inventory.getPrice());
-        dto.setSellerId(inventory.getSellerId());
+        if (product.getInventories() != null && !product.getInventories().isEmpty()) {
+            Inventory inventory = product.getInventories().stream().min(Comparator.comparing(Inventory::getPrice))
+                    .get();
+            dto.setPrice(inventory.getPrice());
+            dto.setSellerId(inventory.getSellerId());
+        }
         dto.setImagesUrl(product.getImages().stream().map(i -> imageBaseUrl + "/" + i.getImageUrl())
                 .collect(Collectors.toList()));
         return dto;
