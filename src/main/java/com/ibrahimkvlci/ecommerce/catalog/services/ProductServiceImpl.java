@@ -236,8 +236,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public DataResult<List<ProductDisplayDTO>> searchProductsWithRanking(String searchTerm) {
-        List<Product> products = productRepository.searchWithRanking(searchTerm);
+    public DataResult<List<ProductDisplayDTO>> searchProductsWithRankingAndInventoriesNotEmpty(String searchTerm) {
+        List<Product> products = productRepository.searchWithRankingAndInventoriesNotEmpty(searchTerm);
         List<ProductDisplayDTO> productDisplayDTOList = products.stream()
                 .map(productMapper::toProductDisplayDTO)
                 .collect(Collectors.toList());

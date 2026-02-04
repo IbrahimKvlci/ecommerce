@@ -158,9 +158,9 @@ public class ProductController {
         }
 
         @GetMapping("/search/ranking")
-        public ResponseEntity<DataResult<List<ProductDisplayDTO>>> searchProductsWithRanking(
+        public ResponseEntity<DataResult<List<ProductDisplayDTO>>> searchProductsWithRankingHasInventories(
                         @RequestParam String searchTerm) {
-                return ResponseEntity.ok(productService.searchProductsWithRanking(searchTerm));
+                return ResponseEntity.ok(productService.searchProductsWithRankingAndInventoriesNotEmpty(searchTerm));
         }
 
         @GetMapping("/search/suggestions")

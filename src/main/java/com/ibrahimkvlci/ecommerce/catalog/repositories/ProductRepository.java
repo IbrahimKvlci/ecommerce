@@ -56,10 +56,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         @Query(value = """
                         SELECT p.*, ts_rank(search_vector, plainto_tsquery('turkish', :searchTerm)) as rank
                         FROM products p
-                        WHERE search_vector @@ plainto_tsquery('turkish', :searchTerm)
+                        WHERE search_vector @@ plainto_tsquery('turkish', :searchTerm) AND EXISTS (
+                            SELECT 1
+                            FROM inventories i
+                            WHERE i.product_id = p.id
+                        )
                         ORDER BY rank DESC
                         """, nativeQuery = true)
-        List<Product> searchWithRanking(@Param("searchTerm") String searchTerm);
+        List<Product> searchWithRankingAndInventoriesNotEmpty(@Param("searchTerm") String searchTerm);
 
         @Query(value = """
                         SELECT word
