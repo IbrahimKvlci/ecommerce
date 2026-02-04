@@ -47,7 +47,7 @@ public class SecurityConfig {
                         })
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/customer/**").permitAll()
-                        .requestMatchers("/api/catalog/products/**").authenticated()
+                        .requestMatchers("/api/catalog/products/**").permitAll()
                         .anyRequest().permitAll())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
