@@ -156,4 +156,15 @@ public class ProductController {
                         @PathVariable Long categoryId) {
                 return ResponseEntity.ok(productService.getDisplayProductsByCategoryId(categoryId));
         }
+
+        @GetMapping("/search/ranking")
+        public ResponseEntity<DataResult<List<ProductDTO>>> searchProductsWithRanking(
+                        @RequestParam String searchTerm) {
+                return ResponseEntity.ok(productService.searchProductsWithRanking(searchTerm));
+        }
+
+        @GetMapping("/search/suggestions")
+        public ResponseEntity<DataResult<List<String>>> findKeywordSuggestions(@RequestParam String prefix) {
+                return ResponseEntity.ok(productService.findKeywordSuggestions(prefix));
+        }
 }

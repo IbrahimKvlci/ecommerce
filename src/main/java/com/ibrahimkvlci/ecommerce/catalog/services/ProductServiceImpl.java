@@ -234,4 +234,21 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
         return new SuccessDataResult<>("Display products found successfully", productDisplayDTOList);
     }
+
+    @Override
+    public DataResult<List<ProductDTO>> searchProductsWithRanking(String searchTerm) {
+        return new SuccessDataResult<>("Products found successfully",
+                productRepository.searchWithRanking(searchTerm).stream()
+                        .map(productMapper::toDTO)
+                        .collect(Collectors.toList()));
+    }
+
+    @Override
+    public DataResult<List<String>> findKeywordSuggestions(String prefix) {
+        if (prefix == null || prefix.trim().isEmpty()) {
+            throw new IllegalArgumentException("Prefix cannot be null or empty");
+        }
+        return new SuccessDataResult<>("Keyword suggestions found successfully",
+                productRepository.findKeywordSuggestions(prefix.trim()));
+    }
 }
