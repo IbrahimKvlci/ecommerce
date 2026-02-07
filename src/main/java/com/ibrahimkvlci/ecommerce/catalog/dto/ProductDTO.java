@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -36,5 +37,7 @@ public class ProductDTO {
     private boolean featured;
 
     private List<String> imagesUrl;
+
+    private Map<String, Object> attributes;
 
 }

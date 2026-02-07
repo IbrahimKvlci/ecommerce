@@ -37,6 +37,7 @@ public class ProductMapper {
         product.setCategory(categoryMapper.toEntity(productDTO.getCategoryDTO()));
         product.setBrand(brandMapper.toEntity(productDTO.getBrandDTO()));
         product.setFeatured(productDTO.isFeatured());
+        product.setAttributes(productDTO.getAttributes());
         return product;
     }
 
@@ -50,6 +51,7 @@ public class ProductMapper {
         product.setCategory(new Category(productAddDTO.getCategoryId()));
         product.setBrand(new Brand(productAddDTO.getBrandId()));
         product.setFeatured(productAddDTO.isFeatured());
+        product.setAttributes(productAddDTO.getAttributes());
         return product;
     }
 
@@ -66,6 +68,7 @@ public class ProductMapper {
         dto.setFeatured(product.isFeatured());
         dto.setImagesUrl(product.getImages().stream().map(i -> imageBaseUrl + "/" + i.getImageUrl())
                 .collect(Collectors.toList()));
+        dto.setAttributes(product.getAttributes());
         return dto;
     }
 
@@ -86,6 +89,7 @@ public class ProductMapper {
         }
         dto.setImagesUrl(product.getImages().stream().map(i -> imageBaseUrl + "/" + i.getImageUrl())
                 .collect(Collectors.toList()));
+        dto.setAttributes(product.getAttributes());
         return dto;
     }
 

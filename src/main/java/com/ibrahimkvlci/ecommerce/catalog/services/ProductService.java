@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.services;
 
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
+import com.ibrahimkvlci.ecommerce.catalog.repositories.projection.AttributeSummary;
 import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductRequestDTO;
@@ -10,6 +11,7 @@ import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -90,6 +92,10 @@ public interface ProductService {
     DataResult<List<ProductDisplayDTO>> searchProductsWithRankingAndInventoriesNotEmpty(String searchTerm);
 
     DataResult<List<String>> findKeywordSuggestions(String prefix);
+
+    DataResult<Map<String, List<AttributeSummary>>> getGroupedAttributes(Long categoryId);
+
+    DataResult<Map<String, List<AttributeSummary>>> getGroupedAttributes(List<Long> categoryIds);
 
     /**
      * Convert DTO to entity

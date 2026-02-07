@@ -6,6 +6,7 @@ import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.BrandRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.CategoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
+import com.ibrahimkvlci.ecommerce.catalog.repositories.projection.AttributeSummary;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductRequestDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
@@ -251,5 +253,27 @@ public class ProductServiceImpl implements ProductService {
         }
         return new SuccessDataResult<>("Keyword suggestions found successfully",
                 productRepository.findKeywordSuggestions(prefix.trim()));
+    }
+
+    @Override
+    public DataResult<Map<String, List<AttributeSummary>>> getGroupedAttributes(Long categoryId) {
+        if (categoryId == null || categoryId <= 0) {
+            throw new IllegalArgumentException("Category ID must be a positive number");
+        }
+        List<AttributeSummary> attributeStats = productRepository.findAttributeStats(categoryId);
+        Map<String, List<AttributeSummary>> groupedAttributes = attributeStats.stream()
+                .collect(Collectors.groupingBy(AttributeSummary::getKey));
+        return new SuccessDataResult<>("Grouped attributes found successfully", groupedAttributes);
+    }
+
+    @Override
+    public DataResult<Map<String, List<AttributeSummary>>> getGroupedAttributes(List<Long> categoryIds) {
+        if (categoryIds == null || categoryIds.isEmpty()) {
+            throw new IllegalArgumentException("Category IDs cannot be null or empty");
+        }
+        List<AttributeSummary> attributeStats = productRepository.findAttributeStats(categoryIds);
+        Map<String, List<AttributeSummary>> groupedAttributes = attributeStats.stream()
+                .collect(Collectors.groupingBy(AttributeSummary::getKey));
+        return new SuccessDataResult<>("Grouped attributes found successfully", groupedAttributes);
     }
 }

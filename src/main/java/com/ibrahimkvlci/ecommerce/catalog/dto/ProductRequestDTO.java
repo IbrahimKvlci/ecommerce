@@ -1,5 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.dto;
 
+import java.util.Map;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -29,6 +31,8 @@ public class ProductRequestDTO {
     private Long brandId;
 
     private boolean featured;
+
+    private Map<String, Object> attributes;
 
     public interface OnCreate {
     }

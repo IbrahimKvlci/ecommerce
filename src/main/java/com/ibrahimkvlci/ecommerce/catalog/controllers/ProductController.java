@@ -4,6 +4,7 @@ import com.ibrahimkvlci.ecommerce.catalog.dto.ProductRequestDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
+import com.ibrahimkvlci.ecommerce.catalog.repositories.projection.AttributeSummary;
 import com.ibrahimkvlci.ecommerce.catalog.services.ProductService;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -167,5 +169,17 @@ public class ProductController {
         public ResponseEntity<DataResult<List<String>>> findKeywordSuggestions(@RequestParam String prefix) {
                 System.out.println("Prefix: " + prefix);
                 return ResponseEntity.ok(productService.findKeywordSuggestions(prefix));
+        }
+
+        @GetMapping("/category/{categoryId}/attributes")
+        public ResponseEntity<DataResult<Map<String, List<AttributeSummary>>>> getGroupedAttributes(
+                        @PathVariable Long categoryId) {
+                return ResponseEntity.ok(productService.getGroupedAttributes(categoryId));
+        }
+
+        @GetMapping("/category/categoryIds/attributes")
+        public ResponseEntity<DataResult<Map<String, List<AttributeSummary>>>> getGroupedAttributes(
+                        @RequestParam List<Long> categoryIds) {
+                return ResponseEntity.ok(productService.getGroupedAttributes(categoryIds));
         }
 }
