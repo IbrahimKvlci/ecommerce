@@ -100,4 +100,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             ORDER BY key, count DESC
             """, nativeQuery = true)
     List<AttributeSummary> findAttributeStats(@Param("categoryIds") List<Long> categoryIds);
+
 }

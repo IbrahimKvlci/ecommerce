@@ -171,15 +171,4 @@ public class ProductController {
                 return ResponseEntity.ok(productService.findKeywordSuggestions(prefix));
         }
 
-        @GetMapping("/category/{categoryId}/attributes")
-        public ResponseEntity<DataResult<Map<String, List<AttributeSummary>>>> getGroupedAttributes(
-                        @PathVariable Long categoryId) {
-                return ResponseEntity.ok(productService.getGroupedAttributes(categoryId));
-        }
-
-        @GetMapping("/category/categoryIds/attributes")
-        public ResponseEntity<DataResult<Map<String, List<AttributeSummary>>>> getGroupedAttributes(
-                        @RequestParam List<Long> categoryIds) {
-                return ResponseEntity.ok(productService.getGroupedAttributes(categoryIds));
-        }
 }

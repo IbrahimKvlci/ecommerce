@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.services;
 
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
+import com.ibrahimkvlci.ecommerce.catalog.models.ProductDocument;
 import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.BrandRepository;
@@ -37,6 +38,7 @@ public class ProductServiceImpl implements ProductService {
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
     private final ProductImageService productImageService;
+    private final SearchService searchService;
 
     @Override
     public DataResult<ProductDTO> createProduct(ProductRequestDTO product, List<MultipartFile> images) {
@@ -239,11 +241,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public DataResult<List<ProductDisplayDTO>> searchProductsWithRankingAndInventoriesNotEmpty(String searchTerm) {
-        List<Product> products = productRepository.searchWithRankingAndInventoriesNotEmpty(searchTerm);
-        List<ProductDisplayDTO> productDisplayDTOList = products.stream()
+        List<ProductDocument> productDocuments = searchService.searchProducts(searchTerm, null);
+        List<ProductDisplayDTO> productDisplayDTOList = productDocuments.stream()
                 .map(productMapper::toProductDisplayDTO)
                 .collect(Collectors.toList());
         return new SuccessDataResult<>("Products found successfully", productDisplayDTOList);
+
     }
 
     @Override

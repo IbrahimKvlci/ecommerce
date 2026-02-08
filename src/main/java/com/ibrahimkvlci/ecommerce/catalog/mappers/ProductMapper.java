@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.mappers;
 
 import java.util.Comparator;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import com.ibrahimkvlci.ecommerce.catalog.models.Inventory;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
+import com.ibrahimkvlci.ecommerce.catalog.models.ProductDocument;
 
 import lombok.RequiredArgsConstructor;
 
@@ -90,6 +92,21 @@ public class ProductMapper {
         dto.setImagesUrl(product.getImages().stream().map(i -> imageBaseUrl + "/" + i.getImageUrl())
                 .collect(Collectors.toList()));
         dto.setAttributes(product.getAttributes());
+        return dto;
+    }
+
+    public ProductDisplayDTO toProductDisplayDTO(ProductDocument productDocument) {
+        if (productDocument == null) {
+            return null;
+        }
+        ProductDisplayDTO dto = new ProductDisplayDTO();
+        dto.setProductId(productDocument.getId());
+        dto.setTitle(productDocument.getTitle());
+        dto.setDescription(productDocument.getDescription());
+        Map<String, Object> attributes = productDocument.getAttributes().stream()
+                .collect(Collectors.toMap(ProductDocument.AttributeItem::getKey,
+                        ProductDocument.AttributeItem::getValue));
+        dto.setAttributes(attributes);
         return dto;
     }
 
