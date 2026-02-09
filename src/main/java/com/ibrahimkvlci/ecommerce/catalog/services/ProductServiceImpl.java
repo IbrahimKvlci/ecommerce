@@ -63,6 +63,8 @@ public class ProductServiceImpl implements ProductService {
             productImageService.uploadProductImage(image, savedProduct);
         }
 
+        searchService.indexProduct(productMapper.toProductDocument(savedProduct));
+
         return new SuccessDataResult<>("Product created successfully", productMapper.toDTO(savedProduct));
 
     }

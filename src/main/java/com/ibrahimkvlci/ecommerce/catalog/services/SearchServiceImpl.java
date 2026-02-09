@@ -70,4 +70,17 @@ public class SearchServiceImpl implements SearchService {
                         throw new RuntimeException("Arama sırasında hata oluştu", e);
                 }
         }
+
+        @Override
+        public void indexProduct(ProductDocument productDocument) {
+                try {
+                        client.index(i -> i
+                                        .index("products")
+                                        .id(productDocument.getId().toString())
+                                        .document(productDocument));
+                } catch (IOException e) {
+                        throw new RuntimeException("Ürün indeksleme sırasında hata oluştu", e);
+                }
+        }
+
 }
