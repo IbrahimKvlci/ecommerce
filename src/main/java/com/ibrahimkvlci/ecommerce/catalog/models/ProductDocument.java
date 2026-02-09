@@ -30,6 +30,8 @@ public class ProductDocument {
 
     private Boolean featured;
 
+    private List<String> images;
+
     private List<AttributeItem> attributes;
 
     @Data
@@ -38,7 +40,7 @@ public class ProductDocument {
     public static class AttributeItem {
         private String key;
 
-        private String value;
+        private Object value;
 
     }
 }

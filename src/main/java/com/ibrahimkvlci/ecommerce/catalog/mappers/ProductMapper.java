@@ -106,8 +106,26 @@ public class ProductMapper {
         Map<String, Object> attributes = productDocument.getAttributes().stream()
                 .collect(Collectors.toMap(ProductDocument.AttributeItem::getKey,
                         ProductDocument.AttributeItem::getValue));
+        dto.setImagesUrl(productDocument.getImages().stream().map(i -> imageBaseUrl + "/" + i)
+                .collect(Collectors.toList()));
         dto.setAttributes(attributes);
         return dto;
+    }
+
+    public ProductDocument toProductDocument(Product product) {
+        if (product == null) {
+            return null;
+        }
+        ProductDocument productDocument = new ProductDocument();
+        productDocument.setId(product.getId());
+        productDocument.setTitle(product.getTitle());
+        productDocument.setDescription(product.getDescription());
+        productDocument.setAttributes(product.getAttributes().entrySet().stream()
+                .map(attr -> new ProductDocument.AttributeItem(attr.getKey(), attr.getValue()))
+                .collect(Collectors.toList()));
+        productDocument.setImages(product.getImages().stream().map(i -> i.getImageUrl())
+                .collect(Collectors.toList()));
+        return productDocument;
     }
 
 }
