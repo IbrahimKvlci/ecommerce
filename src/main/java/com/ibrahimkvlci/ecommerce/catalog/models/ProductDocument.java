@@ -1,5 +1,6 @@
 package com.ibrahimkvlci.ecommerce.catalog.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -30,9 +31,9 @@ public class ProductDocument {
 
     private Boolean featured;
 
-    private List<String> images;
+    private List<String> images = new ArrayList<>();
 
-    private List<AttributeItem> attributes;
+    private List<AttributeItem> attributes = new ArrayList<>();
 
     @Data
     @NoArgsConstructor
