@@ -9,6 +9,7 @@ import com.ibrahimkvlci.ecommerce.catalog.repositories.CategoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.projection.AttributeSummary;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductRequestDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.mappers.ProductMapper;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -239,16 +241,6 @@ public class ProductServiceImpl implements ProductService {
                 .map(productMapper::toProductDisplayDTO)
                 .collect(Collectors.toList());
         return new SuccessDataResult<>("Display products found successfully", productDisplayDTOList);
-    }
-
-    @Override
-    public DataResult<List<ProductDisplayDTO>> searchProductsWithRankingAndInventoriesNotEmpty(String searchTerm) {
-        List<ProductDocument> productDocuments = searchService.searchProducts(searchTerm, null);
-        List<ProductDisplayDTO> productDisplayDTOList = productDocuments.stream()
-                .map(productMapper::toProductDisplayDTO)
-                .collect(Collectors.toList());
-        return new SuccessDataResult<>("Products found successfully", productDisplayDTOList);
-
     }
 
     @Override

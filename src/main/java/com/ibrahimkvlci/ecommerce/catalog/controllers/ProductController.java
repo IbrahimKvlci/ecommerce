@@ -1,16 +1,20 @@
 package com.ibrahimkvlci.ecommerce.catalog.controllers;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductRequestDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.projection.AttributeSummary;
 import com.ibrahimkvlci.ecommerce.catalog.services.ProductService;
+import com.ibrahimkvlci.ecommerce.catalog.services.SearchService;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +32,11 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/catalog/products")
+@RequiredArgsConstructor
 public class ProductController {
 
         private final ProductService productService;
-
-        @Autowired
-        public ProductController(ProductService productService) {
-                this.productService = productService;
-        }
+        private final SearchService searchService;
 
         @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
         public ResponseEntity<DataResult<ProductDTO>> createProduct(
@@ -159,10 +160,10 @@ public class ProductController {
                 return ResponseEntity.ok(productService.getDisplayProductsByCategoryId(categoryId));
         }
 
-        @GetMapping("/search/ranking")
-        public ResponseEntity<DataResult<List<ProductDisplayDTO>>> searchProductsWithRankingHasInventories(
+        @GetMapping("/search")
+        public ResponseEntity<DataResult<ProductSearchDTO>> searchProducts(
                         @RequestParam String searchTerm) {
-                return ResponseEntity.ok(productService.searchProductsWithRankingAndInventoriesNotEmpty(searchTerm));
+                return ResponseEntity.ok(searchService.searchProducts(searchTerm, null));
         }
 
         @GetMapping("/search/suggestions")

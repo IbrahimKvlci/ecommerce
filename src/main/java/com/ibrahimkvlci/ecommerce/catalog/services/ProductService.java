@@ -89,8 +89,6 @@ public interface ProductService {
 
     DataResult<List<ProductDisplayDTO>> getDisplayProductsByCategoryId(Long categoryId);
 
-    DataResult<List<ProductDisplayDTO>> searchProductsWithRankingAndInventoriesNotEmpty(String searchTerm);
-
     DataResult<List<String>> findKeywordSuggestions(String prefix);
 
     DataResult<Map<String, List<AttributeSummary>>> getGroupedAttributes(Long categoryId);
