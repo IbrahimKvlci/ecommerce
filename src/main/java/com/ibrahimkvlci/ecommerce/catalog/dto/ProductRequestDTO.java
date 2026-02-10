@@ -1,5 +1,6 @@
 package com.ibrahimkvlci.ecommerce.catalog.dto;
 
+import java.util.List;
 import java.util.Map;
 
 import jakarta.validation.constraints.NotBlank;
@@ -32,7 +33,7 @@ public class ProductRequestDTO {
 
     private boolean featured;
 
-    private Map<String, Object> attributes;
+    private Map<String, List<String>> attributes;
 
     public interface OnCreate {
     }

@@ -25,7 +25,11 @@ public class ProductDocument {
 
     private Double discountPrice;
 
+    private Long brandId;
+
     private String brand;
+
+    private Long categoryId;
 
     private String category;
 
@@ -41,7 +45,7 @@ public class ProductDocument {
     public static class AttributeItem {
         private String key;
 
-        private Object value;
+        private List<String> value;
 
     }
 }

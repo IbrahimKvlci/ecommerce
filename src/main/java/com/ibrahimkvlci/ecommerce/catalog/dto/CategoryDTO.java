@@ -23,4 +23,8 @@ public class CategoryDTO {
     private String name;
 
     private CategoryDTO parentCategory;
+
+    public CategoryDTO(Long id) {
+        this.id = id;
+    }
 }

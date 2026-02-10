@@ -30,5 +30,5 @@ public class ProductDisplayDTO {
 
     private List<String> imagesUrl = new ArrayList<String>();
 
-    private Map<String, Object> attributes;
+    private Map<String, List<String>> attributes;
 }

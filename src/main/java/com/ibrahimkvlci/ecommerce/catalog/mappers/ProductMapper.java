@@ -1,6 +1,7 @@
 package com.ibrahimkvlci.ecommerce.catalog.mappers;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -103,7 +104,7 @@ public class ProductMapper {
         dto.setProductId(productDocument.getId());
         dto.setTitle(productDocument.getTitle());
         dto.setDescription(productDocument.getDescription());
-        Map<String, Object> attributes = productDocument.getAttributes().stream()
+        Map<String, List<String>> attributes = productDocument.getAttributes().stream()
                 .collect(Collectors.toMap(ProductDocument.AttributeItem::getKey,
                         ProductDocument.AttributeItem::getValue));
         dto.setImagesUrl(productDocument.getImages().stream().map(i -> imageBaseUrl + "/" + i)
@@ -125,6 +126,11 @@ public class ProductMapper {
                 .collect(Collectors.toList()));
         productDocument.setImages(product.getImages().stream().map(i -> i.getImageUrl())
                 .collect(Collectors.toList()));
+        productDocument.setBrandId(product.getBrand().getId());
+        productDocument.setBrand(product.getBrand().getName());
+        productDocument.setCategoryId(product.getCategory().getId());
+        productDocument.setCategory(product.getCategory().getName());
+        productDocument.setFeatured(product.isFeatured());
         return productDocument;
     }
 

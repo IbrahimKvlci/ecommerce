@@ -53,7 +53,7 @@ public class Product {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "attributes", columnDefinition = "jsonb")
-    private Map<String, Object> attributes;
+    private Map<String, List<String>> attributes;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<Inventory> inventories;

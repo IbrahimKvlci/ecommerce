@@ -38,6 +38,6 @@ public class ProductDTO {
 
     private List<String> imagesUrl;
 
-    private Map<String, Object> attributes;
+    private Map<String, List<String>> attributes;
 
 }

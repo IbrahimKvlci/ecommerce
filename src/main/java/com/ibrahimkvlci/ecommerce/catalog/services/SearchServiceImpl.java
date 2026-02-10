@@ -6,7 +6,17 @@ import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.springframework.stereotype.Service;
 
+import com.ibrahimkvlci.ecommerce.catalog.dto.AttributeDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.AttributeValueDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.CategoryDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchDTO;
+import com.ibrahimkvlci.ecommerce.catalog.mappers.ProductMapper;
 import com.ibrahimkvlci.ecommerce.catalog.models.ProductDocument;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.SuccessDataResult;
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.SuccessResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,10 +31,15 @@ public class SearchServiceImpl implements SearchService {
 
         private final OpenSearchClient client;
 
+        private final CategoryService categoryService;
+
+        private final ProductMapper productMapper;
+
         @Override
-        public List<ProductDocument> searchProducts(String keyword, Map<String, List<String>> filters) {
+        public DataResult<ProductSearchDTO> searchProducts(String keyword, Map<String, List<String>> filters) {
+                SearchResponse<ProductDocument> response;
                 try {
-                        SearchResponse<ProductDocument> response = client.search(s -> s
+                        response = client.search(s -> s
                                         .index("products")
                                         .query(q -> q.bool(b -> {
 
@@ -59,25 +74,65 @@ public class SearchServiceImpl implements SearchService {
                                                 }
 
                                                 return b;
-                                        })),
+                                        })).aggregations("top_categories", a -> a.terms(t -> t.field("categoryId")))
+                                        .size(10)
+                                        .aggregations("attributes_nested", a -> a
+                                                        .nested(n -> n.path("attributes"))
+                                                        .aggregations("attr_keys", keyAgg -> keyAgg
+                                                                        .terms(t -> t
+                                                                                        .field("attributes.key")
+                                                                                        .size(10))
+                                                                        .aggregations("attr_values",
+                                                                                        valueAgg -> valueAgg
+                                                                                                        .terms(t -> t
+                                                                                                                        .field("attributes.value")
+                                                                                                                        .size(50))))),
                                         ProductDocument.class);
-
-                        return response.hits().hits().stream()
-                                        .map(Hit::source)
-                                        .collect(Collectors.toList());
-
                 } catch (IOException e) {
-                        throw new RuntimeException("Arama sırasında hata oluştu", e);
+                        throw new RuntimeException(e);
                 }
+
+                List<ProductDocument> productDocuments = response.hits().hits().stream()
+                                .map(Hit::source)
+                                .collect(Collectors.toList());
+
+                List<CategoryDTO> categories = response.aggregations().get("top_categories").lterms().buckets()
+                                .array().stream()
+                                .map(b -> categoryService.getCategoryById(Long.parseLong(b.key())).getData())
+                                .collect(Collectors.toList());
+
+                List<AttributeDTO> attributeDTOs = response.aggregations().get("attributes_nested").nested()
+                                .aggregations().get("attr_keys").sterms().buckets().array().stream()
+                                .map(keyBucket -> {
+                                        String key = keyBucket.key();
+
+                                        List<AttributeValueDTO> values = keyBucket.aggregations().get("attr_values")
+                                                        .sterms().buckets().array().stream()
+                                                        .map(valueBucket -> new AttributeValueDTO(valueBucket.key(),
+                                                                        valueBucket.docCount()))
+                                                        .collect(Collectors.toList());
+
+                                        return new AttributeDTO(key, values);
+                                })
+                                .collect(Collectors.toList());
+
+                List<ProductDisplayDTO> productDisplayDTOs = productDocuments.stream()
+                                .map(productMapper::toProductDisplayDTO)
+                                .collect(Collectors.toList());
+
+                return new SuccessDataResult<ProductSearchDTO>("Search successful",
+                                new ProductSearchDTO(productDisplayDTOs, categories, attributeDTOs));
+
         }
 
         @Override
-        public void indexProduct(ProductDocument productDocument) {
+        public Result indexProduct(ProductDocument productDocument) {
                 try {
                         client.index(i -> i
                                         .index("products")
                                         .id(productDocument.getId().toString())
                                         .document(productDocument));
+                        return new SuccessResult("Product indexed successfully");
                 } catch (IOException e) {
                         throw new RuntimeException("Ürün indeksleme sırasında hata oluştu", e);
                 }
