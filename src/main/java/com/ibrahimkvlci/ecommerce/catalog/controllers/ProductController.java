@@ -161,6 +161,7 @@ public class ProductController {
         @PostMapping("/search")
         public ResponseEntity<DataResult<ProductSearchDTO>> searchProducts(
                         @RequestBody ProductSearchRequest request) {
+                System.out.println(request);
                 return ResponseEntity.ok(searchService.searchProducts(request.getSearchTerm(), request.getFilters()));
         }
 

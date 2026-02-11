@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.ibrahimkvlci.ecommerce.catalog.dto.AttributeDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.AttributeValueDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategoryDTO;
-import com.ibrahimkvlci.ecommerce.catalog.dto.FilterDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchDTO;
 import com.ibrahimkvlci.ecommerce.catalog.mappers.ProductMapper;
@@ -23,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +36,12 @@ public class SearchServiceImpl implements SearchService {
         private final ProductMapper productMapper;
 
         @Override
-        public DataResult<ProductSearchDTO> searchProducts(String keyword, List<FilterDTO> filters) {
+        public DataResult<ProductSearchDTO> searchProducts(String keyword, List<AttributeDTO> filters) {
+
+                List<AttributeDTO> selectedFilters = filters.stream()
+                                .filter(f -> f.getValues().stream().anyMatch(AttributeValueDTO::getIsSelected))
+                                .collect(Collectors.toList());
+
                 SearchResponse<ProductDocument> response;
                 try {
                         response = client.search(s -> s
@@ -50,10 +54,11 @@ public class SearchServiceImpl implements SearchService {
                                                                         .query(keyword)));
                                                 }
 
-                                                if (filters != null) {
-                                                        for (FilterDTO filter : filters) {
+                                                if (selectedFilters != null) {
+                                                        for (AttributeDTO filter : selectedFilters) {
                                                                 String filterKey = filter.getKey();
-                                                                List<String> filterValues = filter.getValues();
+                                                                List<AttributeValueDTO> filterValues = filter
+                                                                                .getValues();
 
                                                                 b.filter(f -> f.nested(n -> n
                                                                                 .path("attributes")
@@ -67,7 +72,15 @@ public class SearchServiceImpl implements SearchService {
                                                                                                                                 .field("attributes.value")
                                                                                                                                 .terms(tt -> tt.value(
                                                                                                                                                 filterValues.stream()
-                                                                                                                                                                .map(FieldValue::of)
+                                                                                                                                                                .map(av -> {
+
+                                                                                                                                                                        if (av.getIsSelected()) {
+                                                                                                                                                                                return FieldValue
+                                                                                                                                                                                                .of(av.getValueText());
+                                                                                                                                                                        }
+                                                                                                                                                                        return null;
+                                                                                                                                                                })
+                                                                                                                                                                .filter(Objects::nonNull)
                                                                                                                                                                 .collect(Collectors
                                                                                                                                                                                 .toList())))))))));
                                                         }
@@ -109,7 +122,7 @@ public class SearchServiceImpl implements SearchService {
                                         List<AttributeValueDTO> values = keyBucket.aggregations().get("attr_values")
                                                         .sterms().buckets().array().stream()
                                                         .map(valueBucket -> new AttributeValueDTO(valueBucket.key(),
-                                                                        valueBucket.docCount()))
+                                                                        valueBucket.docCount(), false))
                                                         .collect(Collectors.toList());
 
                                         return new AttributeDTO(key, values);
@@ -121,7 +134,8 @@ public class SearchServiceImpl implements SearchService {
                                 .collect(Collectors.toList());
 
                 return new SuccessDataResult<ProductSearchDTO>("Search successful",
-                                new ProductSearchDTO(productDisplayDTOs, categories, attributeDTOs));
+                                new ProductSearchDTO(productDisplayDTOs, categories,
+                                                (filters != null && !filters.isEmpty()) ? filters : attributeDTOs));
 
         }
 
