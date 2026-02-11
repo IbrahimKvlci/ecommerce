@@ -2,10 +2,10 @@ package com.ibrahimkvlci.ecommerce.catalog.controllers;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductRequestDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchRequest;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
-import com.ibrahimkvlci.ecommerce.catalog.repositories.projection.AttributeSummary;
 import com.ibrahimkvlci.ecommerce.catalog.services.ProductService;
 import com.ibrahimkvlci.ecommerce.catalog.services.SearchService;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -160,15 +158,14 @@ public class ProductController {
                 return ResponseEntity.ok(productService.getDisplayProductsByCategoryId(categoryId));
         }
 
-        @GetMapping("/search")
+        @PostMapping("/search")
         public ResponseEntity<DataResult<ProductSearchDTO>> searchProducts(
-                        @RequestParam String searchTerm) {
-                return ResponseEntity.ok(searchService.searchProducts(searchTerm, null));
+                        @RequestBody ProductSearchRequest request) {
+                return ResponseEntity.ok(searchService.searchProducts(request.getSearchTerm(), request.getFilters()));
         }
 
         @GetMapping("/search/suggestions")
         public ResponseEntity<DataResult<List<String>>> findKeywordSuggestions(@RequestParam String prefix) {
-                System.out.println("Prefix: " + prefix);
                 return ResponseEntity.ok(productService.findKeywordSuggestions(prefix));
         }
 

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.ibrahimkvlci.ecommerce.catalog.dto.AttributeDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.AttributeValueDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategoryDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.FilterDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchDTO;
 import com.ibrahimkvlci.ecommerce.catalog.mappers.ProductMapper;
@@ -36,7 +37,7 @@ public class SearchServiceImpl implements SearchService {
         private final ProductMapper productMapper;
 
         @Override
-        public DataResult<ProductSearchDTO> searchProducts(String keyword, Map<String, List<String>> filters) {
+        public DataResult<ProductSearchDTO> searchProducts(String keyword, List<FilterDTO> filters) {
                 SearchResponse<ProductDocument> response;
                 try {
                         response = client.search(s -> s
@@ -49,11 +50,10 @@ public class SearchServiceImpl implements SearchService {
                                                                         .query(keyword)));
                                                 }
 
-                                                if (filters != null && !filters.isEmpty()) {
-                                                        for (Map.Entry<String, List<String>> entry : filters
-                                                                        .entrySet()) {
-                                                                String filterKey = entry.getKey();
-                                                                List<String> filterValues = entry.getValue();
+                                                if (filters != null) {
+                                                        for (FilterDTO filter : filters) {
+                                                                String filterKey = filter.getKey();
+                                                                List<String> filterValues = filter.getValues();
 
                                                                 b.filter(f -> f.nested(n -> n
                                                                                 .path("attributes")
