@@ -28,7 +28,18 @@ public class CategoryMapper {
         CategoryDTO dto = new CategoryDTO();
         dto.setId(category.getId());
         dto.setName(category.getName());
-        dto.setParentCategory(toDTO(category.getParent()));
+        dto.setParentCategory(toShallowDTO(category.getParent()));
+        dto.setSubCategory(toShallowDTO(category.getSubCategories().stream().findFirst().orElse(null)));
+        return dto;
+    }
+
+    public CategoryDTO toShallowDTO(Category category) {
+        if (category == null) {
+            return null;
+        }
+        CategoryDTO dto = new CategoryDTO();
+        dto.setId(category.getId());
+        dto.setName(category.getName());
         return dto;
     }
 

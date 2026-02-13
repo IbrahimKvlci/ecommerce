@@ -36,7 +36,8 @@ public class SearchServiceImpl implements SearchService {
         private final ProductMapper productMapper;
 
         @Override
-        public DataResult<ProductSearchDTO> searchProducts(String keyword, List<AttributeDTO> filters) {
+        public DataResult<ProductSearchDTO> searchProducts(String keyword, List<Long> categoryIds,
+                        List<AttributeDTO> filters) {
 
                 List<AttributeDTO> selectedFilters = filters.stream()
                                 .filter(f -> f.getValues().stream().anyMatch(AttributeValueDTO::getIsSelected))
@@ -52,6 +53,15 @@ public class SearchServiceImpl implements SearchService {
                                                         b.must(m -> m.multiMatch(mm -> mm
                                                                         .fields("title", "description")
                                                                         .query(keyword)));
+                                                }
+
+                                                if (categoryIds != null && !categoryIds.isEmpty()) {
+                                                        b.filter(f -> f.terms(t -> t
+                                                                        .field("categoryId")
+                                                                        .terms(ts -> ts.value(categoryIds.stream()
+                                                                                        .map(FieldValue::of)
+                                                                                        .collect(Collectors
+                                                                                                        .toList())))));
                                                 }
 
                                                 if (selectedFilters != null) {

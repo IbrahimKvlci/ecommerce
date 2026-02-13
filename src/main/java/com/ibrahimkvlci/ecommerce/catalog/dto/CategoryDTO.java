@@ -24,6 +24,8 @@ public class CategoryDTO {
 
     private CategoryDTO parentCategory;
 
+    private CategoryDTO subCategory;
+
     public CategoryDTO(Long id) {
         this.id = id;
     }

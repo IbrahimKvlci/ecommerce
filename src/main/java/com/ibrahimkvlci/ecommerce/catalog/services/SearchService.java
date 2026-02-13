@@ -10,7 +10,8 @@ import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 
 public interface SearchService {
 
-    public DataResult<ProductSearchDTO> searchProducts(String keyword, List<AttributeDTO> filters);
+    public DataResult<ProductSearchDTO> searchProducts(String keyword, List<Long> categoryIds,
+            List<AttributeDTO> filters);
 
     public Result indexProduct(ProductDocument productDocument);
 }

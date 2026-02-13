@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,10 +36,10 @@ public class Category {
     private Category parent;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Product> products;
+    private List<Product> products = new ArrayList<>();
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private List<Category> subCategories;
+    private List<Category> subCategories = new ArrayList<>();
 
     public Category(Long id) {
         this.id = id;

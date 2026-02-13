@@ -13,6 +13,8 @@ public class ProductSearchRequest {
 
     private String searchTerm;
 
+    private List<Long> categoryIds;
+
     private List<AttributeDTO> filters;
 
 }
