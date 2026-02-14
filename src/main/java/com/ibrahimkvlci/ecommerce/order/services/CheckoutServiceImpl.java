@@ -86,7 +86,8 @@ public class CheckoutServiceImpl implements CheckoutService {
         for (OrderItem orderItem : order.getOrderItems()) {
             InventoryDTO inventory = inventoryClient.getInventoryByProductIdAndSellerId(orderItem.getProductId(),
                     orderItem.getSellerId());
-            inventoryClient.updateInventory(inventory.getId(), inventory.getQuantity() - orderItem.getQuantity(),
+            inventoryClient.updateInventory(inventory.getSellerId(), inventory.getProduct().getId(),
+                    inventory.getQuantity() - orderItem.getQuantity(),
                     inventory.getPrice());
         }
         order.setStatus(OrderStatus.CONFIRMED);

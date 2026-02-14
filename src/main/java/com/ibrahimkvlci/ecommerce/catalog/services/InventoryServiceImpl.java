@@ -2,9 +2,12 @@ package com.ibrahimkvlci.ecommerce.catalog.services;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDisplayDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryRequestDTO;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.InventoryNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.InventoryValidationException;
 import com.ibrahimkvlci.ecommerce.catalog.models.Inventory;
+import com.ibrahimkvlci.ecommerce.catalog.models.ProductDocument;
+import com.ibrahimkvlci.ecommerce.catalog.models.id.InventoryId;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.InventoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
 import com.ibrahimkvlci.ecommerce.catalog.mappers.InventoryMapper;
@@ -17,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Objects;
@@ -30,15 +34,40 @@ public class InventoryServiceImpl implements InventoryService {
     private final InventoryRepository inventoryRepository;
     private final ProductRepository productRepository;
     private final InventoryMapper inventoryMapper;
+    private final SearchService searchService;
 
     @Override
+    public DataResult<InventoryDTO> createInventory(InventoryRequestDTO inventoryRequestDTO) {
 
-    public DataResult<InventoryDTO> createInventory(Inventory inventory) {
-        productRepository.findById(Objects.requireNonNull(inventory.getProduct().getId()))
+        productRepository.findById(Objects.requireNonNull(inventoryRequestDTO.getProductId()))
                 .orElseThrow(() -> new InventoryValidationException(
-                        "Product not found with ID: " + inventory.getProduct().getId()));
+                        "Product not found with ID: " + inventoryRequestDTO.getProductId()));
 
-        Inventory saved = inventoryRepository.save(inventory);
+        ProductDocument productDocument = searchService.getProductById(inventoryRequestDTO.getProductId()).getData();
+        List<ProductDocument.Inventory> inventories = productDocument.getInventories();
+        if (inventories == null) {
+            inventories = new ArrayList<>();
+        }
+        boolean isInventoryExists = false;
+        for (ProductDocument.Inventory inventory : inventories) {
+            if (inventory.getSellerId().equals(inventoryRequestDTO.getSellerId())) {
+                inventory.setStock(inventoryRequestDTO.getQuantity());
+                inventory.setPrice(inventoryRequestDTO.getPrice());
+                inventory.setDiscountPrice(inventoryRequestDTO.getDiscountPrice());
+                isInventoryExists = true;
+                break;
+            }
+        }
+        if (!isInventoryExists) {
+            inventories
+                    .add(new ProductDocument.Inventory(inventoryRequestDTO.getSellerId(),
+                            inventoryRequestDTO.getQuantity(),
+                            inventoryRequestDTO.getPrice(), inventoryRequestDTO.getDiscountPrice()));
+        }
+        productDocument.setInventories(inventories);
+        searchService.updateProduct(productDocument);
+
+        Inventory saved = inventoryRepository.save(inventoryMapper.toEntity(inventoryRequestDTO));
         return new SuccessDataResult<>("Inventory created successfully", this.mapToDTO(saved));
     }
 
@@ -52,9 +81,9 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public DataResult<InventoryDTO> getInventoryById(Long id) {
-        Inventory inventory = inventoryRepository.findById(Objects.requireNonNull(id))
-                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + id));
+    public DataResult<InventoryDTO> getInventoryById(InventoryId inventoryId) {
+        Inventory inventory = inventoryRepository.findById(inventoryId)
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryId));
         return new SuccessDataResult<>("Inventory found successfully", this.mapToDTO(inventory));
     }
 
@@ -70,9 +99,9 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public DataResult<InventoryDTO> updateInventory(Long id, Inventory inventory) {
-        Inventory existing = inventoryRepository.findById(Objects.requireNonNull(id))
-                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + id));
+    public DataResult<InventoryDTO> updateInventory(InventoryId inventoryId, Inventory inventory) {
+        Inventory existing = inventoryRepository.findById(inventoryId)
+                .orElseThrow(() -> new InventoryNotFoundException("Inventory not found with ID: " + inventoryId));
 
         if (!existing.getProduct().getId().equals(inventory.getProduct().getId())) {
             throw new InventoryValidationException("Product ID cannot be changed for an existing inventory");
@@ -84,19 +113,19 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public Result deleteInventory(Long id) {
-        if (!inventoryRepository.existsById(Objects.requireNonNull(id))) {
-            throw new InventoryNotFoundException("Inventory not found with ID: " + id);
+    public Result deleteInventory(InventoryId inventoryId) {
+        if (!inventoryRepository.existsById(Objects.requireNonNull(inventoryId))) {
+            throw new InventoryNotFoundException("Inventory not found with ID: " + inventoryId);
         }
-        inventoryRepository.deleteById(Objects.requireNonNull(id));
+        inventoryRepository.deleteById(Objects.requireNonNull(inventoryId));
         return new SuccessResult("Inventory deleted successfully");
     }
 
     /**
      * Convert DTO to entity
      */
-    public Inventory mapToEntity(InventoryDTO inventoryDTO) {
-        return inventoryMapper.toEntity(inventoryDTO);
+    public Inventory mapToEntity(InventoryRequestDTO inventoryRequestDTO) {
+        return inventoryMapper.toEntity(inventoryRequestDTO);
     }
 
     /**
@@ -115,8 +144,8 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public DataResult<InventoryDTO> updateInventory(Long id, int quantity, double price) {
-        DataResult<InventoryDTO> inventoryResult = this.getInventoryById(id);
+    public DataResult<InventoryDTO> updateInventory(InventoryId inventoryId, int quantity, double price) {
+        DataResult<InventoryDTO> inventoryResult = this.getInventoryById(inventoryId);
         if (!inventoryResult.isSuccess()) {
             return new com.ibrahimkvlci.ecommerce.catalog.utilities.results.ErrorDataResult<>(
                     inventoryResult.getMessage(), null);
@@ -125,13 +154,7 @@ public class InventoryServiceImpl implements InventoryService {
         inventoryDTO.setQuantity(quantity);
         inventoryDTO.setPrice(price);
         Inventory inventory = this.mapToEntity(inventoryDTO);
-        return this.updateInventory(id, inventory);
-    }
-
-    @Override
-    public DataResult<InventoryDTO> createInventory(InventoryDTO inventoryDTO) {
-        Inventory inventory = this.mapToEntity(inventoryDTO);
-        return this.createInventory(inventory);
+        return this.updateInventory(inventoryId, inventory);
     }
 
     @Override
@@ -152,8 +175,13 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     private InventoryDisplayDTO.OtherInventoryDTO mapToOtherInventoryDTO(Inventory inventory) {
-        return new InventoryDisplayDTO.OtherInventoryDTO(inventory.getId(), inventory.getSellerId(),
+        return new InventoryDisplayDTO.OtherInventoryDTO(inventory.getSellerId(),
                 inventory.getPrice(), inventory.getQuantity());
+    }
+
+    @Override
+    public Inventory mapToEntity(InventoryDTO inventoryDTO) {
+        return inventoryMapper.toEntity(inventoryDTO);
     }
 
 }
