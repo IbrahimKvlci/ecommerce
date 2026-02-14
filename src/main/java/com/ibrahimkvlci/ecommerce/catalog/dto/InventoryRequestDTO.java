@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class InventoryDTO {
+public class InventoryRequestDTO {
 
     @NotNull(message = "Product ID is required")
-    private ProductDTO product;
+    private Long productId;
 
     @NotNull(message = "Quantity is required")
     @Min(value = 0, message = "Quantity cannot be negative")
@@ -23,5 +23,7 @@ public class InventoryDTO {
 
     @NotNull(message = "Price is required")
     private Double price;
+
+    private Double discountPrice;
 
 }

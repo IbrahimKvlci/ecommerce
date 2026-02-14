@@ -26,6 +26,8 @@ public class ProductDisplayDTO {
 
     private Double price;
 
+    private Double discountPrice;
+
     private Long sellerId;
 
     private List<String> imagesUrl = new ArrayList<String>();

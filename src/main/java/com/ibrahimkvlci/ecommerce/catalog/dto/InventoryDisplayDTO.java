@@ -18,7 +18,6 @@ public class InventoryDisplayDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class OtherInventoryDTO {
-        private Long id;
         private Long sellerId;
         private Double price;
         private Integer quantity;
