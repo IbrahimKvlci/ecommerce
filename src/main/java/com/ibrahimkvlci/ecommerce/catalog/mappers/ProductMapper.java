@@ -89,6 +89,7 @@ public class ProductMapper {
                     .get();
             dto.setPrice(inventory.getPrice());
             dto.setSellerId(inventory.getSellerId());
+            dto.setDiscountPrice(inventory.getDiscountPrice());
         }
         dto.setImagesUrl(product.getImages().stream().map(i -> imageBaseUrl + "/" + i.getImageUrl())
                 .collect(Collectors.toList()));
@@ -110,6 +111,14 @@ public class ProductMapper {
         dto.setImagesUrl(productDocument.getImages().stream().map(i -> imageBaseUrl + "/" + i)
                 .collect(Collectors.toList()));
         dto.setAttributes(attributes);
+        if (productDocument.getInventories() != null && !productDocument.getInventories().isEmpty()) {
+            ProductDocument.Inventory inventory = productDocument.getInventories().stream()
+                    .min(Comparator.comparing(ProductDocument.Inventory::getPrice)).get();
+            dto.setPrice(inventory.getPrice());
+            dto.setDiscountPrice(inventory.getDiscountPrice());
+            dto.setSellerId(inventory.getSellerId());
+        }
+        dto.setBrandName(productDocument.getBrand().getName());
         return dto;
     }
 
@@ -126,11 +135,15 @@ public class ProductMapper {
                 .collect(Collectors.toList()));
         productDocument.setImages(product.getImages().stream().map(i -> i.getImageUrl())
                 .collect(Collectors.toList()));
-        productDocument.setBrandId(product.getBrand().getId());
-        productDocument.setBrand(product.getBrand().getName());
-        productDocument.setCategoryId(product.getCategory().getId());
-        productDocument.setCategory(product.getCategory().getName());
+        productDocument.setBrand(new ProductDocument.Brand(product.getBrand().getId(), product.getBrand().getName()));
+        productDocument.setCategory(
+                new ProductDocument.Category(product.getCategory().getId(), product.getCategory().getName()));
         productDocument.setFeatured(product.isFeatured());
+        if (product.getInventories() != null && !product.getInventories().isEmpty()) {
+            productDocument.setInventories(product.getInventories().stream().map(i -> new ProductDocument.Inventory(
+                    i.getSellerId(), i.getQuantity(), i.getPrice(), i.getDiscountPrice()))
+                    .collect(Collectors.toList()));
+        }
         return productDocument;
     }
 

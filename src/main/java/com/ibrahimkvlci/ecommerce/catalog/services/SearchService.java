@@ -14,4 +14,8 @@ public interface SearchService {
             List<AttributeDTO> filters);
 
     public Result indexProduct(ProductDocument productDocument);
+
+    public Result updateProduct(ProductDocument productDocument);
+
+    public DataResult<ProductDocument> getProductById(Long id);
 }

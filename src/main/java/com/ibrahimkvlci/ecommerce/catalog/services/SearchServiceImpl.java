@@ -2,10 +2,12 @@ package com.ibrahimkvlci.ecommerce.catalog.services;
 
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch.core.GetResponse;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.springframework.stereotype.Service;
 
+import com.ibrahimkvlci.ecommerce.catalog.utilities.results.ErrorDataResult;
 import com.ibrahimkvlci.ecommerce.catalog.dto.AttributeDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.AttributeValueDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategoryDTO;
@@ -57,7 +59,7 @@ public class SearchServiceImpl implements SearchService {
 
                                                 if (categoryIds != null && !categoryIds.isEmpty()) {
                                                         b.filter(f -> f.terms(t -> t
-                                                                        .field("categoryId")
+                                                                        .field("category.id")
                                                                         .terms(ts -> ts.value(categoryIds.stream()
                                                                                         .map(FieldValue::of)
                                                                                         .collect(Collectors
@@ -97,7 +99,7 @@ public class SearchServiceImpl implements SearchService {
                                                 }
 
                                                 return b;
-                                        })).aggregations("top_categories", a -> a.terms(t -> t.field("categoryId")))
+                                        })).aggregations("top_categories", a -> a.terms(t -> t.field("category.id")))
                                         .size(10)
                                         .aggregations("attributes_nested", a -> a
                                                         .nested(n -> n.path("attributes"))
@@ -159,6 +161,37 @@ public class SearchServiceImpl implements SearchService {
                         return new SuccessResult("Product indexed successfully");
                 } catch (IOException e) {
                         throw new RuntimeException("Ürün indeksleme sırasında hata oluştu", e);
+                }
+        }
+
+        @Override
+        public Result updateProduct(ProductDocument productDocument) {
+                try {
+                        client.update(u -> u
+                                        .index("products")
+                                        .id(productDocument.getId().toString())
+                                        .doc(productDocument),
+                                        ProductDocument.class);
+                } catch (IOException e) {
+                        throw new RuntimeException("Ürün güncelleme sırasında hata oluştu", e);
+                }
+                return new SuccessResult("Product updated successfully");
+        }
+
+        @Override
+        public DataResult<ProductDocument> getProductById(Long id) {
+                try {
+                        GetResponse<ProductDocument> productDocument = client.get(g -> g
+                                        .index("products")
+                                        .id(id.toString()),
+                                        ProductDocument.class);
+                        if (productDocument.found()) {
+                                return new SuccessDataResult<>("Product retrieved successfully",
+                                                productDocument.source());
+                        }
+                        return new ErrorDataResult<>("Product not found", null);
+                } catch (IOException e) {
+                        throw new RuntimeException("Ürün alma sırasında hata oluştu", e);
                 }
         }
 

@@ -21,21 +21,15 @@ public class ProductDocument {
 
     private String description;
 
-    private Double price;
+    private Brand brand;
 
-    private Double discountPrice;
-
-    private Long brandId;
-
-    private String brand;
-
-    private Long categoryId;
-
-    private String category;
+    private Category category;
 
     private Boolean featured;
 
     private List<String> images = new ArrayList<>();
+
+    private List<Inventory> inventories = new ArrayList<>();
 
     private List<AttributeItem> attributes = new ArrayList<>();
 
@@ -47,5 +41,38 @@ public class ProductDocument {
 
         private List<String> value;
 
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Inventory {
+        private Long sellerId;
+        private Integer stock;
+        private Double price;
+        private Double discountPrice;
+
+        public Inventory(Long sellerId, Integer stock, Double price) {
+            this.sellerId = sellerId;
+            this.stock = stock;
+            this.price = price;
+            this.discountPrice = null;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Brand {
+        private Long id;
+        private String name;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Category {
+        private Long id;
+        private String name;
     }
 }
