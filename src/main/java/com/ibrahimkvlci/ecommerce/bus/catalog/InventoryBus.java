@@ -13,11 +13,11 @@ public class InventoryBus {
 
     private final InventoryApp inventoryApp;
 
-    public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId){
+    public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId) {
         return inventoryApp.getInventoryByProductIdAndSellerId(productId, sellerId);
     }
 
-    public InventoryDTO updateInventory(Long id, int quantity, double price){
-        return inventoryApp.updateInventory(id, quantity, price);
+    public InventoryDTO updateInventory(Long sellerId, Long productId, int quantity, double price) {
+        return inventoryApp.updateInventory(sellerId, productId, quantity, price);
     }
 }

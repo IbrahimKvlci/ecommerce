@@ -19,28 +19,27 @@ public class OrderInventoryClientBus implements InventoryClient {
         public InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId) {
                 var inventory = inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId);
                 return new InventoryDTO(
-                                inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getId(),
-                                new ProductDTO(inventory.getProductDTO().getId(),
-                                                inventory.getProductDTO().getTitle(),
-                                                inventory.getProductDTO().getDescription(),
-                                                inventory.getProductDTO().getImagesUrl()),
+                                new ProductDTO(inventory.getProduct().getId(),
+                                                inventory.getProduct().getTitle(),
+                                                inventory.getProduct().getDescription(),
+                                                inventory.getProduct().getImagesUrl()),
                                 inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getQuantity(),
                                 sellerId,
                                 inventoryBus.getInventoryByProductIdAndSellerId(productId, sellerId).getPrice());
         }
 
         @Override
-        public InventoryDTO updateInventory(Long id, int quantity, double price) {
-                com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO inventory = inventoryBus.updateInventory(id,
+        public InventoryDTO updateInventory(Long sellerId, Long productId, int quantity, double price) {
+                com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO inventory = inventoryBus.updateInventory(sellerId,
+                                productId,
                                 quantity,
                                 price);
 
                 return new InventoryDTO(
-                                inventory.getId(),
-                                new ProductDTO(inventory.getProductDTO().getId(),
-                                                inventory.getProductDTO().getTitle(),
-                                                inventory.getProductDTO().getDescription(),
-                                                inventory.getProductDTO().getImagesUrl()),
+                                new ProductDTO(inventory.getProduct().getId(),
+                                                inventory.getProduct().getTitle(),
+                                                inventory.getProduct().getDescription(),
+                                                inventory.getProduct().getImagesUrl()),
                                 inventory.getQuantity(),
                                 inventory.getSellerId(),
                                 inventory.getPrice());

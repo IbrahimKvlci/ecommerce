@@ -6,5 +6,5 @@ public interface InventoryClient {
 
     InventoryDTO getInventoryByProductIdAndSellerId(Long productId, Long sellerId);
 
-    InventoryDTO updateInventory(Long id, int quantity, double price);
+    InventoryDTO updateInventory(Long sellerId, Long productId, int quantity, double price);
 }
