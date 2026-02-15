@@ -2,6 +2,8 @@ package com.ibrahimkvlci.ecommerce.catalog.dto;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProductSearchDTO {
 
-    private List<ProductDisplayDTO> products;
+    private Page<ProductDisplayDTO> products;
 
     private List<CategoryDTO> categories;
 

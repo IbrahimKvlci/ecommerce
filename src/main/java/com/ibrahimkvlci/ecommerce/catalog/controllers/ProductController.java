@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -160,8 +161,8 @@ public class ProductController {
 
         @PostMapping("/search")
         public ResponseEntity<DataResult<ProductSearchDTO>> searchProducts(
-                        @RequestBody ProductSearchRequest request) {
-                return ResponseEntity.ok(searchService.searchProducts(request));
+                        @RequestBody ProductSearchRequest request, Pageable pageable) {
+                return ResponseEntity.ok(searchService.searchProducts(request, pageable));
         }
 
         @GetMapping("/search/suggestions")

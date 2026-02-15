@@ -6,6 +6,8 @@ import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch.core.GetResponse;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.ErrorDataResult;
@@ -40,7 +42,8 @@ public class SearchServiceImpl implements SearchService {
         private final ProductMapper productMapper;
 
         @Override
-        public DataResult<ProductSearchDTO> searchProducts(ProductSearchRequest productSearchRequest) {
+        public DataResult<ProductSearchDTO> searchProducts(ProductSearchRequest productSearchRequest,
+                        Pageable pageable) {
 
                 String keyword = productSearchRequest.getSearchTerm();
                 List<Long> categoryIds = productSearchRequest.getCategoryIds();
@@ -129,7 +132,9 @@ public class SearchServiceImpl implements SearchService {
                                                                                         valueAgg -> valueAgg
                                                                                                         .terms(t -> t
                                                                                                                         .field("attributes.value")
-                                                                                                                        .size(50))))),
+                                                                                                                        .size(50)))))
+                                        .from((int) pageable.getOffset())
+                                        .size(pageable.getPageSize()),
                                         ProductDocument.class);
                 } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -164,7 +169,10 @@ public class SearchServiceImpl implements SearchService {
                                 .collect(Collectors.toList());
 
                 return new SuccessDataResult<ProductSearchDTO>("Search successful",
-                                new ProductSearchDTO(productDisplayDTOs, categories,
+                                new ProductSearchDTO(
+                                                new PageImpl<>(productDisplayDTOs, pageable,
+                                                                response.hits().total().value()),
+                                                categories,
                                                 (filters != null && !filters.isEmpty()) ? filters : attributeDTOs));
 
         }
