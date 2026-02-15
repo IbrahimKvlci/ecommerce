@@ -161,8 +161,7 @@ public class ProductController {
         @PostMapping("/search")
         public ResponseEntity<DataResult<ProductSearchDTO>> searchProducts(
                         @RequestBody ProductSearchRequest request) {
-                return ResponseEntity.ok(searchService.searchProducts(request.getSearchTerm(), request.getCategoryIds(),
-                                request.getFilters()));
+                return ResponseEntity.ok(searchService.searchProducts(request));
         }
 
         @GetMapping("/search/suggestions")

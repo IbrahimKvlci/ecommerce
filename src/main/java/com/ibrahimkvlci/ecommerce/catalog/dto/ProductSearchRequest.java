@@ -17,4 +17,8 @@ public class ProductSearchRequest {
 
     private List<AttributeDTO> filters;
 
+    private double minPrice = 0;
+
+    private double maxPrice = Double.MAX_VALUE;
+
 }

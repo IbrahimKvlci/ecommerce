@@ -1,5 +1,6 @@
 package com.ibrahimkvlci.ecommerce.catalog.services;
 
+import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch.core.GetResponse;
@@ -13,6 +14,7 @@ import com.ibrahimkvlci.ecommerce.catalog.dto.AttributeValueDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchDTO;
+import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchRequest;
 import com.ibrahimkvlci.ecommerce.catalog.mappers.ProductMapper;
 import com.ibrahimkvlci.ecommerce.catalog.models.ProductDocument;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
@@ -38,8 +40,13 @@ public class SearchServiceImpl implements SearchService {
         private final ProductMapper productMapper;
 
         @Override
-        public DataResult<ProductSearchDTO> searchProducts(String keyword, List<Long> categoryIds,
-                        List<AttributeDTO> filters) {
+        public DataResult<ProductSearchDTO> searchProducts(ProductSearchRequest productSearchRequest) {
+
+                String keyword = productSearchRequest.getSearchTerm();
+                List<Long> categoryIds = productSearchRequest.getCategoryIds();
+                List<AttributeDTO> filters = productSearchRequest.getFilters();
+                double minPrice = productSearchRequest.getMinPrice();
+                double maxPrice = productSearchRequest.getMaxPrice();
 
                 List<AttributeDTO> selectedFilters = filters.stream()
                                 .filter(f -> f.getValues().stream().anyMatch(AttributeValueDTO::getIsSelected))
