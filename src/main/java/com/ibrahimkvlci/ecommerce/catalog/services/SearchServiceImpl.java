@@ -59,8 +59,15 @@ public class SearchServiceImpl implements SearchService {
                                         .query(q -> q.bool(b -> {
 
                                                 b.filter(f -> f.nested(n -> n.path("inventories").query(
-                                                                nq -> nq.range(r -> r.field("inventories.stock")
-                                                                                .gt(JsonData.of(0))))));
+                                                                nq -> nq.range(r -> {
+                                                                        r.field("inventories.stock")
+                                                                                        .gt(JsonData.of(0));
+                                                                        r.field("inventories.price")
+                                                                                        .gte(JsonData.of(minPrice));
+                                                                        r.field("inventories.price")
+                                                                                        .lte(JsonData.of(maxPrice));
+                                                                        return r;
+                                                                }))));
 
                                                 if (keyword != null && !keyword.isEmpty()) {
                                                         b.must(m -> m.multiMatch(mm -> mm
