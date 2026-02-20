@@ -65,7 +65,6 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public DataResult<CartDTO> getCartOfCustomer() {
         DataResult<Long> userIdRes = userClient.getCustomerIdFromJWT();
         if (!userIdRes.isSuccess()) {
@@ -74,7 +73,7 @@ public class CartServiceImpl implements CartService {
         Long customerId = userIdRes.getData();
         return new SuccessDataResult<CartDTO>(cartRepository.findByCustomerId(customerId)
                 .map(cart -> mapToDTO(cart))
-                .orElseThrow(() -> new CartNotFoundException("Cart not found with customerId: " + customerId)));
+                .orElseGet(() -> createCart(new CreateCartRequest(customerId)).getData()));
     }
 
     @Override
