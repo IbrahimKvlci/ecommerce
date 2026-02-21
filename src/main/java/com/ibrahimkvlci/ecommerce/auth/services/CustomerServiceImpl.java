@@ -42,6 +42,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerCodeRepository customerCodeRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final UserInfoService userInfoService;
 
     private final CartClient cartClient;
 
@@ -126,6 +127,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     private String generateCode() {
         return String.valueOf(new Random().nextInt(900000) + 100000);
+    }
+
+    @Override
+    public DataResult<CustomerDTO> getCustomerInfo() {
+        Long userId = userInfoService.getUserIdFromJWT().getData();
+        return new SuccessDataResult<>(customerRepository.findById(userId).map(CustomerDTO::fromEntity).get());
     }
 
 }

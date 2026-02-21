@@ -1,8 +1,10 @@
 package com.ibrahimkvlci.ecommerce.auth.controllers;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.ibrahimkvlci.ecommerce.auth.dto.CustomerDTO;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerRequest;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerResponse;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterVerifyRequest;
@@ -42,5 +44,11 @@ public class CustomerController {
         log.info("Customer verification attempt for {}", request.getEmail());
         DataResult<RegisterCustomerResponse> response = customerService.registerComplete(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<DataResult<CustomerDTO>> getCustomerInfo() {
+        DataResult<CustomerDTO> response = customerService.getCustomerInfo();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

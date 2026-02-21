@@ -22,4 +22,6 @@ public interface CustomerService {
 
     boolean existsByEmail(String email);
 
+    DataResult<CustomerDTO> getCustomerInfo();
+
 }
