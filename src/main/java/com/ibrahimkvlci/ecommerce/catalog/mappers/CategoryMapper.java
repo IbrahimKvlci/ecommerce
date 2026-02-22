@@ -59,10 +59,7 @@ public class CategoryMapper {
             return null;
         }
         Category category = new Category();
-        Category parent = new Category();
-        parent.setId(categoryDTO.getParentCategoryId());
         category.setName(categoryDTO.getName());
-        category.setParent(parent);
         return category;
     }
 }

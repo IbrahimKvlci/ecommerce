@@ -39,6 +39,12 @@ public class CategoryServiceImpl implements CategoryService {
             throw new CategoryValidationException("Category with name '" + category.getName() + "' already exists");
         }
         Category newCategory = categoryMapper.fromAddCategoryDTOTOEntity(category);
+        if (category.getParentCategoryId() != null) {
+            Category parentCategory = categoryRepository.findById(category.getParentCategoryId())
+                    .orElseThrow(() -> new CategoryNotFoundException(
+                            "Parent category not found with ID: " + category.getParentCategoryId()));
+            newCategory.setParent(parentCategory);
+        }
         Category savedCategory = categoryRepository.save(Objects.requireNonNull(newCategory));
 
         log.info("Category created successfully with ID: {}", savedCategory.getId());
