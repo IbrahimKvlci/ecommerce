@@ -8,6 +8,7 @@ import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.ErrorDataResult;
@@ -40,6 +41,8 @@ public class SearchServiceImpl implements SearchService {
         private final CategoryService categoryService;
 
         private final ProductMapper productMapper;
+
+        private final JdbcTemplate jdbcTemplate;
 
         @Override
         public DataResult<ProductSearchDTO> searchProducts(ProductSearchRequest productSearchRequest,
@@ -184,6 +187,7 @@ public class SearchServiceImpl implements SearchService {
                                         .index("products")
                                         .id(productDocument.getId().toString())
                                         .document(productDocument));
+                        refreshUniqueKeywords();
                         return new SuccessResult("Product indexed successfully");
                 } catch (IOException e) {
                         throw new RuntimeException("Ürün indeksleme sırasında hata oluştu", e);
@@ -198,6 +202,7 @@ public class SearchServiceImpl implements SearchService {
                                         .id(productDocument.getId().toString())
                                         .doc(productDocument),
                                         ProductDocument.class);
+                        refreshUniqueKeywords();
                 } catch (IOException e) {
                         throw new RuntimeException("Ürün güncelleme sırasında hata oluştu", e);
                 }
@@ -219,6 +224,13 @@ public class SearchServiceImpl implements SearchService {
                 } catch (IOException e) {
                         throw new RuntimeException("Ürün alma sırasında hata oluştu", e);
                 }
+        }
+
+        @Override
+        public Result refreshUniqueKeywords() {
+                String sql = "REFRESH MATERIALIZED VIEW unique_keywords";
+                jdbcTemplate.execute(sql);
+                return new SuccessResult("Unique keywords refreshed successfully");
         }
 
 }
