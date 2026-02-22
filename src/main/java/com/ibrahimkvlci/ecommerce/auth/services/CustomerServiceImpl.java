@@ -12,6 +12,7 @@ import com.ibrahimkvlci.ecommerce.auth.dto.RegisterVerifyRequest;
 import com.ibrahimkvlci.ecommerce.auth.utilities.results.SuccessDataResult;
 import com.ibrahimkvlci.ecommerce.auth.client.CartClient;
 import com.ibrahimkvlci.ecommerce.auth.dto.CustomerDTO;
+import com.ibrahimkvlci.ecommerce.auth.dto.CustomerRequestDTO;
 import com.ibrahimkvlci.ecommerce.auth.exceptions.RegistrationException;
 import com.ibrahimkvlci.ecommerce.auth.models.Customer;
 import com.ibrahimkvlci.ecommerce.auth.models.Role;
@@ -133,6 +134,21 @@ public class CustomerServiceImpl implements CustomerService {
     public DataResult<CustomerDTO> getCustomerInfo() {
         Long userId = userInfoService.getUserIdFromJWT().getData();
         return new SuccessDataResult<>(customerRepository.findById(userId).map(CustomerDTO::fromEntity).get());
+    }
+
+    @Override
+    public DataResult<CustomerDTO> updateCustomerInfo(CustomerRequestDTO request) {
+        if (request.getEmail() == null || request.getName() == null || request.getSurname() == null) {
+            throw new RegistrationException("Email, name and surname are required");
+        }
+
+        Long userId = userInfoService.getUserIdFromJWT().getData();
+        Customer customer = customerRepository.findById(userId).get();
+        customer.setEmail(request.getEmail());
+        customer.setName(request.getName());
+        customer.setSurname(request.getSurname());
+        Customer saved = customerRepository.save(customer);
+        return new SuccessDataResult<>(CustomerDTO.fromEntity(saved));
     }
 
 }

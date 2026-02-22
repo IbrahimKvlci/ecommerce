@@ -3,8 +3,10 @@ package com.ibrahimkvlci.ecommerce.auth.controllers;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import com.ibrahimkvlci.ecommerce.auth.dto.CustomerDTO;
+import com.ibrahimkvlci.ecommerce.auth.dto.CustomerRequestDTO;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerRequest;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerResponse;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterVerifyRequest;
@@ -51,4 +53,12 @@ public class CustomerController {
         DataResult<CustomerDTO> response = customerService.getCustomerInfo();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PutMapping("/me")
+    public ResponseEntity<DataResult<CustomerDTO>> updateCustomerInfo(
+            @Valid @RequestBody CustomerRequestDTO request) {
+        DataResult<CustomerDTO> response = customerService.updateCustomerInfo(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }

@@ -5,6 +5,7 @@ import com.ibrahimkvlci.ecommerce.auth.dto.RegisterCustomerResponse;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterVerifyRequest;
 import com.ibrahimkvlci.ecommerce.auth.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.auth.dto.CustomerDTO;
+import com.ibrahimkvlci.ecommerce.auth.dto.CustomerRequestDTO;
 
 import java.util.Optional;
 
@@ -23,5 +24,7 @@ public interface CustomerService {
     boolean existsByEmail(String email);
 
     DataResult<CustomerDTO> getCustomerInfo();
+
+    DataResult<CustomerDTO> updateCustomerInfo(CustomerRequestDTO request);
 
 }
