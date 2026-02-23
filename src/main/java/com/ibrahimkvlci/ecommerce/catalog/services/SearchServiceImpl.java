@@ -83,7 +83,7 @@ public class SearchServiceImpl implements SearchService {
 
                                                 if (categoryIds != null && !categoryIds.isEmpty()) {
                                                         b.filter(f -> f.terms(t -> t
-                                                                        .field("category.id")
+                                                                        .field("category.ids")
                                                                         .terms(ts -> ts.value(categoryIds.stream()
                                                                                         .map(FieldValue::of)
                                                                                         .collect(Collectors
@@ -123,7 +123,7 @@ public class SearchServiceImpl implements SearchService {
                                                 }
 
                                                 return b;
-                                        })).aggregations("top_categories", a -> a.terms(t -> t.field("category.id")))
+                                        })).aggregations("top_categories", a -> a.terms(t -> t.field("category.ids")))
                                         .size(10)
                                         .aggregations("attributes_nested", a -> a
                                                         .nested(n -> n.path("attributes"))

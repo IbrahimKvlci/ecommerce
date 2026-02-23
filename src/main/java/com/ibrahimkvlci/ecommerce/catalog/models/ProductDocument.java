@@ -72,7 +72,7 @@ public class ProductDocument {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Category {
-        private Long id;
-        private String name;
+        private List<Long> ids;
+        private List<String> names;
     }
 }

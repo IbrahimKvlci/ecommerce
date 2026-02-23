@@ -1,5 +1,6 @@
 package com.ibrahimkvlci.ecommerce.catalog.mappers;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -136,8 +137,16 @@ public class ProductMapper {
         productDocument.setImages(product.getImages().stream().map(i -> i.getImageUrl())
                 .collect(Collectors.toList()));
         productDocument.setBrand(new ProductDocument.Brand(product.getBrand().getId(), product.getBrand().getName()));
+        List<Long> ids = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        Category category = product.getCategory();
+        while (category != null) {
+            ids.add(category.getId());
+            names.add(category.getName());
+            category = category.getParent();
+        }
         productDocument.setCategory(
-                new ProductDocument.Category(product.getCategory().getId(), product.getCategory().getName()));
+                new ProductDocument.Category(ids, names));
         productDocument.setFeatured(product.isFeatured());
         if (product.getInventories() != null && !product.getInventories().isEmpty()) {
             productDocument.setInventories(product.getInventories().stream().map(i -> new ProductDocument.Inventory(

@@ -38,6 +38,9 @@ public class ProductImageServiceImpl implements ProductImageService {
         productImage.setImageUrl(result);
         productImage.setPrimary(false);
         productImageRepository.save(productImage);
+
+        product.getImages().add(productImage);
+
         return new SuccessDataResult<>("Image uploaded successfully", result);
 
     }

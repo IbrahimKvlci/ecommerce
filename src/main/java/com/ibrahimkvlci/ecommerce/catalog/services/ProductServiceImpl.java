@@ -49,24 +49,25 @@ public class ProductServiceImpl implements ProductService {
         if (productExistsByTitle(product.getTitle())) {
             throw new IllegalArgumentException("Product with title '" + product.getTitle() + "' already exists");
         }
-
-        if (brandRepository.findById(Objects.requireNonNull(product.getBrandId())).isEmpty()) {
+        Brand brand = brandRepository.findById(Objects.requireNonNull(product.getBrandId())).orElse(null);
+        if (brand == null) {
             throw new IllegalArgumentException("Brand with ID " + product.getBrandId() + " not found");
         }
-        if (categoryRepository.findById(Objects.requireNonNull(product.getCategoryId())).isEmpty()) {
+        Category category = categoryRepository.findById(Objects.requireNonNull(product.getCategoryId())).orElse(null);
+        if (category == null) {
             throw new IllegalArgumentException("Category with ID " + product.getCategoryId() + " not found");
         }
-
-        Product savedProduct = productRepository.save(productMapper.toEntity(product));
+        Product productEntity = productMapper.toEntity(product);
+        productEntity.setBrand(brand);
+        productEntity.setCategory(category);
+        Product savedProduct = productRepository.save(productEntity);
         for (MultipartFile image : images) {
             productImageService.uploadProductImage(image, savedProduct);
         }
 
-        Product lastProduct = productRepository.findById(savedProduct.getId()).orElse(null);
+        searchService.indexProduct(productMapper.toProductDocument(savedProduct));
 
-        searchService.indexProduct(productMapper.toProductDocument(lastProduct));
-
-        return new SuccessDataResult<>("Product created successfully", productMapper.toDTO(lastProduct));
+        return new SuccessDataResult<>("Product created successfully", productMapper.toDTO(savedProduct));
 
     }
 
