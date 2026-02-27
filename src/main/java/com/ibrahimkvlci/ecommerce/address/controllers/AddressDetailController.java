@@ -59,4 +59,5 @@ public class AddressDetailController {
     public ResponseEntity<Result> deleteAddressDetail(@PathVariable Long id) {
         return ResponseEntity.ok(addressDetailService.deleteAddressDetail(id));
     }
+
 }

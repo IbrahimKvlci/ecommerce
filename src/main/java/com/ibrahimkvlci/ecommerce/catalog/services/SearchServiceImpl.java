@@ -20,6 +20,7 @@ import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchRequest;
 import com.ibrahimkvlci.ecommerce.catalog.mappers.ProductMapper;
 import com.ibrahimkvlci.ecommerce.catalog.models.ProductDocument;
+import com.ibrahimkvlci.ecommerce.catalog.repositories.CategoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.SuccessDataResult;
@@ -151,6 +152,9 @@ public class SearchServiceImpl implements SearchService {
                                 .array().stream()
                                 .map(b -> categoryService.getCategoryById(Long.parseLong(b.key())).getData())
                                 .collect(Collectors.toList());
+                String categoryName = categoryIds.size() == 1
+                                ? categoryService.getCategoryById(categoryIds.getFirst()).getData().getName()
+                                : null;
 
                 List<AttributeDTO> attributeDTOs = response.aggregations().get("attributes_nested").nested()
                                 .aggregations().get("attr_keys").sterms().buckets().array().stream()
@@ -176,7 +180,8 @@ public class SearchServiceImpl implements SearchService {
                                                 new PageImpl<>(productDisplayDTOs, pageable,
                                                                 response.hits().total().value()),
                                                 categories,
-                                                (filters != null && !filters.isEmpty()) ? filters : attributeDTOs));
+                                                (filters != null && !filters.isEmpty()) ? filters : attributeDTOs,
+                                                categoryName));
 
         }
 

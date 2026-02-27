@@ -18,4 +18,13 @@ public class ProductSearchDTO {
     private List<CategoryDTO> categories;
 
     private List<AttributeDTO> attributes;
+
+    private String categoryName;
+
+    public ProductSearchDTO(Page<ProductDisplayDTO> products, List<CategoryDTO> categories,
+            List<AttributeDTO> attributes) {
+        this.products = products;
+        this.categories = categories;
+        this.attributes = attributes;
+    }
 }
