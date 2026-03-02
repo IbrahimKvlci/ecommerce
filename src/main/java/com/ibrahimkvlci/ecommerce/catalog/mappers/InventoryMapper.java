@@ -26,6 +26,7 @@ public class InventoryMapper {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setId(inventoryRequestDTO.getProductId());
         inventory.setProduct(productMapper.toEntity(productDTO));
+        inventory.setDiscountPrice(inventoryRequestDTO.getDiscountPrice());
         return inventory;
     }
 
@@ -40,6 +41,7 @@ public class InventoryMapper {
         ProductDTO productDTO = new ProductDTO();
         productDTO.setId(inventoryDTO.getProduct().getId());
         inventory.setProduct(productMapper.toEntity(productDTO));
+        inventory.setDiscountPrice(inventoryDTO.getDiscountPrice());
         return inventory;
     }
 
@@ -52,6 +54,7 @@ public class InventoryMapper {
         dto.setQuantity(inventory.getQuantity());
         dto.setPrice(inventory.getPrice());
         dto.setSellerId(inventory.getSellerId());
+        dto.setDiscountPrice(inventory.getDiscountPrice());
         return dto;
     }
 }

@@ -108,6 +108,8 @@ public class InventoryServiceImpl implements InventoryService {
         }
 
         existing.setQuantity(inventory.getQuantity());
+        existing.setPrice(inventory.getPrice());
+        existing.setDiscountPrice(inventory.getDiscountPrice());
         Inventory updated = inventoryRepository.save(existing);
         return new SuccessDataResult<>("Inventory updated successfully", this.mapToDTO(updated));
     }
