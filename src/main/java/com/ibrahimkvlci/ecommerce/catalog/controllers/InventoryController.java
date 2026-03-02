@@ -66,7 +66,7 @@ public class InventoryController {
     public ResponseEntity<DataResult<InventoryDTO>> updateInventory(@PathVariable Long sellerId,
             @PathVariable Long productId, @Valid @RequestBody InventoryDTO inventoryDTO) {
         Inventory inventory = inventoryService.mapToEntity(inventoryDTO);
-        return ResponseEntity.ok(inventoryService.updateInventory(new InventoryId(sellerId, productId), inventory));
+        return ResponseEntity.ok(inventoryService.updateInventory(new InventoryId(productId, sellerId), inventory));
     }
 
     @DeleteMapping("/sellerId/{sellerId}/productId/{productId}")
