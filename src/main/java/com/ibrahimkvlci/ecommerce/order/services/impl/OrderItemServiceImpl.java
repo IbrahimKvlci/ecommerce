@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.order.services;
+package com.ibrahimkvlci.ecommerce.order.services.impl;
 
 import org.springframework.stereotype.Service;
 
@@ -6,6 +6,7 @@ import com.ibrahimkvlci.ecommerce.order.client.InventoryClient;
 import com.ibrahimkvlci.ecommerce.order.client.ProductClient;
 import com.ibrahimkvlci.ecommerce.order.dto.OrderItemDTO;
 import com.ibrahimkvlci.ecommerce.order.models.OrderItem;
+import com.ibrahimkvlci.ecommerce.order.services.OrderItemService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

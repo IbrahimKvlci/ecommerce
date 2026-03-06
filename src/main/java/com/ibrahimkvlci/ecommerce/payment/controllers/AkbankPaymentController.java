@@ -2,7 +2,7 @@ package com.ibrahimkvlci.ecommerce.payment.controllers;
 
 import com.ibrahimkvlci.ecommerce.payment.dto.AkbankPaymentResultRequest;
 import com.ibrahimkvlci.ecommerce.payment.exceptions.PaymentIncorrectValuesError;
-import com.ibrahimkvlci.ecommerce.payment.services.AkbankPaymentService;
+import com.ibrahimkvlci.ecommerce.payment.infrastructure.adapters.AkbankPaymentAdapter;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AkbankPaymentController {
 
-    private final AkbankPaymentService akbankPaymentService;
+    private final AkbankPaymentAdapter akbankPaymentService;
 
     @Value("${frontend.url}")
     private String frontendUrl;

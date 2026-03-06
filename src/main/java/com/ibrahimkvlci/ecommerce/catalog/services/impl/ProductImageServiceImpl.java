@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.catalog.services;
+package com.ibrahimkvlci.ecommerce.catalog.services.impl;
 
 import java.io.IOException;
 
@@ -10,6 +10,8 @@ import com.ibrahimkvlci.ecommerce.catalog.exceptions.ImageUploadException;
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import com.ibrahimkvlci.ecommerce.catalog.models.ProductImage;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductImageRepository;
+import com.ibrahimkvlci.ecommerce.catalog.services.ImageCloudService;
+import com.ibrahimkvlci.ecommerce.catalog.services.ProductImageService;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.SuccessDataResult;

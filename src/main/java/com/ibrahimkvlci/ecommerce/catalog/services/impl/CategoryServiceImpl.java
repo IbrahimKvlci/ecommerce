@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.catalog.services;
+package com.ibrahimkvlci.ecommerce.catalog.services.impl;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.AddCategoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.CategoryDTO;
@@ -8,6 +8,7 @@ import com.ibrahimkvlci.ecommerce.catalog.exceptions.CategoryValidationException
 import com.ibrahimkvlci.ecommerce.catalog.mappers.CategoryMapper;
 import com.ibrahimkvlci.ecommerce.catalog.models.Category;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.CategoryRepository;
+import com.ibrahimkvlci.ecommerce.catalog.services.CategoryService;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.SuccessDataResult;

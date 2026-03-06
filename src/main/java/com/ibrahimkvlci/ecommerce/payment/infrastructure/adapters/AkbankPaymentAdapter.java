@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.payment.services;
+package com.ibrahimkvlci.ecommerce.payment.infrastructure.adapters;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
@@ -31,13 +31,14 @@ import com.ibrahimkvlci.ecommerce.payment.dto.CardInfoDTO;
 import com.ibrahimkvlci.ecommerce.payment.dto.SaleRequest;
 import com.ibrahimkvlci.ecommerce.payment.dto.SaleResponse;
 import com.ibrahimkvlci.ecommerce.payment.exceptions.PaymentIncorrectValuesError;
+import com.ibrahimkvlci.ecommerce.payment.services.PaymentService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @Primary
 @RequiredArgsConstructor
-public class AkbankPaymentService implements PaymentService {
+public class AkbankPaymentAdapter implements PaymentService {
 
     @Value("${akbank.merchantUser}")
     private String merchantUser;

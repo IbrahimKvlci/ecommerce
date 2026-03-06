@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.auth.services;
+package com.ibrahimkvlci.ecommerce.auth.infrastructure.adapters;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -7,13 +7,15 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.ibrahimkvlci.ecommerce.auth.services.EmailService;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class EmailServiceImpl implements EmailService {
+public class JavaMailSenderAdapter implements EmailService {
 
     private final JavaMailSender emailSender;
     private final TemplateEngine templateEngine;

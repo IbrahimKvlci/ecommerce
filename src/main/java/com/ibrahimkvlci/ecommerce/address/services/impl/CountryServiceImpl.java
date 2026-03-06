@@ -1,9 +1,10 @@
-package com.ibrahimkvlci.ecommerce.address.services;
+package com.ibrahimkvlci.ecommerce.address.services.impl;
 
 import com.ibrahimkvlci.ecommerce.address.dto.CountryRequestDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.CountryResponseDTO;
 import com.ibrahimkvlci.ecommerce.address.models.Country;
 import com.ibrahimkvlci.ecommerce.address.repositories.CountryRepository;
+import com.ibrahimkvlci.ecommerce.address.services.CountryService;
 import com.ibrahimkvlci.ecommerce.address.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.address.utilities.results.Result;
 import com.ibrahimkvlci.ecommerce.address.utilities.results.SuccessDataResult;

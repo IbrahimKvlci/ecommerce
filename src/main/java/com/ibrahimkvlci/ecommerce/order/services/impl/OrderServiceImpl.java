@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.order.services;
+package com.ibrahimkvlci.ecommerce.order.services.impl;
 
 import com.ibrahimkvlci.ecommerce.order.client.CustomerClient;
 import com.ibrahimkvlci.ecommerce.order.client.ProductClient;
@@ -14,6 +14,8 @@ import com.ibrahimkvlci.ecommerce.order.models.Order;
 import com.ibrahimkvlci.ecommerce.order.models.OrderItem;
 import com.ibrahimkvlci.ecommerce.order.models.OrderStatus;
 import com.ibrahimkvlci.ecommerce.order.repositories.OrderRepository;
+import com.ibrahimkvlci.ecommerce.order.services.OrderItemService;
+import com.ibrahimkvlci.ecommerce.order.services.OrderService;
 import com.ibrahimkvlci.ecommerce.order.utils.results.*;
 
 import lombok.RequiredArgsConstructor;

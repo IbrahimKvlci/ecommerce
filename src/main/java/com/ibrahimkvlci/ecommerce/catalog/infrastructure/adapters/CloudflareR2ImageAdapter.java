@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.catalog.services;
+package com.ibrahimkvlci.ecommerce.catalog.infrastructure.adapters;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ibrahimkvlci.ecommerce.catalog.services.ImageCloudService;
+
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -15,7 +17,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 
 @Service
 @RequiredArgsConstructor
-public class CloudflareR2ImageService implements ImageCloudService {
+public class CloudflareR2ImageAdapter implements ImageCloudService {
 
     private final S3Client s3Client;
 

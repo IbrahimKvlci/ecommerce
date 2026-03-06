@@ -1,10 +1,11 @@
-package com.ibrahimkvlci.ecommerce.catalog.services;
+package com.ibrahimkvlci.ecommerce.catalog.services.impl;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.BrandDTO;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.BrandNotFoundException;
 import com.ibrahimkvlci.ecommerce.catalog.exceptions.BrandValidationException;
 import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.BrandRepository;
+import com.ibrahimkvlci.ecommerce.catalog.services.BrandService;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.SuccessDataResult;

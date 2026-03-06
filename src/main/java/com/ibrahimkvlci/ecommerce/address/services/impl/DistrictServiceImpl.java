@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.address.services;
+package com.ibrahimkvlci.ecommerce.address.services.impl;
 
 import com.ibrahimkvlci.ecommerce.address.dto.DistrictRequestDTO;
 import com.ibrahimkvlci.ecommerce.address.dto.DistrictResponseDTO;
@@ -6,6 +6,7 @@ import com.ibrahimkvlci.ecommerce.address.models.City;
 import com.ibrahimkvlci.ecommerce.address.models.District;
 import com.ibrahimkvlci.ecommerce.address.repositories.CityRepository;
 import com.ibrahimkvlci.ecommerce.address.repositories.DistrictRepository;
+import com.ibrahimkvlci.ecommerce.address.services.DistrictService;
 import com.ibrahimkvlci.ecommerce.address.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.address.utilities.results.Result;
 import com.ibrahimkvlci.ecommerce.address.utilities.results.SuccessDataResult;

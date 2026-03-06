@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.order.services;
+package com.ibrahimkvlci.ecommerce.order.services.impl;
 
 import com.ibrahimkvlci.ecommerce.order.client.UserClient;
 import com.ibrahimkvlci.ecommerce.order.client.InventoryClient;
@@ -8,6 +8,8 @@ import com.ibrahimkvlci.ecommerce.order.exceptions.AuthException;
 import com.ibrahimkvlci.ecommerce.order.exceptions.CartNotFoundException;
 import com.ibrahimkvlci.ecommerce.order.models.Cart;
 import com.ibrahimkvlci.ecommerce.order.repositories.CartRepository;
+import com.ibrahimkvlci.ecommerce.order.services.CartItemService;
+import com.ibrahimkvlci.ecommerce.order.services.CartService;
 import com.ibrahimkvlci.ecommerce.order.utils.results.DataResult;
 import com.ibrahimkvlci.ecommerce.order.utils.results.Result;
 import com.ibrahimkvlci.ecommerce.order.utils.results.SuccessDataResult;

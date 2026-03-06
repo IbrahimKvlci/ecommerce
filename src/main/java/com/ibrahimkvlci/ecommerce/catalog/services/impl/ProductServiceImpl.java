@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.catalog.services;
+package com.ibrahimkvlci.ecommerce.catalog.services.impl;
 
 import com.ibrahimkvlci.ecommerce.catalog.models.Product;
 import com.ibrahimkvlci.ecommerce.catalog.models.Brand;
@@ -7,6 +7,9 @@ import com.ibrahimkvlci.ecommerce.catalog.repositories.BrandRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.CategoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.projection.AttributeSummary;
+import com.ibrahimkvlci.ecommerce.catalog.services.ProductImageService;
+import com.ibrahimkvlci.ecommerce.catalog.services.ProductService;
+import com.ibrahimkvlci.ecommerce.catalog.services.SearchService;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductRequestDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductDisplayDTO;

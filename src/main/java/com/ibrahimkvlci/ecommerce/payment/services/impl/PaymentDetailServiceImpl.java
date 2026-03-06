@@ -1,10 +1,11 @@
-package com.ibrahimkvlci.ecommerce.payment.services;
+package com.ibrahimkvlci.ecommerce.payment.services.impl;
 
 import com.ibrahimkvlci.ecommerce.payment.models.PaymentDetail;
 import com.ibrahimkvlci.ecommerce.payment.models.PaymentMethod;
 import com.ibrahimkvlci.ecommerce.payment.dto.PaymentDetailDTO;
 import com.ibrahimkvlci.ecommerce.payment.repositories.PaymentDetailRepository;
 import com.ibrahimkvlci.ecommerce.payment.repositories.PaymentMethodRepository;
+import com.ibrahimkvlci.ecommerce.payment.services.PaymentDetailService;
 import com.ibrahimkvlci.ecommerce.payment.exceptions.PaymentDetailNotFoundException;
 import com.ibrahimkvlci.ecommerce.payment.exceptions.PaymentDetailValidationException;
 

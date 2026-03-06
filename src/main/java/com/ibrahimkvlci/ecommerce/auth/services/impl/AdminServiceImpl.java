@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.auth.services;
+package com.ibrahimkvlci.ecommerce.auth.services.impl;
 
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterAdminRequest;
 import com.ibrahimkvlci.ecommerce.auth.dto.RegisterAdminResponse;
@@ -9,6 +9,7 @@ import com.ibrahimkvlci.ecommerce.auth.models.Role;
 import com.ibrahimkvlci.ecommerce.auth.repositories.AdminRepository;
 import com.ibrahimkvlci.ecommerce.auth.repositories.RoleRepository;
 import com.ibrahimkvlci.ecommerce.auth.repositories.UserInfoRepository;
+import com.ibrahimkvlci.ecommerce.auth.services.AdminService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,6 @@ public class AdminServiceImpl implements AdminService {
     private final UserInfoRepository userInfoRepository;
     private final PasswordEncoder passwordEncoder;
 
-
     @Override
     public RegisterAdminResponse registerAdmin(RegisterAdminRequest request) {
         if (userInfoRepository.existsByEmailIgnoreCase(request.getEmail())) {
@@ -41,7 +41,7 @@ public class AdminServiceImpl implements AdminService {
         Admin admin = new Admin();
         admin.setEmail(request.getEmail());
         admin.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        
+
         Role adminRole = roleRepository.findByName("ROLE_ADMIN")
                 .orElseThrow(() -> new AuthException("Role ADMIN not configured"));
         Set<Role> roles = new HashSet<>();

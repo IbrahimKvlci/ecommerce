@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.auth.services;
+package com.ibrahimkvlci.ecommerce.auth.services.impl;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -21,6 +21,9 @@ import com.ibrahimkvlci.ecommerce.auth.repositories.CustomerRepository;
 import com.ibrahimkvlci.ecommerce.auth.repositories.RoleRepository;
 import com.ibrahimkvlci.ecommerce.auth.repositories.UserInfoRepository;
 import com.ibrahimkvlci.ecommerce.auth.repositories.redis.CustomerCodeRepository;
+import com.ibrahimkvlci.ecommerce.auth.services.CustomerService;
+import com.ibrahimkvlci.ecommerce.auth.services.EmailService;
+import com.ibrahimkvlci.ecommerce.auth.services.UserInfoService;
 import com.ibrahimkvlci.ecommerce.auth.utilities.results.DataResult;
 
 import jakarta.transaction.Transactional;

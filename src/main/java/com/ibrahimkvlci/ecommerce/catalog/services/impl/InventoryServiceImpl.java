@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.catalog.services;
+package com.ibrahimkvlci.ecommerce.catalog.services.impl;
 
 import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.InventoryDisplayDTO;
@@ -10,6 +10,8 @@ import com.ibrahimkvlci.ecommerce.catalog.models.ProductDocument;
 import com.ibrahimkvlci.ecommerce.catalog.models.id.InventoryId;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.InventoryRepository;
 import com.ibrahimkvlci.ecommerce.catalog.repositories.ProductRepository;
+import com.ibrahimkvlci.ecommerce.catalog.services.InventoryService;
+import com.ibrahimkvlci.ecommerce.catalog.services.SearchService;
 import com.ibrahimkvlci.ecommerce.catalog.mappers.InventoryMapper;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;

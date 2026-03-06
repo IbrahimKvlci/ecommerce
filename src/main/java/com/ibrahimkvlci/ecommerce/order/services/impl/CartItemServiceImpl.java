@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.order.services;
+package com.ibrahimkvlci.ecommerce.order.services.impl;
 
 import com.ibrahimkvlci.ecommerce.order.client.InventoryClient;
 import com.ibrahimkvlci.ecommerce.order.dto.AddCartItemRequest;
@@ -10,6 +10,7 @@ import com.ibrahimkvlci.ecommerce.order.models.Cart;
 import com.ibrahimkvlci.ecommerce.order.models.CartItem;
 import com.ibrahimkvlci.ecommerce.order.repositories.CartItemRepository;
 import com.ibrahimkvlci.ecommerce.order.repositories.CartRepository;
+import com.ibrahimkvlci.ecommerce.order.services.CartItemService;
 import com.ibrahimkvlci.ecommerce.order.utils.results.DataResult;
 import com.ibrahimkvlci.ecommerce.order.utils.results.Result;
 import com.ibrahimkvlci.ecommerce.order.utils.results.SuccessDataResult;

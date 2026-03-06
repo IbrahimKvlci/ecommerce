@@ -1,7 +1,9 @@
-package com.ibrahimkvlci.ecommerce.auth.services;
+package com.ibrahimkvlci.ecommerce.auth.services.impl;
 
 import com.ibrahimkvlci.ecommerce.auth.dto.AuthRequest;
 import com.ibrahimkvlci.ecommerce.auth.dto.AuthResponse;
+import com.ibrahimkvlci.ecommerce.auth.services.AuthService;
+import com.ibrahimkvlci.ecommerce.auth.services.JWTService;
 import com.ibrahimkvlci.ecommerce.auth.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.auth.utilities.results.SuccessDataResult;
 

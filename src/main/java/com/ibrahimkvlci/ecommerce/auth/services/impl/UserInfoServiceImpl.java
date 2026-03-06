@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.auth.services;
+package com.ibrahimkvlci.ecommerce.auth.services.impl;
 
 import java.util.Optional;
 
@@ -13,7 +13,7 @@ import com.ibrahimkvlci.ecommerce.auth.utilities.results.SuccessDataResult;
 import com.ibrahimkvlci.ecommerce.auth.dto.UserMyDetails;
 import com.ibrahimkvlci.ecommerce.auth.models.UserInfo;
 import com.ibrahimkvlci.ecommerce.auth.repositories.UserInfoRepository;
-
+import com.ibrahimkvlci.ecommerce.auth.services.UserInfoService;
 import com.ibrahimkvlci.ecommerce.auth.exceptions.AuthException;
 import lombok.RequiredArgsConstructor;
 

@@ -1,4 +1,4 @@
-package com.ibrahimkvlci.ecommerce.catalog.services;
+package com.ibrahimkvlci.ecommerce.catalog.services.impl;
 
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
@@ -20,7 +20,8 @@ import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchDTO;
 import com.ibrahimkvlci.ecommerce.catalog.dto.ProductSearchRequest;
 import com.ibrahimkvlci.ecommerce.catalog.mappers.ProductMapper;
 import com.ibrahimkvlci.ecommerce.catalog.models.ProductDocument;
-import com.ibrahimkvlci.ecommerce.catalog.repositories.CategoryRepository;
+import com.ibrahimkvlci.ecommerce.catalog.services.CategoryService;
+import com.ibrahimkvlci.ecommerce.catalog.services.SearchService;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.DataResult;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.Result;
 import com.ibrahimkvlci.ecommerce.catalog.utilities.results.SuccessDataResult;
