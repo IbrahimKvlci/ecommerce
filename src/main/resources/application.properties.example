@@ -61,3 +61,12 @@ cloudflare.r2.region=auto
 
 # Bucket Configurations
 bucket.image.base-url={YOUR_IMAGE_BASE_URL}
+
+# RabbitMQ Configuration
+spring.rabbitmq.host={YOUR_RABBITMQ_HOST_NAME}
+spring.rabbitmq.port={YOUR_RABBITMQ_PORT}
+spring.rabbitmq.username={YOUR_RABBITMQ_USERNAME}
+spring.rabbitmq.password={YOUR_RABBITMQ_PASSWORD}
+
+message-broker.domain-exchange=domain-exchange
+message-broker.customer-created=customer.created

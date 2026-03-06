@@ -14,6 +14,8 @@ import com.ibrahimkvlci.ecommerce.auth.client.CartClient;
 import com.ibrahimkvlci.ecommerce.auth.dto.CustomerDTO;
 import com.ibrahimkvlci.ecommerce.auth.dto.CustomerRequestDTO;
 import com.ibrahimkvlci.ecommerce.auth.exceptions.RegistrationException;
+import com.ibrahimkvlci.ecommerce.auth.infrastructure.adapters.RabbitMQUserEventPublisher;
+import com.ibrahimkvlci.ecommerce.auth.mappers.CustomerMapper;
 import com.ibrahimkvlci.ecommerce.auth.models.Customer;
 import com.ibrahimkvlci.ecommerce.auth.models.Role;
 import com.ibrahimkvlci.ecommerce.auth.models.redis.CustomerCode;
@@ -47,8 +49,9 @@ public class CustomerServiceImpl implements CustomerService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final UserInfoService userInfoService;
+    private final CustomerMapper customerMapper;
 
-    private final CartClient cartClient;
+    private final RabbitMQUserEventPublisher rabbitMQUserEventPublisher;
 
     @Override
     public DataResult<RegisterCustomerResponse> registerInitiate(RegisterCustomerRequest request) {
@@ -100,7 +103,8 @@ public class CustomerServiceImpl implements CustomerService {
 
         Customer saved = customerRepository.save(customer);
 
-        cartClient.createCart(saved.getId());
+        rabbitMQUserEventPublisher.publishCustomerCreated(customerMapper.toDTO(customer));
+
         customerCodeRepository.delete(customerCode);
         return new SuccessDataResult<>(
                 "Customer registered successfully",
