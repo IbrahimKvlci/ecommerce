@@ -1,72 +1,75 @@
-spring.application.name=ecommerce
+spring.application.name=${SPRING_APPLICATION_NAME:ecommerce}
 
 # PostgreSQL Database Configuration
-spring.datasource.url={YOUR_DATABASE_URL}
-spring.datasource.username={YOUR_DATABASE_USERNAME}
-spring.datasource.password={YOUR_DATABASE_PASSWORD}
-spring.datasource.driver-class-name=org.postgresql.Driver
+spring.datasource.url=${SPRING_DATASOURCE_URL:{YOUR_DATABASE_URL}}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME:{YOUR_DATABASE_USERNAME}}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:{YOUR_DATABASE_PASSWORD}}
+spring.datasource.driver-class-name=${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
 
 # JPA/Hibernate Configuration
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.database-platform=${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.PostgreSQLDialect}
+spring.jpa.hibernate.ddl-auto=${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+spring.jpa.show-sql=${SPRING_JPA_SHOW_SQL:true}
+spring.jpa.properties.hibernate.format_sql=${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL:true}
 
 # Connection Pool Configuration
-spring.datasource.hikari.maximum-pool-size=10
-spring.datasource.hikari.minimum-idle=5
-spring.datasource.hikari.connection-timeout=20000
+spring.datasource.hikari.maximum-pool-size=${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:10}
+spring.datasource.hikari.minimum-idle=${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:5}
+spring.datasource.hikari.connection-timeout=${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:20000}
 
 # Redis Configuration
-spring.data.redis.host={YOUR_REDIS_HOST}
-spring.data.redis.port={YOUR_REDIS_PORT}
+spring.data.redis.host=${SPRING_DATA_REDIS_HOST:{YOUR_REDIS_HOST}}
+spring.data.redis.port=${SPRING_DATA_REDIS_PORT:{YOUR_REDIS_PORT}}
 
 # JWT Configuration
-jwt.secret={YOUR_JWT_SECRET}
-jwt.expiration-time.access-token=1800000
-jwt.expiration-time.refresh-token=2592000000
+jwt.secret=${JWT_SECRET:{YOUR_JWT_SECRET}}
+jwt.expiration-time.access-token=${JWT_EXPIRATION_TIME_ACCESS_TOKEN:1800000}
+jwt.expiration-time.refresh-token=${JWT_EXPIRATION_TIME_REFRESH_TOKEN:2592000000}
 
 # Kuveyt Turk Payment Gateway Configuration
-kuveyt.turk.card.check.url=https://boatest.kuveytturk.com.tr/boa.virtualpos.services/Home/ThreeDModelPayGate
-kuveyt.turk.pay.url=https://boatest.kuveytturk.com.tr/boa.virtualpos.services/Home/ThreeDModelProvisionGate
+kuveyt.turk.card.check.url=${KUVEYT_TURK_CARD_CHECK_URL:https://boatest.kuveytturk.com.tr/boa.virtualpos.services/Home/ThreeDModelPayGate}
+kuveyt.turk.pay.url=${KUVEYT_TURK_PAY_URL:https://boatest.kuveytturk.com.tr/boa.virtualpos.services/Home/ThreeDModelProvisionGate}
 
 # Akbank Payment Configuration
-akbank.merchantUser={YOUR_MERCHANT_USER}
-akbank.merchantPassword={YOUR_MERCHANT_PASSWORD}
-akbank.secretKey={YOUR_SECRET_KEY}
-akbank.sale.url={YOUR_SALE_URL}
-akbank.securepay.url=https://virtualpospaymentgatewaypre.akbank.com/securepay
-akbank.okUrl={YOUR_OK_URL}
-akbank.failUrl={YOUR_FAIL_URL}
-akbank.lang=TR
+akbank.merchantUser=${AKBANK_MERCHANTUSER:{YOUR_MERCHANT_USER}}
+akbank.merchantPassword=${AKBANK_MERCHANTPASSWORD:{YOUR_MERCHANT_PASSWORD}}
+akbank.secretKey=${AKBANK_SECRETKEY:{YOUR_SECRET_KEY}}
+akbank.sale.url=${AKBANK_SALE_URL:{YOUR_SALE_URL}}
+akbank.securepay.url=${AKBANK_SECUREPAY_URL:https://virtualpospaymentgatewaypre.akbank.com/securepay}
+akbank.okUrl=${AKBANK_OKURL:{YOUR_OK_URL}}
+akbank.failUrl=${AKBANK_FAILURL:{YOUR_FAIL_URL}}
+akbank.lang=${AKBANK_LANG:TR}
 
 # Frontend Configuration
-frontend.url={YOUR_FRONTEND_URL}
+frontend.url=${FRONTEND_URL:{YOUR_FRONTEND_URL}}
 
 # Mail Configuration
-spring.mail.host={YOUR_MAIL_HOST}
-spring.mail.port={YOUR_MAIL_PORT}
-spring.mail.username={YOUR_MAIL_USERNAME}
-spring.mail.password={YOUR_MAIL_PASSWORD}
-spring.mail.from={YOUR_MAIL}
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.host=${SPRING_MAIL_HOST:{YOUR_MAIL_HOST}}
+spring.mail.port=${SPRING_MAIL_PORT:{YOUR_MAIL_PORT}}
+spring.mail.username=${SPRING_MAIL_USERNAME:{YOUR_MAIL_USERNAME}}
+spring.mail.password=${SPRING_MAIL_PASSWORD:{YOUR_MAIL_PASSWORD}}
+spring.mail.from=${SPRING_MAIL_FROM:{YOUR_MAIL}}
+spring.mail.properties.mail.smtp.auth=${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:true}
+spring.mail.properties.mail.smtp.starttls.enable=${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:true}
 
 # Cloudflare R2 Configurations
-cloudflare.r2.access-key={YOUR_ACCESS_KEY_ID}
-cloudflare.r2.secret-key={YOUR_SECRET_ACCESS_KEY}
-cloudflare.r2.endpoint=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
-cloudflare.r2.bucket={YOUR_BUCKET_NAME}
-cloudflare.r2.region=auto
+cloudflare.r2.access-key=${CLOUDFLARE_R2_ACCESS_KEY:{YOUR_ACCESS_KEY_ID}}
+cloudflare.r2.secret-key=${CLOUDFLARE_R2_SECRET_KEY:{YOUR_SECRET_ACCESS_KEY}}
+cloudflare.r2.endpoint=${CLOUDFLARE_R2_ENDPOINT:https://<ACCOUNT_ID>.r2.cloudflarestorage.com}
+cloudflare.r2.bucket=${CLOUDFLARE_R2_BUCKET:{YOUR_BUCKET_NAME}}
+cloudflare.r2.region=${CLOUDFLARE_R2_REGION:auto}
 
 # Bucket Configurations
-bucket.image.base-url={YOUR_IMAGE_BASE_URL}
+bucket.image.base-url=${BUCKET_IMAGE_BASE_URL:{YOUR_IMAGE_BASE_URL}}
+
+# Elasticsearch Configuration
+spring.opensearch.uris=${SPRING_OPENSEARCH_URIS:http://localhost:9200}
 
 # RabbitMQ Configuration
-spring.rabbitmq.host={YOUR_RABBITMQ_HOST_NAME}
-spring.rabbitmq.port={YOUR_RABBITMQ_PORT}
-spring.rabbitmq.username={YOUR_RABBITMQ_USERNAME}
-spring.rabbitmq.password={YOUR_RABBITMQ_PASSWORD}
+spring.rabbitmq.host=${SPRING_RABBITMQ_HOST:{YOUR_RABBITMQ_HOST_NAME}}
+spring.rabbitmq.port=${SPRING_RABBITMQ_PORT:{YOUR_RABBITMQ_PORT}}
+spring.rabbitmq.username=${SPRING_RABBITMQ_USERNAME:{YOUR_RABBITMQ_USERNAME}}
+spring.rabbitmq.password=${SPRING_RABBITMQ_PASSWORD:{YOUR_RABBITMQ_PASSWORD}}
 
-message-broker.domain-exchange=domain-exchange
-message-broker.customer-created=customer.created
+message-broker.domain-exchange=${MESSAGE_BROKER_DOMAIN_EXCHANGE:domain-exchange}
+message-broker.customer-created=${MESSAGE_BROKER_CUSTOMER_CREATED:customer.created}
