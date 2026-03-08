@@ -27,6 +27,13 @@ services:
       memlock:
         soft: -1
         hard: -1
+  opensearch-init:
+    image: curlimages/curl:latest
+    depends_on:
+      - opensearch-node
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: ["/bin/sh", "/scripts/init-opensearch.sh"]
   redis:
     image: redis:8.4-alpine
     ports: 

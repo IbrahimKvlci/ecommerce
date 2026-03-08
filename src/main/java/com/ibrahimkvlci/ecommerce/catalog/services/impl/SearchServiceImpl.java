@@ -196,7 +196,7 @@ public class SearchServiceImpl implements SearchService {
                         refreshUniqueKeywords();
                         return new SuccessResult("Product indexed successfully");
                 } catch (IOException e) {
-                        throw new RuntimeException("Ürün indeksleme sırasında hata oluştu", e);
+                        throw new RuntimeException(e.getMessage(), e);
                 }
         }
 

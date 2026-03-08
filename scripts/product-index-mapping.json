@@ -1,0 +1,86 @@
+{
+    "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 1,
+        "analysis": {
+            "analyzer": {
+                "default": {
+                    "type": "standard"
+                }
+            }
+        }
+    },
+    "mappings": {
+        "properties": {
+            "id": {
+                "type": "long"
+            },
+            "title": {
+                "type": "text",
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
+                    }
+                }
+            },
+            "description": {
+                "type": "text"
+            },
+            "brand": {
+                "properties": {
+                    "id": {
+                        "type": "long"
+                    },
+                    "name": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "category": {
+                "properties": {
+                    "ids": {
+                        "type": "long"
+                    },
+                    "names": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "featured": {
+                "type": "boolean"
+            },
+            "images": {
+                "type": "keyword"
+            },
+            "inventories": {
+                "type": "nested",
+                "properties": {
+                    "sellerId": {
+                        "type": "long"
+                    },
+                    "stock": {
+                        "type": "integer"
+                    },
+                    "price": {
+                        "type": "double"
+                    },
+                    "discountPrice": {
+                        "type": "double"
+                    }
+                }
+            },
+            "attributes": {
+                "type": "nested",
+                "properties": {
+                    "key": {
+                        "type": "keyword"
+                    },
+                    "value": {
+                        "type": "keyword"
+                    }
+                }
+            }
+        }
+    }
+}
