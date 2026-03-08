@@ -19,5 +19,4 @@ public interface SearchService {
 
     public DataResult<ProductDocument> getProductById(Long id);
 
-    public Result refreshUniqueKeywords();
 }

@@ -44,8 +44,6 @@ public class SearchServiceImpl implements SearchService {
 
         private final ProductMapper productMapper;
 
-        private final JdbcTemplate jdbcTemplate;
-
         @Override
         public DataResult<ProductSearchDTO> searchProducts(ProductSearchRequest productSearchRequest,
                         Pageable pageable) {
@@ -193,7 +191,6 @@ public class SearchServiceImpl implements SearchService {
                                         .index("products")
                                         .id(productDocument.getId().toString())
                                         .document(productDocument));
-                        refreshUniqueKeywords();
                         return new SuccessResult("Product indexed successfully");
                 } catch (IOException e) {
                         throw new RuntimeException(e.getMessage(), e);
@@ -208,7 +205,6 @@ public class SearchServiceImpl implements SearchService {
                                         .id(productDocument.getId().toString())
                                         .doc(productDocument),
                                         ProductDocument.class);
-                        refreshUniqueKeywords();
                 } catch (IOException e) {
                         throw new RuntimeException("Ürün güncelleme sırasında hata oluştu", e);
                 }
@@ -230,13 +226,6 @@ public class SearchServiceImpl implements SearchService {
                 } catch (IOException e) {
                         throw new RuntimeException("Ürün alma sırasında hata oluştu", e);
                 }
-        }
-
-        @Override
-        public Result refreshUniqueKeywords() {
-                String sql = "REFRESH MATERIALIZED VIEW unique_keywords";
-                jdbcTemplate.execute(sql);
-                return new SuccessResult("Unique keywords refreshed successfully");
         }
 
 }
